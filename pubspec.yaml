@@ -1,7 +1,6 @@
 name: flutter_zoom_drawer
 description: A Flutter package with custom implementation of the Android Drawer
 version: 0.0.1
-author: medyas
 homepage: https://github.com/medyas/flutter_zoom_drawer
 
 environment:
