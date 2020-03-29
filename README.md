@@ -2,7 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/flutter_zoom_drawer.svg)](https://pub.dev/packages/flutter_zoom_drawer) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 
-A Flutter package with custom implementation of the Drawer
+A Flutter package with custom implementation of the Side Menu (Drawer)
 
 ## Getting Started
 
@@ -18,7 +18,7 @@ dependencies:
 * Simple sliding drawer
 * Sliding drawer with rotation
 * Sliding drawer with rotation and shadows
-* Support both LTR & RTL
+* Support for both LTR & RTL
 
 
 ## Documentation
