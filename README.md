@@ -16,6 +16,7 @@ dependencies:
 ## Features
 
 * Simple sliding drawer
+* Sliding drawer with shadows
 * Sliding drawer with rotation
 * Sliding drawer with rotation and shadows
 * Support for both LTR & RTL
@@ -72,15 +73,73 @@ To get access to the drawer, and be able to control it, there are 2 ways:
 
 ![Example app Demo](https://drive.google.com/uc?export=view&id=1xc6XwVVtpl0RK9IJEdheagM4d1ychQms)
 
+![Example RTL Demo](https://drive.google.com/uc?export=view&id=1YLC60zJ6N637PB6IQDo4TIXY1qGSJ2ET)
+
 * Drawer Sliding
+
+```dart
+    ZoomDrawer(
+      controller: ZoomDrawerController,
+      menuScreen: MENU_SCREEN,
+      mainScreen: MAIN_SCREEN,
+      borderRadius: 24.0,
+      showShadow: false,
+      angle: 0.0,
+      backgroundColor: Colors.grey[300],
+      slideWidth: MediaQuery.of(context).size.width*(ZoomDrawer.isRTL()? .45: 0.65),
+    )
+```
 
 ![Drawer Sliding](https://drive.google.com/uc?export=view&id=1axuT4Geh08s_QjmED9VTZiwZ9dC_C17C)
 
+* Drawer Sliding with shadow
+
+```dart
+    ZoomDrawer(
+      controller: ZoomDrawerController,
+      menuScreen: MENU_SCREEN,
+      mainScreen: MAIN_SCREEN,
+      borderRadius: 24.0,
+      showShadow: true,
+      angle: 0.0,
+      backgroundColor: Colors.grey[300],
+      slideWidth: MediaQuery.of(context).size.width*(ZoomDrawer.isRTL()? .45: 0.65),
+    )
+```
+
+![Drawer Sliding](https://drive.google.com/uc?export=view&id=1VNkUgtj_bhyYgWJ_Bs3yUpVNUJ30ToPL)
+
 * Drawer Sliding with rotation
+
+```dart
+    ZoomDrawer(
+      controller: ZoomDrawerController,
+      menuScreen: MENU_SCREEN,
+      mainScreen: MAIN_SCREEN,
+      borderRadius: 24.0,
+      showShadow: false,
+      angle: -12.0,
+      backgroundColor: Colors.grey[300],
+      slideWidth: MediaQuery.of(context).size.width*(ZoomDrawer.isRTL()? .45: 0.65),
+    )
+```
 
 ![Drawer Sliding with rotation](https://drive.google.com/uc?export=view&id=1xVYoZHnS9BFi5KicZtP3DY1vEiwZ4FyH)
 
 * Drawer Sliding with rotation and shadows
+
+```dart
+    ZoomDrawer(
+      controller: ZoomDrawerController,
+      menuScreen: MENU_SCREEN,
+      mainScreen: MAIN_SCREEN,
+      borderRadius: 24.0,
+      showShadow: true,
+      angle: -12.0,
+      backgroundColor: Colors.grey[300],
+      slideWidth: MediaQuery.of(context).size.width*(ZoomDrawer.isRTL()? .45: 0.65),
+    )
+```
 
 ![Drawer Sliding with rotation and shadows](https://drive.google.com/uc?export=view&id=1b-U25tIY36ka75Ju2jQT9BIUVHv-oNe6)
 

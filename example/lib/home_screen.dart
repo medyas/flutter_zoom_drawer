@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:example/menu_page.dart';
 import 'package:example/page_structure.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,14 +7,13 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-
-  static const List<MenuItem> MAIN_MENU = [
-    MenuItem("Payment", Icons.payment, 0),
-    MenuItem("Promos", Icons.card_giftcard, 1),
-    MenuItem("Notification", Icons.notifications, 2),
-    MenuItem("Help", Icons.help, 3),
-    MenuItem("About Us", Icons.info_outline, 4),
-    MenuItem("Rate Us", Icons.star_border, 5),
+  static List<MenuItem> mainMenu = [
+    MenuItem(tr("payment"), Icons.payment, 0),
+    MenuItem(tr("promos"), Icons.card_giftcard, 1),
+    MenuItem(tr("notifications"), Icons.notifications, 2),
+    MenuItem(tr("help"), Icons.help, 3),
+    MenuItem(tr("about_us"), Icons.info_outline, 4),
+    MenuItem(tr("rate_us"), Icons.star_border, 5),
   ];
 
   @override
@@ -30,16 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return ZoomDrawer(
       controller: _drawerController,
       menuScreen: MenuScreen(
-        HomeScreen.MAIN_MENU,
+        HomeScreen.mainMenu,
         callback: _updatePage,
         current: _currentPage,
       ),
       mainScreen: MainScreen(),
       borderRadius: 24.0,
-      showShadow: false,
+      showShadow: true,
       angle: 0.0,
-      backgroundColor: Colors.grey[300],
-      slideWidth: MediaQuery.of(context).size.width*.65,
+      slideWidth:
+          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
     );
   }
 
@@ -60,12 +60,13 @@ class _MainScreenState extends State<MainScreen> {
     return Selector<MenuProvider, int>(
       selector: (_, provider) => provider.currentPage,
       builder: (_, index, __) => PageStructure(
-        title: "${HomeScreen.MAIN_MENU[index].title} Page",
+        title: "${HomeScreen.mainMenu[index].title} ${tr("page")}",
         backgroundColor: Colors.white,
         child: Container(
           color: Colors.grey[300],
           child: Center(
-            child: Text("Current Page: ${HomeScreen.MAIN_MENU[index].title}"),
+            child: Text(
+                "${tr("current")}: ${HomeScreen.mainMenu[index].title}"),
           ),
         ),
       ),

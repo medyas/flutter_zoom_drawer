@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:example/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -50,7 +50,7 @@ class _MenuScreenState extends State<MenuScreen> {
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: ZoomDrawer.isRTL()? CrossAxisAlignment.end: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Spacer(),
               Padding(
@@ -69,7 +69,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 padding: const EdgeInsets.only(
                     bottom: 36.0, left: 24.0, right: 24.0),
                 child: Text(
-                  "Adan Balina",
+                  tr("name"),
                   style: TextStyle(
                     fontSize: 22,
                     color: Colors.white,
@@ -103,7 +103,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Logout",
+                      tr("logout"),
                       style: TextStyle(fontSize: 18),
                     ),
                   ),

@@ -151,7 +151,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ///
   /// * [slide] is the sliding amount of the drawer
   ///
-  Widget zoomAndSlideContent(Widget container,
+  Widget _zoomAndSlideContent(Widget container,
       {double angle, double scale, double slide = 0}) {
     var slidePercent, scalePercent;
 
@@ -222,6 +222,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   Widget build(BuildContext context) {
+    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery
+        .of(context)
+        .size
+        .width * .1 : 15.0;
+
     return Stack(
       children: [
         GestureDetector(
@@ -236,11 +241,15 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           },
         ),
         if (widget.showShadow) ...[
+
           /// Displaying the first shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) => zoomAndSlideContent(w,
-                angle: widget.angle - 8, scale: .9, slide: 20),
+            builder: (_, w) =>
+                _zoomAndSlideContent(w,
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
+                    scale: .9,
+                    slide: slidePercent * 2),
             child: Container(
               color: widget.backgroundColor.withAlpha(31),
             ),
@@ -249,8 +258,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           /// Displaying the second shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) => zoomAndSlideContent(w,
-                angle: widget.angle - 4.0, scale: .95, slide: 10),
+            builder: (_, w) =>
+                _zoomAndSlideContent(w,
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
+                    scale: .95,
+                    slide: slidePercent),
             child: Container(
               color: widget.backgroundColor,
             ),
@@ -260,7 +272,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Displaying the main screen
         AnimatedBuilder(
           animation: _animationController,
-          builder: (_, w) => zoomAndSlideContent(w),
+          builder: (_, w) => _zoomAndSlideContent(w),
           child: widget.mainScreen,
         ),
       ],
