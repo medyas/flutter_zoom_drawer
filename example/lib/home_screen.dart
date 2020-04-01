@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       mainScreen: MainScreen(),
       borderRadius: 24.0,
       showShadow: true,
-      angle: 0.0,
+      angle: -12.0,
       slideWidth:
           MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
     );

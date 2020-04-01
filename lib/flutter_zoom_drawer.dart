@@ -185,7 +185,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     final cornerRadius = widget.borderRadius * percentOpen;
 
     /// calculated rotation amount based on the provided angle and animation value
-    final rotationAngle = ((angle ?? widget.angle) * pi / 180) * percentOpen;
+    final rotationAngle = (((angle ?? widget.angle) * pi * _rtlSlide) / 180) * percentOpen;
 
     return Transform(
       transform: Matrix4.translationValues(slideAmount, 0.0, 0.0)
@@ -222,7 +222,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   Widget build(BuildContext context) {
-    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery
+    final slidePercent =
+    ZoomDrawer.isRTL() ? MediaQuery
         .of(context)
         .size
         .width * .1 : 15.0;

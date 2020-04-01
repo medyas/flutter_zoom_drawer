@@ -1,3 +1,7 @@
+# [1.0.1+1]
+ 
+* Fixed RTL rotation bug 
+
 # [1.0.1] 
 
 * Added Sliding with shadow.
