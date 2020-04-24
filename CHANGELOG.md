@@ -1,3 +1,7 @@
+# [1.0.2]
+
+* Added `isOpen` method to determine the status of the drawer
+
 # [1.0.1+1]
  
 * Fixed RTL rotation bug 

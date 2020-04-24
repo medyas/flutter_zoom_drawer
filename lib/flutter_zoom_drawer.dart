@@ -13,6 +13,13 @@ class ZoomDrawerController {
 
   /// callback function to toggle the drawer
   Function toggle;
+
+  /// callback function to determine the status of the drawer
+  Function isOpen;
+
+  /// callback function to get the current drawer status
+  /// opening, closing, open, closed
+//  Function drawerStatus;
 }
 
 class ZoomDrawer extends StatefulWidget {
@@ -78,9 +85,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   final bool _rtl = ZoomDrawer.isRTL();
 
   AnimationController _animationController;
-  MenuState _state = MenuState.closed;
+  DrawerState _state = DrawerState.closed;
 
-  double get percentOpen => _animationController.value;
+  double get _percentOpen => _animationController.value;
 
   /// Open drawer
   open() {
@@ -94,12 +101,19 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Toggle drawer
   toggle() {
-    if (_state == MenuState.open) {
+    if (_state == DrawerState.open) {
       close();
-    } else if (_state == MenuState.closed) {
+    } else if (_state == DrawerState.closed) {
       open();
     }
   }
+
+  /// check whether drawer is open
+  bool isOpen() =>
+      _state == DrawerState.open /* || _state == DrawerState.opening*/;
+
+  /// Drawer status
+//  DrawerState drawerStatus() => _state;
 
   @override
   void initState() {
@@ -112,16 +126,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       ..addStatusListener((AnimationStatus status) {
         switch (status) {
           case AnimationStatus.forward:
-            _state = MenuState.opening;
+            _state = DrawerState.opening;
             break;
           case AnimationStatus.reverse:
-            _state = MenuState.closing;
+            _state = DrawerState.closing;
             break;
           case AnimationStatus.completed:
-            _state = MenuState.open;
+            _state = DrawerState.open;
             break;
           case AnimationStatus.dismissed:
-            _state = MenuState.closed;
+            _state = DrawerState.closed;
             break;
         }
       });
@@ -131,6 +145,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       widget.controller.open = open;
       widget.controller.close = close;
       widget.controller.toggle = toggle;
+      widget.controller.isOpen = isOpen;
+//      widget.controller.drawerStatus = drawerStatus;
     }
   }
 
@@ -157,21 +173,21 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     /// determine current slide percent based on the MenuStatus
     switch (_state) {
-      case MenuState.closed:
+      case DrawerState.closed:
         slidePercent = 0.0;
         scalePercent = 0.0;
         break;
-      case MenuState.open:
+      case DrawerState.open:
         slidePercent = 1.0;
         scalePercent = 1.0;
         break;
-      case MenuState.opening:
-        slidePercent = _slideOutCurve.transform(percentOpen);
-        scalePercent = _scaleDownCurve.transform(percentOpen);
+      case DrawerState.opening:
+        slidePercent = _slideOutCurve.transform(_percentOpen);
+        scalePercent = _scaleDownCurve.transform(_percentOpen);
         break;
-      case MenuState.closing:
-        slidePercent = _slideInCurve.transform(percentOpen);
-        scalePercent = _scaleUpCurve.transform(percentOpen);
+      case DrawerState.closing:
+        slidePercent = _slideInCurve.transform(_percentOpen);
+        scalePercent = _scaleUpCurve.transform(_percentOpen);
         break;
     }
 
@@ -182,10 +198,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     final contentScale = (scale ?? 1.0) - (0.2 * scalePercent);
 
     /// calculated radius based on the provided radius and animation value
-    final cornerRadius = widget.borderRadius * percentOpen;
+    final cornerRadius = widget.borderRadius * _percentOpen;
 
     /// calculated rotation amount based on the provided angle and animation value
-    final rotationAngle = (((angle ?? widget.angle) * pi * _rtlSlide) / 180) * percentOpen;
+    final rotationAngle =
+        (((angle ?? widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
 
     return Transform(
       transform: Matrix4.translationValues(slideAmount, 0.0, 0.0)
@@ -282,4 +299,4 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 }
 
 /// Drawer State enum
-enum MenuState { opening, closing, open, closed }
+enum DrawerState { opening, closing, open, closed }
