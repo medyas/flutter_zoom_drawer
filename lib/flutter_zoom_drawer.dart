@@ -240,10 +240,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   @override
   Widget build(BuildContext context) {
     final slidePercent =
-    ZoomDrawer.isRTL() ? MediaQuery
-        .of(context)
-        .size
-        .width * .1 : 15.0;
+        ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
 
     return Stack(
       children: [
@@ -259,15 +256,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           },
         ),
         if (widget.showShadow) ...[
-
           /// Displaying the first shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
-                    scale: .9,
-                    slide: slidePercent * 2),
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
+                scale: .9,
+                slide: slidePercent * 2),
             child: Container(
               color: widget.backgroundColor.withAlpha(31),
             ),
@@ -276,11 +271,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           /// Displaying the second shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
-                    scale: .95,
-                    slide: slidePercent),
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
+                scale: .95,
+                slide: slidePercent),
             child: Container(
               color: widget.backgroundColor,
             ),
