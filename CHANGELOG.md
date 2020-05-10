@@ -1,3 +1,7 @@
+# [1.0.3]
+
+* Added the ability to customize the open and close `curve` of the drawer
+
 # [1.0.2]
 
 * Added `isOpen` method to determine the status of the drawer

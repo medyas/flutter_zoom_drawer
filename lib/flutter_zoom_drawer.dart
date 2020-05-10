@@ -32,6 +32,8 @@ class ZoomDrawer extends StatefulWidget {
     this.angle = -12.0,
     this.backgroundColor = Colors.white,
     this.showShadow = false,
+    this.openCurve,
+    this.closeCurve,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// controller to have access to the open/close/toggle function of the drawer
@@ -58,6 +60,12 @@ class ZoomDrawer extends StatefulWidget {
   /// Boolean, whether to show the drawer shadows - defaults to false
   final bool showShadow;
 
+  /// Drawer slide out curve
+  final Curve openCurve;
+
+  /// Drawer slide in curve
+  final Curve closeCurve;
+
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
 
@@ -77,7 +85,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   final Curve _scaleDownCurve = Interval(0.0, 0.3, curve: Curves.easeOut);
   final Curve _scaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
+  final Curve _slideInCurve =
+      Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
 
   /// check the slide direction
   final int _rtlSlide = ZoomDrawer.isRTL() ? -1 : 1;
@@ -182,11 +191,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         scalePercent = 1.0;
         break;
       case DrawerState.opening:
-        slidePercent = _slideOutCurve.transform(_percentOpen);
+        slidePercent =
+            (widget.openCurve ?? _slideOutCurve).transform(_percentOpen);
         scalePercent = _scaleDownCurve.transform(_percentOpen);
         break;
       case DrawerState.closing:
-        slidePercent = _slideInCurve.transform(_percentOpen);
+        slidePercent =
+            (widget.closeCurve ?? _slideInCurve).transform(_percentOpen);
         scalePercent = _scaleUpCurve.transform(_percentOpen);
         break;
     }

@@ -34,6 +34,8 @@ dependencies:
       angle: -12.0,
       backgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width*.65,
+      openCurve: Curves.fastOutSlowIn,
+      closeCurve: Curves.bounceIn,
     )
 ```
 
@@ -47,6 +49,8 @@ dependencies:
 | `angle`            | `double`               |    No     | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0   |
 | `backgroundColor`  | `Color`                |    No     | Background color of the drawer shadows - defaults to white                  |
 | `showShadow`       | `bool`                 |    No     | Boolean, whether to show the drawer shadows - defaults to false             |
+| `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                  |
+| `closeCurve`       | `Curve`                |    No     | close animation curve - defaults to `Curves.easeOut`             |
 
 
 ### Controlling the drawer
