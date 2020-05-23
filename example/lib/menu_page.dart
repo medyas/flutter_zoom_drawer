@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:example/home_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,7 +34,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final TextStyle androidStyle = const TextStyle(
         fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white);
     final TextStyle iosStyle = const TextStyle(color: Colors.white);
-    final style = Platform.isAndroid ? androidStyle : iosStyle;
+    final style = kIsWeb? androidStyle: Platform.isAndroid ? androidStyle : iosStyle;
 
     return Scaffold(
       body: Container(

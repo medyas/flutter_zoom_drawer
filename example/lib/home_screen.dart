@@ -14,7 +14,6 @@ class HomeScreen extends StatefulWidget {
     MenuItem(tr("notifications"), Icons.notifications, 2),
     MenuItem(tr("help"), Icons.help, 3),
     MenuItem(tr("about_us"), Icons.info_outline, 4),
-    MenuItem(tr("rate_us"), Icons.star_border, 5),
   ];
 
   @override
@@ -60,20 +59,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return Selector<MenuProvider, int>(
-      selector: (_, provider) => provider.currentPage,
-      builder: (_, index, __) => PageStructure(
-        title: "${HomeScreen.mainMenu[index].title} ${tr("page")}",
-        backgroundColor: Colors.white,
-        child: Container(
-          color: Colors.grey[300],
-          child: Center(
-            child: Text(
-                "${tr("current")}: ${HomeScreen.mainMenu[index].title}"),
-          ),
-        ),
-      ),
-    );
+    return PageStructure();
   }
 }
 

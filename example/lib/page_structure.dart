@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'dart:math' show pi;
 
+import 'package:easy_localization/easy_localization.dart';
+import 'package:example/home_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:provider/provider.dart';
 
 class PageStructure extends StatelessWidget {
   final String title;
@@ -15,8 +19,8 @@ class PageStructure extends StatelessWidget {
 
   const PageStructure({
     Key key,
-    @required this.title,
-    @required this.child,
+    this.title,
+    this.child,
     this.actions,
     this.backgroundColor,
     this.elevation,
@@ -25,14 +29,27 @@ class PageStructure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final angle = ZoomDrawer.isRTL() ? 180 * pi / 180 : 0.0;
+    final _currentPage =
+        context.select<MenuProvider, int>((provider) => provider.currentPage);
+    final container = Container(
+      color: Colors.grey[300],
+      child: Center(
+        child: Text(
+            "${tr("current")}: ${HomeScreen.mainMenu[_currentPage].title}"),
+      ),
+    );
+    final color = Theme
+        .of(context)
+        .accentColor;
+    final style = TextStyle(color: color);
 
     return PlatformScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       appBar: PlatformAppBar(
         automaticallyImplyLeading: false,
         android: (_) => MaterialAppBarData(elevation: elevation),
         title: PlatformText(
-          title,
+          HomeScreen.mainMenu[_currentPage].title,
         ),
         leading: Transform.rotate(
           angle: angle,
@@ -47,11 +64,33 @@ class PageStructure extends StatelessWidget {
         ),
         trailingActions: actions,
       ),
-      body: Platform.isAndroid
-          ? child
-          : SafeArea(
-              child: child,
-            ),
+      bottomNavBar: PlatformNavBar(
+        currentIndex: _currentPage,
+        itemChanged: (index) =>
+            Provider.of<MenuProvider>(context, listen: false)
+                .updateCurrentPage(index),
+        items: HomeScreen.mainMenu
+            .map(
+              (item) => BottomNavigationBarItem(
+                title: Text(
+                  item.title,
+                  style: style,
+                ),
+                icon: Icon(
+                  item.icon,
+                  color: color,
+                ),
+              ),
+            )
+            .toList(),
+      ),
+      body: kIsWeb
+          ? container
+          : Platform.isAndroid
+              ? container
+              : SafeArea(
+                  child: container,
+                ),
     );
   }
 }
