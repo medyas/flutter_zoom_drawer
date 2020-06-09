@@ -59,7 +59,15 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return PageStructure();
+    final rtl = ZoomDrawer.isRTL();
+    return GestureDetector(
+      child: PageStructure(),
+      onPanUpdate: (details) {
+        if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
+          ZoomDrawer.of(context).toggle();
+        }
+      },
+    );
   }
 }
 
