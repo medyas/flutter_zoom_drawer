@@ -1,3 +1,7 @@
+# [1.0.4]
+
+* Added `ValueNotifier<DrawerState>` to get updates on the Drawer current state
+
 # [1.0.3]
 
 * Added the ability to customize the open and close `curve` of the drawer

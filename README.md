@@ -65,6 +65,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
     _drawerController.close();
     _drawerController.toggle();
     _drawerController.isOpen();
+    _drawerController.stateNotifier;
 ```
 
 * Using the static method inside ancestor widgets to get access to the `ZoomDrawer`.
@@ -73,6 +74,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
   ZoomDrawer.of(context).close();
   ZoomDrawer.of(context).toggle();
   ZoomDrawer.of(context).isOpen();
+  ZoomDrawer.of(context).stateNotifier;
 ```
 
 ## Screens

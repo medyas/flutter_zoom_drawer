@@ -60,13 +60,22 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final rtl = ZoomDrawer.isRTL();
-    return GestureDetector(
-      child: PageStructure(),
-      onPanUpdate: (details) {
-        if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
-          ZoomDrawer.of(context).toggle();
-        }
+    return ValueListenableBuilder<DrawerState>(
+      valueListenable: ZoomDrawer.of(context).stateNotifier,
+      builder: (context, state, child) {
+        return AbsorbPointer(
+          absorbing: state != DrawerState.closed,
+          child: child,
+        );
       },
+      child: GestureDetector(
+        child: PageStructure(),
+        onPanUpdate: (details) {
+          if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
+            ZoomDrawer.of(context).toggle();
+          }
+        },
+      ),
     );
   }
 }
