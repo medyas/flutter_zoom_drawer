@@ -1,3 +1,7 @@
+# [1.0.4+1]
+
+* Fixed animation controller dispose issue 
+
 # [1.0.4]
 
 * Added `ValueNotifier<DrawerState>` to get updates on the Drawer current state

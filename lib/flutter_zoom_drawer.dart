@@ -87,7 +87,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   final Curve _scaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideInCurve =
-  Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
+      Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
 
   /// check the slide direction
   final int _rtlSlide = ZoomDrawer.isRTL() ? -1 : 1;
@@ -166,15 +166,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
-
   _updateStatusNotifier() {
     stateNotifier.value = _state;
   }
 
   @override
   void dispose() {
-    super.dispose();
     _animationController.dispose();
+    super.dispose();
   }
 
   /// Build the widget based on the animation value
@@ -263,10 +262,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   @override
   Widget build(BuildContext context) {
     final slidePercent =
-    ZoomDrawer.isRTL() ? MediaQuery
-        .of(context)
-        .size
-        .width * .1 : 15.0;
+        ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
 
     return Stack(
       children: [
@@ -282,15 +278,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           },
         ),
         if (widget.showShadow) ...[
-
           /// Displaying the first shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
-                    scale: .9,
-                    slide: slidePercent * 2),
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
+                scale: .9,
+                slide: slidePercent * 2),
             child: Container(
               color: widget.backgroundColor.withAlpha(31),
             ),
@@ -299,11 +293,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           /// Displaying the second shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
-                    scale: .95,
-                    slide: slidePercent),
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
+                scale: .95,
+                slide: slidePercent),
             child: Container(
               color: widget.backgroundColor,
             ),
