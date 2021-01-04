@@ -42,8 +42,8 @@ dependencies:
 | Parameters         | Value                  | Required  | Docs                                                                        |
 | ------------------ |----------------------- | :-------: | --------------------------------------------------------------------------- |
 | `controller`       | `ZoomDrawerController` |    No     | Controller to have access to the open/close/toggle function of the drawer   |
-| `mainScreen`       | `Widget`               |   Yes     | Screen containing the menu/bottom screen                                    |
-| `menuScreen`       | `Widget`               |   Yes     | Screen containing the main content to display                               |
+| `mainScreen`       | `Widget`               |   Yes     | Screen containing the main content to display                               |
+| `menuScreen`       | `Widget`               |   Yes     | Screen containing the menu/bottom screen                                    |
 | `slideWidth`       | `double`               |    No     | Sliding width of the drawer - defaults to 275.0                             |
 | `borderRadius`     | `double`               |    No     | Border radius of the slided content - defaults to 16.0                      |
 | `angle`            | `double`               |    No     | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0   |
