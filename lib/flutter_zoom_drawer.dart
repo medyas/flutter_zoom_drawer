@@ -26,6 +26,7 @@ class ZoomDrawerController {
 
 class ZoomDrawer extends StatefulWidget {
   ZoomDrawer({
+    this.type = 'default',
     this.controller,
     @required this.menuScreen,
     @required this.mainScreen,
@@ -38,6 +39,9 @@ class ZoomDrawer extends StatefulWidget {
     this.closeCurve,
     this.duration,
   }) : assert(angle <= 0.0 && angle >= -30.0);
+
+  // Layout style
+  final String type;
 
   /// controller to have access to the open/close/toggle function of the drawer
   final ZoomDrawerController controller;
@@ -335,11 +339,71 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
+  Widget renderStyle2() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double slide = rightSlide * _animationController.value;
+        double scale = 1 - (_animationController.value * 0.3);
+
+        double left = (1 - _animationController.value) * rightSlide;
+
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.blueAccent,
+              body: Transform.translate(
+                offset: Offset(0, 0),
+                child: widget.menuScreen,
+              ),
+            ),
+            Transform(
+              transform: Matrix4.identity()..translate(slide),
+              alignment: Alignment.center,
+              child: widget.mainScreen,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget renderStyle3() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double slide = rightSlide * _animationController.value;
+        double left = (1 - _animationController.value) * rightSlide;
+
+        return Stack(
+          children: [
+            Transform(
+              transform: Matrix4.identity()..translate(slide),
+              alignment: Alignment.center,
+              child: widget.mainScreen,
+            ),
+            Transform.translate(
+              offset: Offset(-left, 0),
+              child: Container(color: Colors.blueAccent, width: rightSlide, child: widget.menuScreen),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget renderLayout() {
-    String type = 'default';
-    switch (type) {
+    switch (widget.type) {
       case 'style1':
         return renderStyle1();
+        break;
+      case 'style2':
+        return renderStyle2();
+        break;
+      case 'style3':
+        return renderStyle3();
         break;
       default:
         return renderDefault();
