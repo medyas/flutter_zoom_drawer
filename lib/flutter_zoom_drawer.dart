@@ -2,8 +2,9 @@ library flutter_zoom_drawer;
 
 import 'dart:math' show pi;
 import 'dart:ui' as ui show window;
-import 'package:flutter/material.dart';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class ZoomDrawerController {
   /// callback function to open the drawer
@@ -258,10 +259,96 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
       )
   * */
 
+  Widget renderDefault() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double slide = rightSlide * _animationController.value;
+        double scale = 1 - (_animationController.value * 0.3);
+
+        double left = (1 - _animationController.value) * rightSlide;
+
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.blueAccent,
+              body: Transform.translate(
+                offset: Offset(0, 0),
+                child: widget.menuScreen,
+              ),
+            ),
+            Transform(
+              transform: Matrix4.identity()
+                ..translate(slide)
+                ..scale(scale),
+              alignment: Alignment.center,
+              child: widget.mainScreen,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget renderStyle1() {
+    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
+    return Stack(
+      children: [
+        widget.menuScreen,
+        if (widget.showShadow) ...[
+          /// Displaying the first shadow
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8, scale: .9, slide: slidePercent * 2),
+            child: Container(
+              color: widget.backgroundColor.withAlpha(31),
+            ),
+          ),
+
+          /// Displaying the second shadow
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (_, w) => _zoomAndSlideContent(w,
+                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0, scale: .95, slide: slidePercent),
+            child: Container(
+              color: widget.backgroundColor,
+            ),
+          )
+        ],
+
+        /// Displaying the main screen
+        AnimatedBuilder(
+          animation: _animationController,
+          builder: (_, w) => _zoomAndSlideContent(w),
+          child: GestureDetector(
+            child: widget.mainScreen,
+            onTap: () {
+              if (_state == DrawerState.open) {
+                toggle();
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget renderLayout() {
+    String type = 'default';
+    switch (type) {
+      case 'style1':
+        return renderStyle1();
+        break;
+      default:
+        return renderDefault();
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
-
     return GestureDetector(
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
@@ -269,46 +356,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
           toggle();
         }
       },
-      child: Stack(
-        children: [
-          widget.menuScreen,
-          if (widget.showShadow) ...[
-            /// Displaying the first shadow
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (_, w) => _zoomAndSlideContent(w,
-                  angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8, scale: .9, slide: slidePercent * 2),
-              child: Container(
-                color: widget.backgroundColor.withAlpha(31),
-              ),
-            ),
-
-            /// Displaying the second shadow
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (_, w) => _zoomAndSlideContent(w,
-                  angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0, scale: .95, slide: slidePercent),
-              child: Container(
-                color: widget.backgroundColor,
-              ),
-            )
-          ],
-
-          /// Displaying the main screen
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (_, w) => _zoomAndSlideContent(w),
-            child: GestureDetector(
-              child: widget.mainScreen,
-              onTap: () {
-                if (_state == DrawerState.open) {
-                  toggle();
-                }
-              },
-            ),
-          ),
-        ],
-      ),
+      child: renderLayout(),
     );
   }
 }
