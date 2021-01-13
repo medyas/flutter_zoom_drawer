@@ -394,6 +394,58 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
+  Widget renderStyle4() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        // double slide = rightSlide * _animationController.value;
+        double left = (1 - _animationController.value) * rightSlide;
+
+        return Stack(
+          children: [
+            widget.mainScreen,
+            Transform.translate(
+              offset: Offset(-left, 0),
+              child: Container(color: Colors.blueAccent, width: rightSlide, child: widget.menuScreen),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget renderStyle5() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double slide = rightSlide * _animationController.value;
+        double scale = 1 - (_animationController.value * 0.3);
+        double top = _animationController.value * 200;
+
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.blueAccent,
+              body: Transform.translate(
+                offset: Offset(0, 0),
+                child: widget.menuScreen,
+              ),
+            ),
+            Transform(
+              transform: Matrix4.identity()
+                ..translate(slide, top)
+                ..scale(scale),
+              alignment: Alignment.center,
+              child: widget.mainScreen,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget renderLayout() {
     switch (widget.type) {
       case 'style1':
@@ -404,6 +456,12 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         break;
       case 'style3':
         return renderStyle3();
+        break;
+      case 'style4':
+        return renderStyle4();
+        break;
+      case 'style5':
+        return renderStyle5();
         break;
       default:
         return renderDefault();
