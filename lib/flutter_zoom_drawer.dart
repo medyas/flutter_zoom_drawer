@@ -111,6 +111,8 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     _animationController.reverse();
   }
 
+  AnimationController get animationController => _animationController;
+
   /// Toggle drawer
   toggle() {
     if (_state == DrawerState.open) {
