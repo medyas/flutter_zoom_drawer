@@ -38,10 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: 24.0,
 //      showShadow: true,
       angle: 0.0,
-      slideWidth:
-          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
-      openCurve: Curves.fastOutSlowIn,
-      closeCurve: Curves.bounceIn,
+      slideWidth: MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
+      // openCurve: Curves.fastOutSlowIn,
+      // closeCurve: Curves.bounceIn,
     );
   }
 
