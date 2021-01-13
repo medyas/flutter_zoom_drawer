@@ -35,6 +35,7 @@ class ZoomDrawer extends StatefulWidget {
     this.showShadow = false,
     this.openCurve,
     this.closeCurve,
+    this.duration,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// controller to have access to the open/close/toggle function of the drawer
@@ -66,6 +67,9 @@ class ZoomDrawer extends StatefulWidget {
 
   /// Drawer slide in curve
   final Curve closeCurve;
+
+  /// Drawer Duration
+  final Duration duration;
 
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
@@ -134,7 +138,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     /// Initialize the animation controller
     /// add status listener to update the menuStatus
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500))
+        vsync: this, duration: widget.duration is Duration ? widget.duration : Duration(milliseconds: 250))
       ..addStatusListener((AnimationStatus status) {
         switch (status) {
           case AnimationStatus.forward:
