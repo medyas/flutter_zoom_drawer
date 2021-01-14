@@ -446,6 +446,43 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
+  Widget renderStyle6() {
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double slide = rightSlide * _animationController.value;
+        double scale = 1 - (_animationController.value * 0.3);
+        double top = _animationController.value * 200;
+        double x = _animationController.value * (rightSlide / 2);
+
+        double rotate = _animationController.value * (pi / 4);
+
+        print(rotate);
+
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.blueAccent,
+              body: Transform.translate(
+                offset: Offset(0, 0),
+                child: widget.menuScreen,
+              ),
+            ),
+            Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.0009)
+                ..translate(x)
+                ..rotateY(rotate),
+              alignment: Alignment.centerRight,
+              child: widget.mainScreen,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget renderLayout() {
     switch (widget.type) {
       case 'style1':
@@ -462,6 +499,9 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         break;
       case 'style5':
         return renderStyle5();
+        break;
+      case 'style6':
+        return renderStyle6();
         break;
       default:
         return renderDefault();
