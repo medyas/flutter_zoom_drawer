@@ -280,18 +280,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   * */
 
   Widget renderDefault() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
     final slidePercent =
         ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
 
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        double slide = rightSlide * _animationController.value;
-        double scale = 1 - (_animationController.value * 0.3);
-
-        double left = (1 - _animationController.value) * rightSlide;
-
         return Stack(
           children: [
             Scaffold(
@@ -305,22 +299,21 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               /// Displaying the first shadow
               AnimatedBuilder(
                 animation: _animationController,
-                builder: (_, w) => _zoomAndSlideContent(
-                  w,
-                  angle: 0.0,
-                  scale: .9,
-                  slideW: slidePercent * 3,
-                ),
+                builder: (_, w) => _zoomAndSlideContent(w,
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
+                    scale: .9,
+                    slideW: slidePercent * 2),
                 child: Container(
                   color: widget.backgroundColor.withAlpha(31),
                 ),
               ),
-
-              /// Displaying the second shadow
+/// Displaying the second shadow
               AnimatedBuilder(
                 animation: _animationController,
                 builder: (_, w) => _zoomAndSlideContent(w,
-                    angle: 0.0, scale: .95, slideW: slidePercent),
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
+                    scale: .95,
+                    slideW: slidePercent),
                 child: Container(
                   color: widget.backgroundColor,
                 ),
@@ -328,8 +321,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             ],
             AnimatedBuilder(
               animation: _animationController,
-              builder: (_, w) => _zoomAndSlideContent(w,
-                  angle: 0.0, scale: 1, slideW: slidePercent * -1),
+              builder: (_, w) => _zoomAndSlideContent(w),
               child: GestureDetector(
                 child: widget.mainScreen,
                 onTap: () {
@@ -346,64 +338,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final slidePercent =
-        ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
-    return Stack(
-      children: [
-        widget.menuScreen,
-        if (widget.showShadow) ...[
-          /// Displaying the first shadow
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (_, w) => _zoomAndSlideContent(w,
-                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
-                scale: .9,
-                slideW: slidePercent * 2),
-            child: Container(
-              color: widget.backgroundColor.withAlpha(31),
-            ),
-          ),
-
-          /// Displaying the second shadow
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (_, w) => _zoomAndSlideContent(w,
-                angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
-                scale: .95,
-                slideW: slidePercent),
-            child: Container(
-              color: widget.backgroundColor,
-            ),
-          )
-        ],
-
-        /// Displaying the main screen
-        AnimatedBuilder(
-          animation: _animationController,
-          builder: (_, w) => _zoomAndSlideContent(w),
-          child: GestureDetector(
-            child: widget.mainScreen,
-            onTap: () {
-              if (_state == DrawerState.open) {
-                toggle();
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget renderStyle2() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         double slide = rightSlide * _animationController.value;
         double scale = 1 - (_animationController.value * 0.3);
-
         double left = (1 - _animationController.value) * rightSlide;
-
         return Stack(
           children: [
             Scaffold(
@@ -443,14 +384,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle3() {
+  Widget renderStyle2() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         double slide = rightSlide * _animationController.value;
         double left = (1 - _animationController.value) * rightSlide;
-
         return Stack(
           children: [
             Transform(
@@ -478,7 +418,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle4() {
+  Widget renderStyle3() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
@@ -520,7 +460,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       },
     );
   }
-  Widget renderStyle5() {
+  
+  Widget renderStyle4() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
@@ -550,7 +491,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle6() {
+  Widget renderStyle5() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
@@ -584,6 +525,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   Widget renderLayout() {
     switch (widget.type) {
+      case 'default':
+        return renderDefault();
+        break;
       case 'style1':
         return renderStyle1();
         break;
@@ -598,9 +542,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         break;
       case 'style5':
         return renderStyle5();
-        break;
-      case 'style6':
-        return renderStyle6();
         break;
       default:
         return renderDefault();
