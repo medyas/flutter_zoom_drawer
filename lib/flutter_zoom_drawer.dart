@@ -368,7 +368,19 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               transform: Matrix4.identity()..translate(slide),
               alignment: Alignment.center,
               child: GestureDetector(
-                child: widget.mainScreen,
+                child: Stack(
+                  children: [
+                    widget.mainScreen,
+                    if (_animationController.value > 0) ...[
+                      Opacity(
+                        opacity: _animationController.value * 0.5,
+                        child: Container(
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ],
+                ),
                 onTap: () {
                   if (_state == DrawerState.open) {
                     toggle();
@@ -426,7 +438,19 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               animation: _animationController,
               builder: (_, w) => _zoomAndSlideContent(w),
               child: GestureDetector(
-                child: widget.mainScreen,
+                child: Stack(
+                  children: [
+                    widget.mainScreen,
+                    if (_animationController.value > 0) ...[
+                      Opacity(
+                        opacity: 0,
+                        child: Container(
+                          color: Colors.black,
+                        ),
+                      )
+                    ]
+                  ],
+                ),
                 onTap: () {
                   if (_state == DrawerState.open) {
                     toggle();
