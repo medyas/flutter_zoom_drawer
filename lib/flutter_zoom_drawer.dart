@@ -486,7 +486,19 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 ..translate(x)
                 ..rotateY(rotate),
               alignment: Alignment.centerRight,
-              child: widget.mainScreen,
+              child: Stack(
+                children: [
+                  widget.mainScreen,
+                  if (_animationController.value > 0) ...[
+                    Opacity(
+                      opacity: 0,
+                      child: Container(
+                        color: Colors.black,
+                      ),
+                    )
+                  ]
+                ],
+              ),
             ),
           ],
         );
@@ -518,7 +530,19 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 ..scale(scale)
                 ..rotateY(-rotate),
               alignment: Alignment.centerRight,
-              child: widget.mainScreen,
+              child: Stack(
+                children: [
+                  widget.mainScreen,
+                  if (_animationController.value > 0) ...[
+                    Opacity(
+                      opacity: 0,
+                      child: Container(
+                        color: Colors.black,
+                      ),
+                    )
+                  ]
+                ],
+              ),
             ),
           ],
         );
