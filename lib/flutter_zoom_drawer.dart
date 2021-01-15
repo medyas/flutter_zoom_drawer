@@ -281,7 +281,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   widget.mainScreen,
                   if (_animationController.value > 0) ...[
                     Opacity(
-                      opacity: 0.5,
+                      opacity: _animationController.value * 0.5,
                       child: Container(
                         color: Colors.black,
                       ),
@@ -317,7 +317,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return Stack(
           children: [
             Scaffold(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: widget.backgroundColor,
               body: Transform.translate(
                 offset: Offset(0, 0),
                 child: widget.menuScreen,
@@ -328,24 +328,25 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               alignment: Alignment.center,
               child: Container(
                 child: GestureDetector(
-                  child: widget.mainScreen,
+                  child: Stack(
+                    children: [
+                      widget.mainScreen,
+                      if (_animationController.value > 0) ...[
+                        Opacity(
+                          opacity: _animationController.value * 0.5,
+                          child: Container(
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
+                    ],
+                  ),
                   onTap: () {
                     if (_state == DrawerState.open) {
                       toggle();
                     }
                   },
                 ),
-                decoration: BoxDecoration(
-                    boxShadow: widget.showShadow
-                        ? ([
-                            BoxShadow(
-                              color: Colors.grey[850],
-                              spreadRadius: 5,
-                              blurRadius: 70,
-                              offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ])
-                        : null),
               ),
             ),
           ],
