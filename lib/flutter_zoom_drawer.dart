@@ -488,13 +488,31 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.mainScreen,
+            GestureDetector(
+              child: widget.mainScreen,
+              onTap: () {
+                if (_state == DrawerState.open) {
+                  toggle();
+                }
+              },
+            ),
             Transform.translate(
               offset: Offset(-left, 0),
               child: Container(
-                color: Colors.blueAccent,
+                // color: Colors.blueAccent,
                 width: rightSlide,
                 child: widget.menuScreen,
+                decoration: BoxDecoration(
+                  color: Colors.grey[850],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 100.0),
+                      spreadRadius: _state == DrawerState.open ? 200 : 0,
+                      // blurRadius: _state == DrawerState.open ? 1 : 0,
+                      // offset: Offset(_state == DrawerState.open ? 1 : 0, 0), // changes position of shadow
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -502,7 +520,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       },
     );
   }
-
   Widget renderStyle5() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
