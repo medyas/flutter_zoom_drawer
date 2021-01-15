@@ -426,14 +426,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                   },
                 ),
                 decoration: BoxDecoration(
-                  boxShadow: [
+                  boxShadow:  widget.showShadow ? ([
                     BoxShadow(
                       color: Colors.grey[850],
                       spreadRadius: 5,
                       blurRadius: 70,
                       offset: Offset(0, 3), // changes position of shadow
                     ),
-                  ],
+                  ]): null
                 ),
               ),
             ),
@@ -504,14 +504,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 child: widget.menuScreen,
                 decoration: BoxDecoration(
                   color: Colors.grey[850],
-                  boxShadow: [
+                  boxShadow: widget.showShadow ? ([
                     BoxShadow(
                       color: Color.fromRGBO(0, 0, 0, 100.0),
                       spreadRadius: _state == DrawerState.open ? 200 : 0,
                       // blurRadius: _state == DrawerState.open ? 1 : 0,
                       // offset: Offset(_state == DrawerState.open ? 1 : 0, 0), // changes position of shadow
                     ),
-                  ],
+                  ]) : null
                 ),
               ),
             ),
