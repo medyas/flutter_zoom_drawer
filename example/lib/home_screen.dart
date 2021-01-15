@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return ZoomDrawer(
       controller: _drawerController,
+      type: 'default',  // default,style1,style2,style3,style4,style5
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
@@ -36,9 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       mainScreen: MainScreen(),
       borderRadius: 24.0,
-//      showShadow: true,
-      angle: 0.0,
-      slideWidth: MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
+      showShadow: true, //default,style1,style3
+      angle: 0.0, //default
+      slideWidth: MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65), // default
+      // slideHeight: MediaQuery.of(context).size.height * (ZoomDrawer.isRTL() ? .45 : -0.17), //default
       // openCurve: Curves.fastOutSlowIn,
       // closeCurve: Curves.bounceIn,
     );
