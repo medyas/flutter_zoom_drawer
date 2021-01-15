@@ -267,53 +267,41 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   * */
 
   Widget renderDefault() {
-    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
-
+    final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
+        double left = (1 - _animationController.value) * rightSlide;
+
         return Stack(
           children: [
-            Scaffold(
-              backgroundColor: Colors.blueAccent,
-              body: Transform.translate(
-                offset: Offset(0, 0),
+            GestureDetector(
+              child: Stack(
+                children: [
+                  widget.mainScreen,
+                  if (_animationController.value > 0) ...[
+                    Opacity(
+                      opacity: 0.5,
+                      child: Container(
+                        color: Colors.black,
+                      ),
+                    )
+                  ],
+                ],
+              ),
+              onTap: () {
+                if (_state == DrawerState.open) {
+                  toggle();
+                }
+              },
+            ),
+            Transform.translate(
+              offset: Offset(-left, 0),
+              child: Container(
+                width: rightSlide,
                 child: widget.menuScreen,
               ),
             ),
-            if (widget.showShadow) ...[
-              /// Displaying the first shadow
-              AnimatedBuilder(
-                animation: _animationController,
-                builder: (_, w) => _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8, scale: .9, slideW: slidePercent * 2),
-                child: Container(
-                  color: widget.backgroundColor.withAlpha(31),
-                ),
-              ),
-
-              /// Displaying the second shadow
-              AnimatedBuilder(
-                animation: _animationController,
-                builder: (_, w) => _zoomAndSlideContent(w,
-                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0, scale: .95, slideW: slidePercent),
-                child: Container(
-                  color: widget.backgroundColor,
-                ),
-              )
-            ],
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (_, w) => _zoomAndSlideContent(w),
-              child: GestureDetector(
-                child: widget.mainScreen,
-                onTap: () {
-                  if (_state == DrawerState.open) {
-                    toggle();
-                  }
-                },
-              ),
-            )
           ],
         );
       },
@@ -326,8 +314,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
       animation: _animationController,
       builder: (context, child) {
         double slide = rightSlide * _animationController.value;
-        double scale = 1 - (_animationController.value * 0.3);
-        double left = (1 - _animationController.value) * rightSlide;
         return Stack(
           children: [
             Scaffold(
@@ -400,43 +386,53 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderStyle3() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        // double slide = rightSlide * _animationController.value;
-        double left = (1 - _animationController.value) * rightSlide;
-
         return Stack(
           children: [
-            GestureDetector(
-              child: widget.mainScreen,
-              onTap: () {
-                if (_state == DrawerState.open) {
-                  toggle();
-                }
-              },
-            ),
-            Transform.translate(
-              offset: Offset(-left, 0),
-              child: Container(
-                // color: Colors.blueAccent,
-                width: rightSlide,
+            Scaffold(
+              backgroundColor: Colors.blueAccent,
+              body: Transform.translate(
+                offset: Offset(0, 0),
                 child: widget.menuScreen,
-                decoration: BoxDecoration(
-                    color: Colors.grey[850],
-                    boxShadow: widget.showShadow
-                        ? ([
-                            BoxShadow(
-                              color: Color.fromRGBO(0, 0, 0, 100.0),
-                              spreadRadius: _state == DrawerState.open ? 200 : 0,
-                              // blurRadius: _state == DrawerState.open ? 1 : 0,
-                              // offset: Offset(_state == DrawerState.open ? 1 : 0, 0), // changes position of shadow
-                            ),
-                          ])
-                        : null),
               ),
             ),
+            if (widget.showShadow) ...[
+              /// Displaying the first shadow
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (_, w) => _zoomAndSlideContent(w,
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8, scale: .9, slideW: slidePercent * 2),
+                child: Container(
+                  color: widget.backgroundColor.withAlpha(31),
+                ),
+              ),
+
+              /// Displaying the second shadow
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (_, w) => _zoomAndSlideContent(w,
+                    angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0, scale: .95, slideW: slidePercent),
+                child: Container(
+                  color: widget.backgroundColor,
+                ),
+              )
+            ],
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (_, w) => _zoomAndSlideContent(w),
+              child: GestureDetector(
+                child: widget.mainScreen,
+                onTap: () {
+                  if (_state == DrawerState.open) {
+                    toggle();
+                  }
+                },
+              ),
+            )
           ],
         );
       },
