@@ -267,7 +267,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   * */
 
   Widget renderDefault() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -309,7 +309,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderStyle1() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -356,7 +356,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderStyle2() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -465,7 +465,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderStyle4() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -514,7 +514,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderStyle5() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.6;
+    final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
