@@ -564,6 +564,41 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
+  Widget renderStyle6() {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        double scale = _animationController.value > 0.8 ? _animationController.value : 0.8;
+        return Stack(
+          children: [
+            widget.mainScreen,
+            if (_animationController.value > 0) ...[
+              Opacity(
+                opacity: _animationController.value,
+                child: Transform(
+                  transform: Matrix4.identity()..scale(scale),
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_state == DrawerState.open) {
+                        toggle();
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        widget.menuScreen,
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   Widget renderLayout() {
     switch (widget.type) {
       case StyleState.style1:
@@ -580,6 +615,9 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         break;
       case StyleState.style5:
         return renderStyle5();
+        break;
+      case StyleState.style6:
+        return renderStyle6();
         break;
       default:
         return renderDefault();
@@ -605,4 +643,4 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
 enum DrawerState { opening, closing, open, closed }
 
 // Style State
-enum StyleState { styleDefault, style1, style2, style3, style4, style5 }
+enum StyleState { styleDefault, style1, style2, style3, style4, style5, style6 }
