@@ -96,7 +96,8 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   final Curve _scaleDownCurve = Interval(0.0, 0.3, curve: Curves.easeOut);
   final Curve _scaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
+  final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut);// Curves.bounceOut
+  static const Cubic slowMiddle = Cubic(0.19, 1, 0.22, 1);
 
   /// check the slide direction
   final int _rtlSlide = ZoomDrawer.isRTL() ? -1 : 1;
@@ -104,6 +105,8 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   final bool _rtl = ZoomDrawer.isRTL();
 
   AnimationController _animationController;
+  Animation<double> scaleAnimation;
+
   DrawerState _state = DrawerState.closed;
 
   double get _percentOpen => _animationController.value;
@@ -165,7 +168,15 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
             break;
         }
       });
-
+    scaleAnimation =
+        new Tween(
+      begin: 0.9,
+      end: 1.0,
+        ).animate(new CurvedAnimation(
+          parent: _animationController,
+          curve: Curves.slowMiddle,
+        ));
+        // CurvedAnimation(parent: _animationController, curve: Curves.easeIn); //Curves.easeIn Curves.linear
     /// assign controller function to the widget methods
     if (widget.controller != null) {
       widget.controller.open = open;
@@ -272,7 +283,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
       animation: _animationController,
       builder: (context, child) {
         double left = (1 - _animationController.value) * rightSlide;
-
         return Stack(
           children: [
             GestureDetector(
@@ -423,7 +433,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   color: widget.backgroundColor.withAlpha(31),
                 ),
               ),
-
               /// Displaying the second shadow
               AnimatedBuilder(
                 animation: _animationController,
@@ -469,7 +478,8 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        double x = _animationController.value * (rightSlide / 2.6);
+        double x = _animationController.value * (rightSlide / 1.9);
+        double scale = 1 - (_animationController.value * 0.3);
         double rotate = _animationController.value * (pi / 4);
         return Stack(
           children: [
@@ -484,6 +494,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
                 ..translate(x)
+                ..scale(scale)
                 ..rotateY(rotate),
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -568,25 +579,36 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        double scale = _animationController.value > 0.8 ? _animationController.value : 0.8;
+        double scale = _animationController.value > 0.8 ? _animationController.value  : 0.8;
         return Stack(
           children: [
             widget.mainScreen,
             if (_animationController.value > 0) ...[
               Opacity(
-                opacity: _animationController.value,
-                child: Transform(
-                  transform: Matrix4.identity()..scale(scale),
-                  alignment: Alignment.center,
+                // opacity: _animationController.value,
+                opacity: _animationController.drive(CurveTween(curve: Curves.easeIn)).value, //Curves.easeOut
+                child: ScaleTransition(
+                  scale: scaleAnimation,
                   child: GestureDetector(
-                    onTap: () {
-                      if (_state == DrawerState.open) {
-                        toggle();
-                      }
-                    },
                     child: Stack(
-                      children: [
+                      children: <Widget>[
                         widget.menuScreen,
+                          Padding(
+                          padding: EdgeInsets.only(right: 24, top: 24),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  if (_state == DrawerState.open) {
+                                    toggle();
+                                  }
+                                },
+                                backgroundColor: Colors.transparent,
+                                elevation: 0.0,
+                                child: Icon(Icons.close, size: 20),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
