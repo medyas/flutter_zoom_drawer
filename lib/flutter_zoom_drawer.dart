@@ -478,8 +478,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        double x = _animationController.value * (rightSlide / 1.9);
-        double scale = 1 - (_animationController.value * 0.3);
+        double x = _animationController.value * (rightSlide / 1.89);
         double rotate = _animationController.value * (pi / 4);
         return Stack(
           children: [
@@ -494,7 +493,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
                 ..translate(x)
-                ..scale(scale)
                 ..rotateY(rotate),
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -529,7 +527,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        double x = _animationController.value * (rightSlide / 2.6);
+        double x = _animationController.value * (rightSlide / 2.52);
         double scale = 1 - (_animationController.value * 0.3);
         double rotate = _animationController.value * (pi / 4);
         return Stack(
