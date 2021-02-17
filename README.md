@@ -27,6 +27,7 @@ dependencies:
 ```dart
     ZoomDrawer(
       controller: ZoomDrawerController,
+      style: DrawerStyle.DefaultStyle,
       menuScreen: MENU_SCREEN,
       mainScreen: MAIN_SCREEN,
       borderRadius: 24.0,
@@ -42,15 +43,17 @@ dependencies:
 | Parameters         | Value                  | Required  | Docs                                                                        |
 | ------------------ |----------------------- | :-------: | --------------------------------------------------------------------------- |
 | `controller`       | `ZoomDrawerController` |    No     | Controller to have access to the open/close/toggle function of the drawer   |
+| `style`            | `DrawerStyle`          |    No     | the drawer style to be displayed (check the `DrawerStyle` enum)             |
 | `mainScreen`       | `Widget`               |   Yes     | Screen containing the main content to display                               |
 | `menuScreen`       | `Widget`               |   Yes     | Screen containing the menu/bottom screen                                    |
 | `slideWidth`       | `double`               |    No     | Sliding width of the drawer - defaults to 275.0                             |
+| `mainScreenScale`  | `double`               |    No     | MainScreen scale - defaults to 0.3                             |
 | `borderRadius`     | `double`               |    No     | Border radius of the slided content - defaults to 16.0                      |
 | `angle`            | `double`               |    No     | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0   |
 | `backgroundColor`  | `Color`                |    No     | Background color of the drawer shadows - defaults to white                  |
 | `showShadow`       | `bool`                 |    No     | Boolean, whether to show the drawer shadows - defaults to false             |
-| `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                  |
-| `closeCurve`       | `Curve`                |    No     | close animation curve - defaults to `Curves.easeOut`             |
+| `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                         |
+| `closeCurve`       | `Curve`                |    No     | close animation curve - defaults to `Curves.easeOut`                        |
 
 
 ### Controlling the drawer

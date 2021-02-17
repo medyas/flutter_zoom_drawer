@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:example/menu_page.dart';
 import 'package:example/page_structure.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -29,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return ZoomDrawer(
       controller: _drawerController,
+      style: DrawerStyle.Style7,
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
@@ -38,7 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: 24.0,
 //      showShadow: true,
       angle: 0.0,
-      slideWidth: MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
+      slideWidth:
+          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
       // openCurve: Curves.fastOutSlowIn,
       // closeCurve: Curves.bounceIn,
     );

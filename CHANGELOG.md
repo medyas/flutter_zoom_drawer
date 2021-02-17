@@ -1,3 +1,7 @@
+# [1.0.5]
+
+* Add multiple drawer styles thanks to @dangtienngoc
+
 # [1.0.4+1]
 
 * Fixed animation controller dispose issue 

@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(EasyLocalization(
-      child: MyApp(),
-      path: 'assets/langs',
-      supportedLocales: MyApp.list,
-      useOnlyLangCode: true,
-    ));
+void main() => runApp(
+      EasyLocalization(
+        child: MyApp(),
+        path: 'assets/langs',
+        supportedLocales: MyApp.list,
+        useOnlyLangCode: true,
+      ),
+    );
 
 class MyApp extends StatelessWidget {
   static const list = [
@@ -24,8 +26,10 @@ class MyApp extends StatelessWidget {
     final windowLocale = ui.window.locale;
     Locale locale;
     try {
-      final first = MyApp.list
-          ?.firstWhere((l) => l?.languageCode == windowLocale?.languageCode);
+      final first = MyApp.list?.firstWhere(
+        (l) => l?.languageCode == windowLocale?.languageCode,
+        orElse: null,
+      );
       locale = first != null ? first : Locale('en', 'US');
     } catch (e) {
       print(e);
@@ -39,13 +43,9 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         //app-specific localization
-        EasyLocalization
-            .of(context)
-            .delegate,
+        EasyLocalization.of(context).delegate,
       ],
-      supportedLocales: EasyLocalization
-          .of(context)
-          .supportedLocales,
+      supportedLocales: EasyLocalization.of(context).supportedLocales,
       locale: locale,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
