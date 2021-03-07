@@ -50,6 +50,7 @@ dependencies:
 | `mainScreenScale`  | `double`               |    No     | MainScreen scale - defaults to 0.3                             |
 | `borderRadius`     | `double`               |    No     | Border radius of the slided content - defaults to 16.0                      |
 | `angle`            | `double`               |    No     | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0   |
+| `disableGesture`   | `bool`                 |    No     | Disable the home page swipe to open drawer gesture - defaults to `false`   |
 | `backgroundColor`  | `Color`                |    No     | Background color of the drawer shadows - defaults to white                  |
 | `showShadow`       | `bool`                 |    No     | Boolean, whether to show the drawer shadows - defaults to false             |
 | `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                         |

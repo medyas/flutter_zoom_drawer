@@ -1,6 +1,12 @@
+# [2.0.0]
+
+* Migrated to Null Safety
+* Added a parameter to disable the swipe gesture (`disableGesture`)
+
+
 # [1.0.5]
 
-* Add multiple drawer styles thanks to @dangtienngoc
+* Added multiple drawer styles thanks to @dangtienngoc
 
 # [1.0.4+1]
 

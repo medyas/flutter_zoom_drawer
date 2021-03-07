@@ -11,14 +11,14 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class PageStructure extends StatelessWidget {
-  final String title;
-  final Widget child;
-  final List<Widget> actions;
-  final Color backgroundColor;
-  final double elevation;
+  final String? title;
+  final Widget? child;
+  final List<Widget>? actions;
+  final Color? backgroundColor;
+  final double? elevation;
 
   const PageStructure({
-    Key key,
+    Key? key,
     this.title,
     this.child,
     this.actions,
@@ -47,7 +47,7 @@ class PageStructure extends StatelessWidget {
       backgroundColor: Colors.transparent,
       appBar: PlatformAppBar(
         automaticallyImplyLeading: false,
-        android: (_) => MaterialAppBarData(elevation: elevation),
+        material: (_, __) => MaterialAppBarData(elevation: elevation),
         title: PlatformText(
           HomeScreen.mainMenu[_currentPage].title,
         ),
@@ -58,7 +58,7 @@ class PageStructure extends StatelessWidget {
               Icons.menu,
             ),
             onPressed: () {
-              ZoomDrawer.of(context).toggle();
+              ZoomDrawer.of(context)!.toggle();
             },
           ),
         ),

@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _updatePage(index) {
     Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index);
-    _drawerController.toggle();
+    _drawerController.toggle!();
   }
 }
 
@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final rtl = ZoomDrawer.isRTL();
     return ValueListenableBuilder<DrawerState>(
-      valueListenable: ZoomDrawer.of(context).stateNotifier,
+      valueListenable: ZoomDrawer.of(context)!.stateNotifier!,
       builder: (context, state, child) {
         return AbsorbPointer(
           absorbing: state != DrawerState.closed,
@@ -72,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
         child: PageStructure(),
         onPanUpdate: (details) {
           if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
-            ZoomDrawer.of(context).toggle();
+            ZoomDrawer.of(context)!.toggle();
           }
         },
       ),

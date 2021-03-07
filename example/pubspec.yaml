@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -22,15 +22,15 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
+  cupertino_icons: ^1.0.2
   flutter_zoom_drawer:
     path: ../
-  flutter_platform_widgets: ^0.32.5
-  provider: ^4.3.2+2
+  flutter_platform_widgets: ^1.0.1-nullsafety.0
+  provider: ^5.0.0
 
   flutter_localizations:
     sdk: flutter
-  easy_localization: ^2.3.3
+  easy_localization: ^3.0.0
 
 dev_dependencies:
   flutter_test:

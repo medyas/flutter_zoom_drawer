@@ -8,44 +8,45 @@ import 'package:flutter/material.dart';
 
 class ZoomDrawerController {
   /// callback function to open the drawer
-  Function open;
+  Function? open;
 
   /// callback function to close the drawer
-  Function close;
+  Function? close;
 
   /// callback function to toggle the drawer
-  Function toggle;
+  Function? toggle;
 
   /// callback function to determine the status of the drawer
-  Function isOpen;
+  Function? isOpen;
 
   /// Drawer state notifier
   /// opening, closing, open, closed
-  ValueNotifier<DrawerState> stateNotifier;
+  ValueNotifier<DrawerState>? stateNotifier;
 }
 
 class ZoomDrawer extends StatefulWidget {
   ZoomDrawer({
     this.style = DrawerStyle.DefaultStyle,
     this.controller,
-    @required this.menuScreen,
-    @required this.mainScreen,
+    required this.menuScreen,
+    required this.mainScreen,
     this.mainScreenScale = 0.3,
     this.slideWidth = 275.0,
     this.borderRadius = 16.0,
     this.angle = -12.0,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = const Color(0xffffffff),
     this.showShadow = false,
     this.openCurve,
     this.closeCurve,
     this.duration,
+    this.disableGesture = false,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// Layout style
   final DrawerStyle style;
 
   /// controller to have access to the open/close/toggle function of the drawer
-  final ZoomDrawerController controller;
+  final ZoomDrawerController? controller;
 
   /// Screen containing the menu/bottom screen
   final Widget menuScreen;
@@ -72,20 +73,24 @@ class ZoomDrawer extends StatefulWidget {
   final bool showShadow;
 
   /// Drawer slide out curve
-  final Curve openCurve;
+  final Curve? openCurve;
 
   /// Drawer slide in curve
-  final Curve closeCurve;
+  final Curve? closeCurve;
 
   /// Drawer Duration
-  final Duration duration;
+  final Duration? duration;
+
+  /// Disable swipe gesture
+  final bool disableGesture;
 
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
 
   /// static function to provide the drawer state
-  static _ZoomDrawerState of(BuildContext context) {
-    return context.findAncestorStateOfType<State<ZoomDrawer>>();
+  static _ZoomDrawerState? of(BuildContext context) {
+    return context.findAncestorStateOfType<State<ZoomDrawer>>()
+        as _ZoomDrawerState?;
   }
 
   /// Static function to determine the device text direction RTL/LTR
@@ -107,22 +112,22 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   final bool _rtl = ZoomDrawer.isRTL();
 
-  AnimationController _animationController;
+  AnimationController? _animationController;
   DrawerState _state = DrawerState.closed;
 
-  double get _percentOpen => _animationController.value;
+  double get _percentOpen => _animationController!.value;
 
   /// Open drawer
   open() {
-    _animationController.forward();
+    _animationController!.forward();
   }
 
   /// Close drawer
   close() {
-    _animationController.reverse();
+    _animationController!.reverse();
   }
 
-  AnimationController get animationController => _animationController;
+  AnimationController? get animationController => _animationController;
 
   /// Toggle drawer
   toggle() {
@@ -138,7 +143,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       _state == DrawerState.open /* || _state == DrawerState.opening*/;
 
   /// Drawer state
-  ValueNotifier<DrawerState> stateNotifier;
+  ValueNotifier<DrawerState>? stateNotifier;
 
   @override
   void initState() {
@@ -176,21 +181,21 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     /// assign controller function to the widget methods
     if (widget.controller != null) {
-      widget.controller.open = open;
-      widget.controller.close = close;
-      widget.controller.toggle = toggle;
-      widget.controller.isOpen = isOpen;
-      widget.controller.stateNotifier = stateNotifier;
+      widget.controller!.open = open;
+      widget.controller!.close = close;
+      widget.controller!.toggle = toggle;
+      widget.controller!.isOpen = isOpen;
+      widget.controller!.stateNotifier = stateNotifier;
     }
   }
 
   _updateStatusNotifier() {
-    stateNotifier.value = _state;
+    stateNotifier!.value = _state;
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController!.dispose();
     super.dispose();
   }
 
@@ -205,8 +210,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ///
   /// * [slide] is the sliding amount of the drawer
   ///
-  Widget _zoomAndSlideContent(Widget container,
-      {double angle, double scale, double slide = 0}) {
+  Widget _zoomAndSlideContent(Widget? container,
+      {double? angle, double? scale, double slide = 0}) {
     var slidePercent, scalePercent;
 
     /// determine current slide percent based on the MenuStatus
@@ -258,6 +263,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.disableGesture) return renderLayout();
+
     return GestureDetector(
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
@@ -274,62 +281,31 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     switch (widget.style) {
       case DrawerStyle.Style1:
         return renderStyle1();
-        break;
       case DrawerStyle.Style2:
         return renderStyle2();
-        break;
       case DrawerStyle.Style3:
         return renderStyle3();
-        break;
       case DrawerStyle.Style4:
         return renderStyle4();
-        break;
       case DrawerStyle.Style5:
         return renderStyle5();
-        break;
       case DrawerStyle.Style6:
         return renderStyle6();
-        break;
       case DrawerStyle.Style7:
         return renderStyle7();
-        break;
       default:
         return renderDefault();
-        break;
     }
   }
-
-  /*
-    Container(
-        decoration: BoxDecoration(
-          boxShadow: Platform.isAndroid
-              ? [
-                  BoxShadow(
-                    color: Colors.black12,
-                    offset: const Offset(0.0, 5.0),
-                    blurRadius: 15.0,
-                    spreadRadius: 10.0,
-                  ),
-                ]
-              : kElevationToShadow[5],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(cornerRadius),
-          child: container,
-        ),
-      )
-  * */
 
   Widget renderDefault() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double slide = rightSlide * _animationController.value;
+        double slide = rightSlide * _animationController!.value;
         double scale =
-            1 - (_animationController.value * widget.mainScreenScale);
-
-        double left = (1 - _animationController.value) * rightSlide;
+            1 - (_animationController!.value * widget.mainScreenScale);
 
         return Stack(
           children: [
@@ -361,7 +337,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         if (widget.showShadow) ...[
           /// Displaying the first shadow
           AnimatedBuilder(
-            animation: _animationController,
+            animation: _animationController!,
             builder: (_, w) => _zoomAndSlideContent(
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
@@ -375,7 +351,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
           /// Displaying the second shadow
           AnimatedBuilder(
-            animation: _animationController,
+            animation: _animationController!,
             builder: (_, w) => _zoomAndSlideContent(
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
@@ -390,7 +366,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         /// Displaying the main screen
         AnimatedBuilder(
-          animation: _animationController,
+          animation: _animationController!,
           builder: (_, w) => _zoomAndSlideContent(w),
           child: GestureDetector(
             child: widget.mainScreen,
@@ -408,12 +384,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle2() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double slide = rightSlide * _animationController.value;
-        double scale = 1 - (_animationController.value * 0.3);
-
-        double left = (1 - _animationController.value) * rightSlide;
+        double slide = rightSlide * _animationController!.value;
 
         return Stack(
           children: [
@@ -437,10 +410,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle3() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double slide = rightSlide * _animationController.value;
-        double left = (1 - _animationController.value) * rightSlide;
+        double slide = rightSlide * _animationController!.value;
+        double left = (1 - _animationController!.value) * rightSlide;
 
         return Stack(
           children: [
@@ -465,10 +438,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle4() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        // double slide = rightSlide * _animationController.value;
-        double left = (1 - _animationController.value) * rightSlide;
+        double left = (1 - _animationController!.value) * rightSlide;
 
         return Stack(
           children: [
@@ -489,11 +461,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle5() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double slide = rightSlide * _animationController.value;
-        double scale = 1 - (_animationController.value * 0.3);
-        double top = _animationController.value * 200;
+        double slide = rightSlide * _animationController!.value;
+        double scale = 1 - (_animationController!.value * 0.3);
+        double top = _animationController!.value * 200;
 
         return Stack(
           children: [
@@ -519,10 +491,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle6() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double x = _animationController.value * (rightSlide / 2);
-        double rotate = _animationController.value * (pi / 4);
+        double x = _animationController!.value * (rightSlide / 2);
+        double rotate = _animationController!.value * (pi / 4);
         return Stack(
           children: [
             Scaffold(
@@ -548,11 +520,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle7() {
     final rightSlide = MediaQuery.of(context).size.width * 0.6;
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
-        double x = _animationController.value * (rightSlide / 2);
-        double scale = 1 - (_animationController.value * 0.3);
-        double rotate = _animationController.value * (pi / 4);
+        double x = _animationController!.value * (rightSlide / 2);
+        double scale = 1 - (_animationController!.value * 0.3);
+        double rotate = _animationController!.value * (pi / 4);
         return Stack(
           children: [
             Scaffold(

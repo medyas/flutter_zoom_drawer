@@ -9,12 +9,12 @@ import 'package:provider/provider.dart';
 
 class MenuScreen extends StatefulWidget {
   final List<MenuItem> mainMenu;
-  final Function(int) callback;
-  final int current;
+  final Function(int)? callback;
+  final int? current;
 
   MenuScreen(
     this.mainMenu, {
-    Key key,
+    Key? key,
     this.callback,
     this.current,
   });
@@ -24,7 +24,6 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-
   final widthBox = SizedBox(
     width: 16.0,
   );
@@ -34,7 +33,11 @@ class _MenuScreenState extends State<MenuScreen> {
     final TextStyle androidStyle = const TextStyle(
         fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white);
     final TextStyle iosStyle = const TextStyle(color: Colors.white);
-    final style = kIsWeb? androidStyle: Platform.isAndroid ? androidStyle : iosStyle;
+    final style = kIsWeb
+        ? androidStyle
+        : Platform.isAndroid
+            ? androidStyle
+            : iosStyle;
 
     return Scaffold(
       body: Container(
@@ -125,42 +128,42 @@ class _MenuScreenState extends State<MenuScreen> {
 }
 
 class MenuItemWidget extends StatelessWidget {
-  final MenuItem item;
-  final Widget widthBox;
-  final TextStyle style;
-  final Function callback;
-  final bool selected;
+  final MenuItem? item;
+  final Widget? widthBox;
+  final TextStyle? style;
+  final Function? callback;
+  final bool? selected;
 
   final white = Colors.white;
 
-  const MenuItemWidget(
-      {Key key,
-      this.item,
-      this.widthBox,
-      this.style,
-      this.callback,
-      this.selected})
-      : super(key: key);
+  const MenuItemWidget({
+    Key? key,
+    this.item,
+    this.widthBox,
+    this.style,
+    this.callback,
+    this.selected,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-      onPressed: () => callback(item.index),
-      color: selected ? Color(0x44000000) : null,
+      onPressed: () => callback!(item!.index),
+      color: selected! ? Color(0x44000000) : null,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Icon(
-            item.icon,
+            item!.icon,
             color: white,
             size: 24,
           ),
-          widthBox,
+          widthBox!,
           Expanded(
             child: Text(
-              item.title,
+              item!.title,
               style: style,
             ),
           )
