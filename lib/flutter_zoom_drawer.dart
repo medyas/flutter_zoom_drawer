@@ -96,7 +96,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   final Curve _scaleDownCurve = Interval(0.0, 0.3, curve: Curves.easeOut);
   final Curve _scaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut);// Curves.bounceOut
+  final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
   static const Cubic slowMiddle = Cubic(0.19, 1, 0.22, 1);
 
   /// check the slide direction
@@ -168,15 +168,14 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
             break;
         }
       });
-    scaleAnimation =
-        new Tween(
+    scaleAnimation = new Tween(
       begin: 0.9,
       end: 1.0,
-        ).animate(new CurvedAnimation(
-          parent: _animationController!,
-          curve: Curves.slowMiddle,
-        ));
-        // CurvedAnimation(parent: _animationController, curve: Curves.easeIn); //Curves.easeIn Curves.linear
+    ).animate(new CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.slowMiddle,
+    ));
+    // CurvedAnimation(parent: _animationController, curve: Curves.easeIn); //Curves.easeIn Curves.linear
     /// assign controller function to the widget methods
     if (widget.controller != null) {
       widget.controller!.open = open;
@@ -433,6 +432,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   color: widget.backgroundColor.withAlpha(31),
                 ),
               ),
+
               /// Displaying the second shadow
               AnimatedBuilder(
                 animation: _animationController!,
@@ -577,7 +577,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double scale = _animationController!.value > 0.8 ? _animationController!.value  : 0.8;
+        double scale = _animationController!.value > 0.8 ? _animationController!.value : 0.8;
         return Stack(
           children: [
             widget.mainScreen,
@@ -591,22 +591,22 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                     child: Stack(
                       children: <Widget>[
                         widget.menuScreen,
-                          Padding(
+                        Padding(
                           padding: EdgeInsets.only(right: 24, top: 24),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: FloatingActionButton(
-                                onPressed: () {
-                                  if (_state == DrawerState.open) {
-                                    toggle();
-                                  }
-                                },
-                                backgroundColor: Colors.transparent,
-                                elevation: 0.0,
-                                child: Icon(Icons.close, size: 20),
-                              ),
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                if (_state == DrawerState.open) {
+                                  toggle();
+                                }
+                              },
+                              backgroundColor: Colors.transparent,
+                              elevation: 0.0,
+                              child: Icon(Icons.close, size: 20),
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -623,25 +623,18 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     switch (widget.type) {
       case StyleState.style1:
         return renderStyle1();
-        break;
       case StyleState.style2:
         return renderStyle2();
-        break;
       case StyleState.style3:
         return renderStyle3();
-        break;
       case StyleState.style4:
         return renderStyle4();
-        break;
       case StyleState.style5:
         return renderStyle5();
-        break;
       case StyleState.style6:
         return renderStyle6();
-        break;
       default:
         return renderDefault();
-        break;
     }
   }
 
