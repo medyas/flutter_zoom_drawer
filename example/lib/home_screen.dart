@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:example/menu_page.dart';
 import 'package:example/page_structure.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -29,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return ZoomDrawer(
       controller: _drawerController,
-      type: 'default',  // default,style1,style2,style3,style4,style5
+      type: StyleState.styleDefault, // default,style1,style2,style3,style4,style5
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
