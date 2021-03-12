@@ -35,6 +35,7 @@ class ZoomDrawer extends StatefulWidget {
     this.borderRadius = 16.0,
     this.angle = -12.0,
     this.backgroundColor = Colors.white,
+    this.shadowColor = Colors.white,
     this.showShadow = false,
     this.openCurve,
     this.closeCurve,
@@ -65,6 +66,8 @@ class ZoomDrawer extends StatefulWidget {
 
   /// Background color of the drawer shadows - defaults to white
   final Color backgroundColor;
+
+  final Color shadowColor;
 
   /// Boolean, whether to show the drawer shadows - defaults to false
   final bool showShadow;
@@ -429,7 +432,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 builder: (_, w) => _zoomAndSlideContent(w,
                     angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8, scale: .9, slideW: slidePercent * 2),
                 child: Container(
-                  color: widget.backgroundColor.withAlpha(31),
+                  color: widget.shadowColor.withOpacity(0.3),
                 ),
               ),
 
@@ -439,7 +442,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 builder: (_, w) => _zoomAndSlideContent(w,
                     angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0, scale: .95, slideW: slidePercent),
                 child: Container(
-                  color: widget.backgroundColor,
+                  color: widget.shadowColor.withOpacity(0.9),
                 ),
               )
             ],
@@ -601,7 +604,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                                   toggle();
                                 }
                               },
-                              backgroundColor: widget.backgroundColor,
+                              backgroundColor: Colors.transparent,
                               elevation: 0.0,
                               child: Icon(Icons.close, size: 20),
                             ),
