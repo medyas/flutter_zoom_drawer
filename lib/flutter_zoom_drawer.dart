@@ -416,7 +416,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return Stack(
           children: [
             Scaffold(
-              backgroundColor: Colors.transparent,
+              backgroundColor: widget.backgroundColor,
               body: Transform.translate(
                 offset: Offset(0, 0),
                 child: widget.menuScreen,
@@ -483,7 +483,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return Stack(
           children: [
             Scaffold(
-              backgroundColor: Colors.transparent,
+              backgroundColor: widget.backgroundColor,
               body: Transform.translate(
                 offset: Offset(0, 0),
                 child: widget.menuScreen,
@@ -533,7 +533,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return Stack(
           children: [
             Scaffold(
-              backgroundColor: Colors.transparent,
+              backgroundColor: widget.backgroundColor,
               body: Transform.translate(
                 offset: Offset(0, 0),
                 child: widget.menuScreen,
@@ -601,7 +601,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                                   toggle();
                                 }
                               },
-                              backgroundColor: Colors.transparent,
+                              backgroundColor: widget.backgroundColor,
                               elevation: 0.0,
                               child: Icon(Icons.close, size: 20),
                             ),
