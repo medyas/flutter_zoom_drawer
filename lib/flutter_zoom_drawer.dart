@@ -595,7 +595,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                       children: <Widget>[
                         // widget.menuScreen,
                         Container(
-                          color: Colors.red.withOpacity(0.6),//widget.backgroundColor.withOpacity(0.6),
+                          color:  widget.backgroundColor,//widget.backgroundColor.withOpacity(0.6),
                           child: widget.menuScreen,
                         ),
                         Padding(
