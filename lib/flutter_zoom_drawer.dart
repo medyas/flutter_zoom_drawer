@@ -26,7 +26,7 @@ class ZoomDrawerController {
 
 class ZoomDrawer extends StatefulWidget {
   ZoomDrawer({
-    this.type = StyleState.styleDefault,
+    this.type = StyleState.overlay,
     this.controller,
     required this.menuScreen,
     required this.mainScreen,
@@ -91,7 +91,7 @@ class ZoomDrawer extends StatefulWidget {
 
   /// Static function to determine the device text direction RTL/LTR
   static bool isRTL() {
-    return ui.window.locale.languageCode.toLowerCase() == "ar";
+    return ui.window?.locale?.languageCode.toLowerCase() == "ar";
   }
 }
 
@@ -279,7 +279,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
       )
   * */
 
-  Widget renderDefault() {
+  Widget renderOverlay() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -320,7 +320,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle1() {
+  Widget renderFixedStack() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -367,7 +367,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle2() {
+  Widget renderStack() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -410,7 +410,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle3() {
+  Widget renderScaleRight() {
     final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
 
     return AnimatedBuilder(
@@ -476,7 +476,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle4() {
+  Widget renderRatate3dIn() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -525,7 +525,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle5() {
+  Widget renderRatate3dOut() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -576,7 +576,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderStyle6() {
+  Widget renderPopUp() {
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
@@ -593,7 +593,11 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   child: GestureDetector(
                     child: Stack(
                       children: <Widget>[
-                        widget.menuScreen,
+                        // widget.menuScreen,
+                        Container(
+                          color: Colors.red.withOpacity(0.6),//widget.backgroundColor.withOpacity(0.6),
+                          child: widget.menuScreen,
+                        ),
                         Padding(
                           padding: EdgeInsets.only(right: 24, top: 24),
                           child: Align(
@@ -624,20 +628,20 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
 
   Widget renderLayout() {
     switch (widget.type) {
-      case StyleState.style1:
-        return renderStyle1();
-      case StyleState.style2:
-        return renderStyle2();
-      case StyleState.style3:
-        return renderStyle3();
-      case StyleState.style4:
-        return renderStyle4();
-      case StyleState.style5:
-        return renderStyle5();
-      case StyleState.style6:
-        return renderStyle6();
+      case StyleState.fixedStack:
+        return renderFixedStack();
+      case StyleState.stack:
+        return renderStack();
+      case StyleState.scaleRight:
+        return renderScaleRight();
+      case StyleState.ratate3dIn:
+        return renderRatate3dIn();
+      case StyleState.ratate3dOut:
+        return renderRatate3dOut();
+      case StyleState.popUp:
+        return renderPopUp();
       default:
-        return renderDefault();
+        return renderOverlay();
     }
   }
 
@@ -659,4 +663,4 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
 enum DrawerState { opening, closing, open, closed }
 
 // Style State
-enum StyleState { styleDefault, style1, style2, style3, style4, style5, style6 }
+enum StyleState { overlay, fixedStack, stack, scaleRight, ratate3dIn, ratate3dOut, popUp }
