@@ -1,7 +1,6 @@
 library flutter_zoom_drawer;
 
 import 'dart:math' show pi;
-import 'dart:ui' as ui show window;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +39,7 @@ class ZoomDrawer extends StatefulWidget {
     this.openCurve,
     this.closeCurve,
     this.duration,
+    this.isRTL = false,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   // Layout style
@@ -81,17 +81,15 @@ class ZoomDrawer extends StatefulWidget {
   /// Drawer Duration
   final Duration? duration;
 
+  /// Static function to determine the device text direction RTL/LTR
+  final bool isRTL;
+
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
 
   /// static function to provide the drawer state
   static _ZoomDrawerState? of(BuildContext context) {
     return context.findAncestorStateOfType<State<ZoomDrawer>>() as _ZoomDrawerState?;
-  }
-
-  /// Static function to determine the device text direction RTL/LTR
-  static bool isRTL() {
-    return ui.window?.locale?.languageCode.toLowerCase() == "ar";
   }
 }
 
@@ -101,11 +99,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   final Curve _slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
   static const Cubic slowMiddle = Cubic(0.19, 1, 0.22, 1);
-
-  /// check the slide direction
-  final int _rtlSlide = ZoomDrawer.isRTL() ? -1 : 1;
-
-  final bool _rtl = ZoomDrawer.isRTL();
 
   AnimationController? _animationController;
   late Animation<double> scaleAnimation;
@@ -212,6 +205,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   ///
   Widget _zoomAndSlideContent(Widget? container, {double? angle, double? scale, double slideW = 0, double slideH = 0}) {
     var slidePercent, scalePercent;
+    int _rtlSlide = widget.isRTL ? -1 : 1;
 
     /// determine current slide percent based on the MenuStatus
     switch (_state) {
@@ -411,7 +405,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderScaleRight() {
-    final slidePercent = ZoomDrawer.isRTL() ? MediaQuery.of(context).size.width * .1 : 15.0;
+    final slidePercent = widget.isRTL ? MediaQuery.of(context).size.width * .1 : 15.0;
 
     return AnimatedBuilder(
       animation: _animationController!,
@@ -476,7 +470,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderRatate3dIn() {
+  Widget renderRotate3dIn() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -525,7 +519,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     );
   }
 
-  Widget renderRatate3dOut() {
+  Widget renderRotate3dOut() {
     final rightSlide = MediaQuery.of(context).size.width * 0.75;
     return AnimatedBuilder(
       animation: _animationController!,
@@ -595,7 +589,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                       children: <Widget>[
                         // widget.menuScreen,
                         Container(
-                          color:  widget.backgroundColor,//widget.backgroundColor.withOpacity(0.6),
+                          color: Colors.red.withOpacity(0.6), //widget.backgroundColor.withOpacity(0.6),
                           child: widget.menuScreen,
                         ),
                         Padding(
@@ -634,10 +628,10 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return renderStack();
       case StyleState.scaleRight:
         return renderScaleRight();
-      case StyleState.ratate3dIn:
-        return renderRatate3dIn();
-      case StyleState.ratate3dOut:
-        return renderRatate3dOut();
+      case StyleState.rotate3dIn:
+        return renderRotate3dIn();
+      case StyleState.rotate3dOut:
+        return renderRotate3dOut();
       case StyleState.popUp:
         return renderPopUp();
       default:
@@ -650,7 +644,8 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return GestureDetector(
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
-        if (_state == DrawerState.open && details.delta.dx < -6 && !_rtl || details.delta.dx < 6 && _rtl) {
+        if (_state == DrawerState.open && details.delta.dx < -6 && !widget.isRTL ||
+            details.delta.dx < 6 && widget.isRTL) {
           toggle();
         }
       },
@@ -663,4 +658,4 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
 enum DrawerState { opening, closing, open, closed }
 
 // Style State
-enum StyleState { overlay, fixedStack, stack, scaleRight, ratate3dIn, ratate3dOut, popUp }
+enum StyleState { overlay, fixedStack, stack, scaleRight, rotate3dIn, rotate3dOut, popUp }
