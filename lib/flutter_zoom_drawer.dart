@@ -274,7 +274,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   * */
 
   Widget renderOverlay() {
-    final rightSlide = MediaQuery.of(context).size.width * 0.75;
+    final rightSlide = MediaQuery.of(context).size.width * .75;
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
@@ -302,7 +302,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               },
             ),
             Transform.translate(
-              offset: Offset(-left, 0),
+              offset: Offset(widget.isRTL ? left : -left, 0),
               child: Container(
                 width: rightSlide,
                 child: widget.menuScreen,
@@ -330,7 +330,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               ),
             ),
             Transform(
-              transform: Matrix4.identity()..translate(slide),
+              transform: Matrix4.identity()..translate(widget.isRTL ? -slide : slide),
               alignment: Alignment.center,
               child: Container(
                 child: GestureDetector(
@@ -371,7 +371,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
         return Stack(
           children: [
             Transform(
-              transform: Matrix4.identity()..translate(slide),
+              transform: Matrix4.identity()..translate(widget.isRTL ? -slide : slide),
               alignment: Alignment.center,
               child: GestureDetector(
                 child: Stack(
@@ -395,7 +395,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
               ),
             ),
             Transform.translate(
-              offset: Offset(-left, 0),
+              offset: Offset(widget.isRTL ? left : -left, 0),
               child: Container(color: Colors.blueAccent, width: rightSlide, child: widget.menuScreen),
             ),
           ],
@@ -489,9 +489,9 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(x)
-                ..rotateY(rotate),
-              alignment: Alignment.centerRight,
+                ..translate(widget.isRTL ? -x : x)
+                ..rotateY(widget.isRTL ? -rotate : rotate),
+              alignment:widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
                   if (_state == DrawerState.open) {
@@ -539,10 +539,10 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(x)
+                ..translate(widget.isRTL ? -x : x)
                 ..scale(scale)
-                ..rotateY(-rotate),
-              alignment: Alignment.centerRight,
+                ..rotateY(widget.isRTL ? rotate : -rotate),
+              alignment:widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
                   if (_state == DrawerState.open) {
@@ -574,20 +574,17 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double scale = _animationController!.value > 0.8 ? _animationController!.value : 0.8;
         return Stack(
           children: [
             widget.mainScreen,
             if (_animationController!.value > 0) ...[
               Opacity(
-                // opacity: _animationController.value,
                 opacity: _animationController!.drive(CurveTween(curve: Curves.easeIn)).value, //Curves.easeOut
                 child: ScaleTransition(
                   scale: scaleAnimation,
                   child: GestureDetector(
                     child: Stack(
                       children: <Widget>[
-                        // widget.menuScreen,
                         Container(
                           color: Colors.red.withOpacity(0.6), //widget.backgroundColor.withOpacity(0.6),
                           child: widget.menuScreen,
