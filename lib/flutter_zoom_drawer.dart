@@ -405,8 +405,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   }
 
   Widget renderScaleRight() {
-    final slidePercent = widget.isRTL ? MediaQuery.of(context).size.width * .08 : 15.0;
-
+    final slidePercent = widget.isRTL ? MediaQuery.of(context).size.width * .085 : 15.0;
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
