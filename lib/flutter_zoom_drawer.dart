@@ -523,7 +523,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double x = _animationController!.value * (rightSlide / 2.52);
+        double x = _animationController!.value * (rightSlide / 2.65);
         double scale = 1 - (_animationController!.value * 0.3);
         double rotate = _animationController!.value * (pi / 4);
         return Stack(
