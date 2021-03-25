@@ -112,7 +112,13 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                   borderSide: BorderSide(color: Colors.white, width: 2.0),
-                  onPressed: () => print("Pressed !"),
+                  onPressed: () {
+                    final l = context.locale;
+                    if(l.languageCode.toLowerCase() == "ar")
+                      context.setLocale(Locale('en'));
+                    else
+                      context.setLocale(Locale('ar'));
+                  },
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.0)),

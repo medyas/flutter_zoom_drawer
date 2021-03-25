@@ -1,6 +1,6 @@
 name: flutter_zoom_drawer
 description: A Flutter package with custom implementation of the Side Menu (Drawer)
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/medyas/flutter_zoom_drawer
 
 environment:
@@ -9,8 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  vector_math: ^2.1.0
 
 dev_dependencies:
   flutter_test:

@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _currentPage = 0;
 
+
   @override
   Widget build(BuildContext context) {
     return ZoomDrawer(
@@ -38,8 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: 24.0,
 //      showShadow: true,
       angle: 0.0,
+      mainScreenScale: .1,
       slideWidth:
-          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .45 : 0.65),
+          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .55 : 0.65),
+      isRtl: context.locale.languageCode == "ar",
       // openCurve: Curves.fastOutSlowIn,
       // closeCurve: Curves.bounceIn,
     );

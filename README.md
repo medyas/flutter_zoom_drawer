@@ -53,6 +53,7 @@ dependencies:
 | `disableGesture`   | `bool`                 |    No     | Disable the home page swipe to open drawer gesture - defaults to `false`   |
 | `backgroundColor`  | `Color`                |    No     | Background color of the drawer shadows - defaults to white                  |
 | `showShadow`       | `bool`                 |    No     | Boolean, whether to show the drawer shadows - defaults to false             |
+| `isRtl`            | `bool`                 |    No     | Boolean, display the drawer in RTL             |
 | `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                         |
 | `closeCurve`       | `Curve`                |    No     | close animation curve - defaults to `Curves.easeOut`                        |
 
