@@ -29,18 +29,14 @@ class PageStructure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final angle = ZoomDrawer.isRTL() ? 180 * pi / 180 : 0.0;
-    final _currentPage =
-        context.select<MenuProvider, int>((provider) => provider.currentPage);
+    final _currentPage = context.select<MenuProvider, int>((provider) => provider.currentPage);
     final container = Container(
       color: Colors.grey[300],
       child: Center(
-        child: Text(
-            "${tr("current")}: ${HomeScreen.mainMenu[_currentPage].title}"),
+        child: Text("${tr("current")}: ${HomeScreen.mainMenu[_currentPage].title}"),
       ),
     );
-    final color = Theme
-        .of(context)
-        .accentColor;
+    final color = Theme.of(context).accentColor;
     final style = TextStyle(color: color);
 
     return PlatformScaffold(
@@ -65,17 +61,15 @@ class PageStructure extends StatelessWidget {
         trailingActions: actions,
       ),
       bottomNavBar: PlatformNavBar(
+        material: (_, __) => MaterialNavBarData(
+          selectedLabelStyle: style,
+        ),
         currentIndex: _currentPage,
-        itemChanged: (index) =>
-            Provider.of<MenuProvider>(context, listen: false)
-                .updateCurrentPage(index),
+        itemChanged: (index) => Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index),
         items: HomeScreen.mainMenu
             .map(
               (item) => BottomNavigationBarItem(
-                title: Text(
-                  item.title,
-                  style: style,
-                ),
+                label: item.title,
                 icon: Icon(
                   item.icon,
                   color: color,
