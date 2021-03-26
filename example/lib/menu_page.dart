@@ -30,8 +30,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle androidStyle = const TextStyle(
-        fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white);
+    final TextStyle androidStyle = const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white);
     final TextStyle iosStyle = const TextStyle(color: Colors.white);
     final style = kIsWeb
         ? androidStyle
@@ -58,8 +57,7 @@ class _MenuScreenState extends State<MenuScreen> {
             children: <Widget>[
               Spacer(),
               Padding(
-                padding: const EdgeInsets.only(
-                    bottom: 24.0, left: 24.0, right: 24.0),
+                padding: const EdgeInsets.only(bottom: 24.0, left: 24.0, right: 24.0),
                 child: Container(
                   width: 80,
                   height: 80,
@@ -70,8 +68,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(
-                    bottom: 36.0, left: 24.0, right: 24.0),
+                padding: const EdgeInsets.only(bottom: 36.0, left: 24.0, right: 24.0),
                 child: Text(
                   tr("name"),
                   style: TextStyle(
@@ -103,7 +100,7 @@ class _MenuScreenState extends State<MenuScreen> {
               Spacer(),
               Padding(
                 padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                child: OutlineButton(
+                child: OutlinedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
@@ -111,17 +108,12 @@ class _MenuScreenState extends State<MenuScreen> {
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
-                  onPressed: () {
-                    final l = context.locale;
-                    if(l.languageCode.toLowerCase() == "ar")
-                      context.setLocale(Locale('en'));
-                    else
-                      context.setLocale(Locale('ar'));
-                  },
-                  textColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white, width: 2.0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                    textStyle: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () => print("Pressed !"),
                 ),
               ),
               Spacer(),
@@ -153,9 +145,11 @@ class MenuItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return TextButton(
       onPressed: () => callback!(item!.index),
-      color: selected! ? Color(0x44000000) : null,
+      style: TextButton.styleFrom(
+        primary: selected! ? Color(0x44000000) : null,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
