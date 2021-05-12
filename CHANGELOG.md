@@ -1,3 +1,8 @@
+# [2.0.2]
+
+* Add Persian to RTL support list
+* Fixed `window.locale` null safety bug
+
 # [2.0.1]
 
 * Fixed RTL support in styles
