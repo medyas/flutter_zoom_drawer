@@ -136,7 +136,7 @@ packages:
     source: hosted
     version: "1.3.0"
   vector_math:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: vector_math
       url: "https://pub.dartlang.org"
