@@ -103,7 +103,7 @@ class ZoomDrawer extends StatefulWidget {
     List<String> rtlLanguages = ["ar", "ur", "he", "dv", "fa"];
 
     /// Device language
-    String? locale = ui.window.locale?.languageCode?.toLowerCase();
+    final locale = ui.window.locale!.languageCode.toLowerCase();
 
     return rtlLanguages.contains(locale);
   }
