@@ -97,15 +97,22 @@ class ZoomDrawer extends StatefulWidget {
         as _ZoomDrawerState?;
   }
 
+  /// Languages that are Right to Left
+  static List<String> RTL_LANGUAGES = ["ar", "ur", "he", "dv", "fa"];
   /// Static function to determine the device text direction RTL/LTR
   static bool isRTL() {
-    /// Languages that are Right to Left
-    List<String> rtlLanguages = ["ar", "ur", "he", "dv", "fa"];
 
     /// Device language
-    final locale = ui.window.locale!.languageCode.toLowerCase();
+    final locale = _getLanguageCode();
 
-    return rtlLanguages.contains(locale);
+    return RTL_LANGUAGES.contains(locale);
+  }
+  static String? _getLanguageCode() {
+    try {
+      return ui.window.locale.languageCode.toLowerCase();
+    } catch(e) {
+      return null;
+    }
   }
 }
 

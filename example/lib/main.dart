@@ -20,7 +20,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   static const list = [
-    Locale('en'),
+    // Locale('en'),
     Locale('ar'),
   ];
 
@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
+        primarySwatch: Colors.blue,
+        accentColor: Colors.orange,
       ),
       home: ChangeNotifierProvider(
         create: (_) => MenuProvider(),

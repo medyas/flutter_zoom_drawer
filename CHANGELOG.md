@@ -1,3 +1,11 @@
+# [2.0.2+2]
+
+* Fixed Locale warning
+
+# [2.0.2+1]
+
+* Updated null assertion
+
 # [2.0.2]
 
 * Add Persian to RTL support list

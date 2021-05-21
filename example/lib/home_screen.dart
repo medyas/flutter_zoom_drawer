@@ -24,12 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _currentPage = 0;
 
-
   @override
   Widget build(BuildContext context) {
+    final isRtl = context.locale.languageCode == "ar";
     return ZoomDrawer(
       controller: _drawerController,
-      // style: DrawerStyle.Style7,
+      // style: DrawerStyle.Style3,
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
@@ -40,9 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
 //      showShadow: true,
       angle: 0.0,
       mainScreenScale: .1,
-      slideWidth:
-          MediaQuery.of(context).size.width * (ZoomDrawer.isRTL() ? .55 : 0.65),
-      isRtl: context.locale.languageCode == "ar",
+      slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
+      isRtl: isRtl,
       // openCurve: Curves.fastOutSlowIn,
       // closeCurve: Curves.bounceIn,
     );

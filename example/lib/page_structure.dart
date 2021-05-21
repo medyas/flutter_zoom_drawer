@@ -28,16 +28,16 @@ class PageStructure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final angle = ZoomDrawer.isRTL() ? 180 * pi / 180 : 0.0;
-    final _currentPage = context.select<MenuProvider, int>((provider) => provider.currentPage);
-    final container = Container(
-      color: Colors.grey[300],
-      child: Center(
-        child: Text("${tr("current")}: ${HomeScreen.mainMenu[_currentPage].title}"),
-      ),
-    );
     final color = Theme.of(context).accentColor;
-    final style = TextStyle(color: color);
+    final angle = ZoomDrawer.isRTL() ? 180 * pi / 180 : 0.0;
+    final _currentPage =
+        context.select<MenuProvider, int>((provider) => provider.currentPage);
+    final container = Container(
+      alignment: Alignment.center,
+      color: Colors.white,
+      child:
+          Text("${tr("current")}: ${HomeScreen.mainMenu[_currentPage].title}"),
+    );
 
     return PlatformScaffold(
       backgroundColor: Colors.transparent,
@@ -62,29 +62,29 @@ class PageStructure extends StatelessWidget {
       ),
       bottomNavBar: PlatformNavBar(
         material: (_, __) => MaterialNavBarData(
-          selectedLabelStyle: style,
+          selectedLabelStyle: TextStyle(color: color),
         ),
         currentIndex: _currentPage,
         itemChanged: (index) => Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index),
         items: HomeScreen.mainMenu
             .map(
               (item) => BottomNavigationBarItem(
-                label: item.title,
-                icon: Icon(
-                  item.icon,
-                  color: color,
-                ),
-              ),
-            )
+            label: item.title,
+            icon: Icon(
+              item.icon,
+              color: color,
+            ),
+          ),
+        )
             .toList(),
       ),
       body: kIsWeb
           ? container
           : Platform.isAndroid
-              ? container
-              : SafeArea(
-                  child: container,
-                ),
+          ? container
+          : SafeArea(
+        child: container,
+      ),
     );
   }
 }
