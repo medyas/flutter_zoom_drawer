@@ -20,7 +20,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   static const list = [
-    // Locale('en'),
+    Locale('en'),
     Locale('ar'),
   ];
 

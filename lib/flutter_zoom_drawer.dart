@@ -41,6 +41,7 @@ class ZoomDrawer extends StatefulWidget {
     this.duration,
     this.disableGesture = false,
     this.isRtl,
+    this.clipMainScreen: true,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// Layout style
@@ -88,6 +89,9 @@ class ZoomDrawer extends StatefulWidget {
   /// display the drawer in RTL
   final bool? isRtl;
 
+  /// determine whether to clip the main screen
+  final bool clipMainScreen;
+
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
 
@@ -99,18 +103,19 @@ class ZoomDrawer extends StatefulWidget {
 
   /// Languages that are Right to Left
   static List<String> RTL_LANGUAGES = ["ar", "ur", "he", "dv", "fa"];
+
   /// Static function to determine the device text direction RTL/LTR
   static bool isRTL() {
-
     /// Device language
     final locale = _getLanguageCode();
 
     return RTL_LANGUAGES.contains(locale);
   }
+
   static String? _getLanguageCode() {
     try {
       return ui.window.locale.languageCode.toLowerCase();
-    } catch(e) {
+    } catch (e) {
       return null;
     }
   }
@@ -283,10 +288,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         ..rotateZ(rotationAngle)
         ..scale(contentScale, contentScale),
       alignment: Alignment.centerLeft,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(cornerRadius),
-        child: container,
-      ),
+      child: widget.clipMainScreen
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(cornerRadius),
+              child: container,
+            )
+          : container,
     );
   }
 
@@ -344,10 +351,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..translate(slide)
                 ..scale(scale),
               alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(cornerRadius),
-                child: widget.mainScreen,
-              ),
+              child: widget.clipMainScreen
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      child: widget.mainScreen,
+                    )
+                  : widget.mainScreen,
             ),
           ],
         );
@@ -420,10 +429,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             Transform(
               transform: Matrix4.identity()..translate(slide),
               alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(cornerRadius),
-                child: widget.mainScreen,
-              ),
+              child: widget.clipMainScreen
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      child: widget.mainScreen,
+                    )
+                  : widget.mainScreen,
             ),
           ],
         );
@@ -497,10 +508,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..translate(slide, top)
                 ..scale(scale),
               alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(cornerRadius),
-                child: widget.mainScreen,
-              ),
+              child: widget.clipMainScreen
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      child: widget.mainScreen,
+                    )
+                  : widget.mainScreen,
             ),
           ],
         );
@@ -529,10 +542,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..scale(scale)
                 ..rotateY(rotate * _rtlSlide),
               alignment: Alignment.centerRight,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(cornerRadius),
-                child: widget.mainScreen,
-              ),
+              child: widget.clipMainScreen
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      child: widget.mainScreen,
+                    )
+                  : widget.mainScreen,
             ),
           ],
         );
@@ -561,10 +576,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..scale(scale)
                 ..rotateY(-rotate * _rtlSlide),
               alignment: Alignment.centerRight,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(cornerRadius),
-                child: widget.mainScreen,
-              ),
+              child: widget.clipMainScreen
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      child: widget.mainScreen,
+                    )
+                  : widget.mainScreen,
             ),
           ],
         );

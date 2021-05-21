@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isRtl = context.locale.languageCode == "ar";
     return ZoomDrawer(
       controller: _drawerController,
-      // style: DrawerStyle.Style3,
+      style: DrawerStyle.Style7,
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       mainScreenScale: .1,
       slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
       isRtl: isRtl,
+      clipMainScreen: false,
       // openCurve: Curves.fastOutSlowIn,
       // closeCurve: Curves.bounceIn,
     );
