@@ -1,3 +1,7 @@
+# [2.0.2+4]
+
+* Fixed Locale warning
+
 # [2.0.2+3]
 
 * added possibility to disable main screen clipping

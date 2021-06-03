@@ -114,7 +114,7 @@ class ZoomDrawer extends StatefulWidget {
 
   static String? _getLanguageCode() {
     try {
-      return ui.window.locale.languageCode.toLowerCase();
+      return ui.window.locale!.languageCode.toLowerCase();
     } catch (e) {
       return null;
     }
