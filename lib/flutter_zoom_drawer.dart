@@ -120,13 +120,13 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   AnimationController? get animationController => _animationController;
 
   /// Toggle drawer
-  toggle() {
-    if (_state == DrawerState.open) {
-      close();
-    } else if (_state == DrawerState.closed) {
-      open();
-    }
-  }
+  // toggle() {
+  //   if (_state == DrawerState.open) {
+  //     close();
+  //   } else if (_state == DrawerState.closed) {
+  //     open();
+  //   }
+  // }
 
   /// check whether drawer is open
   bool isOpen() => _state == DrawerState.open /* || _state == DrawerState.opening*/;
@@ -490,7 +490,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 ..setEntry(3, 2, 0.0009)
                 ..translate(widget.isRTL ? -x : x)
                 ..rotateY(widget.isRTL ? -rotate : rotate),
-              alignment:widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
+              alignment: widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
                   if (_state == DrawerState.open) {
@@ -541,7 +541,7 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                 ..translate(widget.isRTL ? -x : x)
                 ..scale(scale)
                 ..rotateY(widget.isRTL ? rotate : -rotate),
-              alignment:widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
+              alignment: widget.isRTL ? Alignment.centerLeft : Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
                   if (_state == DrawerState.open) {
@@ -640,11 +640,20 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
     return GestureDetector(
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
-        if (_state == DrawerState.open && details.delta.dx < -6 && !widget.isRTL) {
-          toggle();
+        if ((details.delta.dx > 6 || details.delta.dx < 6 && _state == DrawerState.open) && !widget.isRTL) {
+          if (_state == DrawerState.closed) {
+            open();
+          } else if (_state == DrawerState.open && details.delta.dx < -6) {
+            close();
+          }
         }
-        if(_state == DrawerState.open && details.delta.dx > 6 && widget.isRTL){
-          toggle();
+
+        if ((details.delta.dx < -6 || details.delta.dx > 6 && _state == DrawerState.open) && widget.isRTL) {
+          if (_state == DrawerState.closed) {
+            open();
+          } else if (_state == DrawerState.open && details.delta.dx > 6) {
+            close();
+          }
         }
       },
       child: renderLayout(),
