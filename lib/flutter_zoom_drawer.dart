@@ -639,12 +639,14 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return GestureDetector(
       /// Detecting the slide amount to close the drawer in RTL & LTR
-      // onPanUpdate: (details) {
-      //   if (_state == DrawerState.open && details.delta.dx < -6 && !widget.isRTL ||
-      //       details.delta.dx < 6 && widget.isRTL) {
-      //     toggle();
-      //   }
-      // },
+      onPanUpdate: (details) {
+        if (_state == DrawerState.open && details.delta.dx < -6 && !widget.isRTL) {
+          toggle();
+        }
+        if(_state == DrawerState.open && details.delta.dx > 6 && widget.isRTL){
+          toggle();
+        }
+      },
       child: renderLayout(),
     );
   }
