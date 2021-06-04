@@ -120,13 +120,13 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
   AnimationController? get animationController => _animationController;
 
   /// Toggle drawer
-  // toggle() {
-  //   if (_state == DrawerState.open) {
-  //     close();
-  //   } else if (_state == DrawerState.closed) {
-  //     open();
-  //   }
-  // }
+  toggle() {
+    if (_state == DrawerState.open) {
+      close();
+    } else if (_state == DrawerState.closed) {
+      open();
+    }
+  }
 
   /// check whether drawer is open
   bool isOpen() => _state == DrawerState.open /* || _state == DrawerState.opening*/;
