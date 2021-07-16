@@ -354,6 +354,19 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   transform: Matrix4.identity()..translate(widget.isRTL ? -slide : slide),
                   alignment: Alignment.center,
                   child: GestureDetector(
+                      onPanUpdate: (details) {
+                    if ((details.delta.dx > 6 || details.delta.dx < 6 && _state == DrawerState.open) && !widget.isRTL) {
+                      if (_state == DrawerState.open && details.delta.dx < -6) {
+                        close();
+                      }
+                    }
+
+                    if ((details.delta.dx < -6 || details.delta.dx > 6 && _state == DrawerState.open) && widget.isRTL) {
+                      if (_state == DrawerState.open && details.delta.dx > 6) {
+                        close();
+                      }
+                    }
+                  },
                     child: Stack(
                       children: [
                         widget.mainScreen,
@@ -395,7 +408,6 @@ class _ZoomDrawerState extends State<ZoomDrawer> with SingleTickerProviderStateM
                   },
                   child: Container(
                     width: DrawerState.closed == _state ? 20 : 0,
-                    color: Colors.red,
                   ),
                 ),
               ],
