@@ -62,7 +62,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    final rtl = ZoomDrawer.isRTL();
+    final rtl = context.locale.languageCode == "ar";
     return ValueListenableBuilder<DrawerState>(
       valueListenable: ZoomDrawer.of(context)!.stateNotifier!,
       builder: (context, state, child) {

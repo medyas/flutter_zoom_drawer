@@ -40,8 +40,8 @@ class ZoomDrawer extends StatefulWidget {
     this.closeCurve,
     this.duration,
     this.disableGesture = false,
-    this.isRtl,
-    this.clipMainScreen: true,
+    this.isRtl= false,
+    this.clipMainScreen= true,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// Layout style
@@ -87,7 +87,7 @@ class ZoomDrawer extends StatefulWidget {
   final bool disableGesture;
 
   /// display the drawer in RTL
-  final bool? isRtl;
+  final bool isRtl;
 
   /// determine whether to clip the main screen
   final bool clipMainScreen;
@@ -99,25 +99,6 @@ class ZoomDrawer extends StatefulWidget {
   static _ZoomDrawerState? of(BuildContext context) {
     return context.findAncestorStateOfType<State<ZoomDrawer>>()
         as _ZoomDrawerState?;
-  }
-
-  /// Languages that are Right to Left
-  static List<String> RTL_LANGUAGES = ["ar", "ur", "he", "dv", "fa"];
-
-  /// Static function to determine the device text direction RTL/LTR
-  static bool isRTL() {
-    /// Device language
-    final locale = _getLanguageCode();
-
-    return RTL_LANGUAGES.contains(locale);
-  }
-
-  static String? _getLanguageCode() {
-    try {
-      return ui.window.locale!.languageCode.toLowerCase();
-    } catch (e) {
-      return null;
-    }
   }
 }
 
@@ -131,8 +112,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// check the slide direction
   late int _rtlSlide;
-
-  late bool _rtl;
 
   AnimationController? _animationController;
   DrawerState _state = DrawerState.closed;
@@ -210,15 +189,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       widget.controller!.stateNotifier = stateNotifier;
     }
 
-    _rtl = widget.isRtl ?? ZoomDrawer.isRTL();
-    _rtlSlide = _rtl ? -1 : 1;
+    _rtlSlide = widget.isRtl  ? -1 : 1;
   }
 
   @override
   void didUpdateWidget(covariant ZoomDrawer oldWidget) {
     if (oldWidget.isRtl != widget.isRtl) {
-      _rtl = widget.isRtl ?? ZoomDrawer.isRTL();
-      _rtlSlide = _rtl ? -1 : 1;
+      _rtlSlide = widget.isRtl  ? -1 : 1;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -305,8 +282,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
         if (_state == DrawerState.open &&
-            ((details.delta.dx < -6 && !_rtl) ||
-                (details.delta.dx < 6 && _rtl))) {
+            ((details.delta.dx < -6 && !widget.isRtl ) ||
+                (details.delta.dx < 6 && widget.isRtl ))) {
           toggle();
         }
       },
@@ -365,7 +342,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final slidePercent = _rtl ? MediaQuery.of(context).size.width * .1 : 15.0;
+    final slidePercent = widget.isRtl  ? MediaQuery.of(context).size.width * .1 : 15.0;
     return Stack(
       children: [
         widget.menuScreen,
@@ -525,10 +502,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        final slideWidth = _rtl ? widget.slideWidth : widget.slideWidth / 2;
+        final slideWidth = widget.isRtl  ? widget.slideWidth : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
         double scale =
-            1 - (_percentOpen * widget.mainScreenScale) + (_rtl ? 0.0 : 0.2);
+            1 - (_percentOpen * widget.mainScreenScale) + (widget.isRtl  ? 0.0 : 0.2);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
 
@@ -560,10 +537,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       animation: _animationController!,
       builder: (context, child) {
         final slideWidth =
-            _rtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
+        widget.isRtl  ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
         double scale =
-            1 - (_percentOpen * widget.mainScreenScale) + (_rtl ? 0.0 : -0.2);
+            1 - (_percentOpen * widget.mainScreenScale) + (widget.isRtl  ? 0.0 : -0.2);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
         return Stack(

@@ -29,7 +29,7 @@ class PageStructure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).accentColor;
-    final angle = ZoomDrawer.isRTL() ? 180 * pi / 180 : 0.0;
+    final angle = context.locale.languageCode == "ar" ? 180 * pi / 180 : 0.0;
     final _currentPage =
         context.select<MenuProvider, int>((provider) => provider.currentPage);
     final container = Container(

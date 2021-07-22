@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:example/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -43,4 +44,25 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
+  /// Languages that are Right to Left
+  static List<String> RTL_LANGUAGES = ["ar", "ur", "he", "dv", "fa"];
+
+  /// Static function to determine the device text direction RTL/LTR
+  static bool isRTL() {
+    /// Device language
+    final locale = _getLanguageCode();
+
+    return RTL_LANGUAGES.contains(locale);
+  }
+
+  static String? _getLanguageCode() {
+    try {
+      return ui.window.locale!.languageCode.toLowerCase();
+    } catch (e) {
+      return null;
+    }
+  }
 }
+
+
