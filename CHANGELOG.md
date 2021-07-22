@@ -1,3 +1,7 @@
+# [2.1.0]
+
+* Removed `isRtl` method to fixed Locale warning
+
 # [2.0.2+4]
 
 * Fixed Locale warning
