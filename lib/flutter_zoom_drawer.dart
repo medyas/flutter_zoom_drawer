@@ -505,7 +505,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         final slideWidth = widget.isRtl  ? widget.slideWidth : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
         double scale =
-            1 - (_percentOpen * widget.mainScreenScale) + (widget.isRtl  ? 0.0 : 0.2);
+            1 - (_percentOpen * widget.mainScreenScale);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
 
@@ -540,7 +540,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         widget.isRtl  ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
         double scale =
-            1 - (_percentOpen * widget.mainScreenScale) + (widget.isRtl  ? 0.0 : -0.2);
+            1 - (_percentOpen * widget.mainScreenScale);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
         return Stack(

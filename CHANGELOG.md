@@ -1,3 +1,7 @@
+# [2.1.1]
+
+* fixed `Style6` & `Style7` issues
+
 # [2.1.0]
 
 * Removed `isRtl` method to fixed Locale warning
