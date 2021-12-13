@@ -1,3 +1,8 @@
+# [2.1.2]
+
+* fixed swipe to close issue
+* add `swipeOffset` to customize swipe length for triggering drawer close
+
 # [2.1.1]
 
 * fixed `Style6` & `Style7` issues

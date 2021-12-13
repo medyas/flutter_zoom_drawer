@@ -29,28 +29,27 @@ class _HomeScreenState extends State<HomeScreen> {
     final isRtl = context.locale.languageCode == "ar";
     return ZoomDrawer(
       controller: _drawerController,
-      style: DrawerStyle.Style7,
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
         current: _currentPage,
       ),
       mainScreen: MainScreen(),
-      borderRadius: 24.0,
-//      showShadow: true,
+      openCurve: Curves.fastOutSlowIn,
+      borderRadius: 60.0,
+      style: DrawerStyle.Style7,
+      showShadow: true,
+      mainScreenScale: .3,
       angle: 0.0,
-      mainScreenScale: .1,
+      swipeOffset: 2.0,
       slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
       isRtl: isRtl,
-      clipMainScreen: false,
-      // openCurve: Curves.fastOutSlowIn,
-      // closeCurve: Curves.bounceIn,
     );
   }
 
   void _updatePage(index) {
     Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index);
-    _drawerController.toggle!();
+    _drawerController.toggle?.call();
   }
 }
 
@@ -75,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
         child: PageStructure(),
         onPanUpdate: (details) {
           if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
-            ZoomDrawer.of(context)!.toggle();
+            ZoomDrawer.of(context)?.toggle.call();
           }
         },
       ),

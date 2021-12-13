@@ -40,8 +40,9 @@ class ZoomDrawer extends StatefulWidget {
     this.closeCurve,
     this.duration,
     this.disableGesture = false,
-    this.isRtl= false,
-    this.clipMainScreen= true,
+    this.isRtl = false,
+    this.clipMainScreen = true,
+    this.swipeOffset = 6.0,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// Layout style
@@ -91,6 +92,9 @@ class ZoomDrawer extends StatefulWidget {
 
   /// determine whether to clip the main screen
   final bool clipMainScreen;
+
+  /// The swipe offset to trigger drawer close
+  final double swipeOffset;
 
   @override
   _ZoomDrawerState createState() => new _ZoomDrawerState();
@@ -189,13 +193,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       widget.controller!.stateNotifier = stateNotifier;
     }
 
-    _rtlSlide = widget.isRtl  ? -1 : 1;
+    _rtlSlide = widget.isRtl ? -1 : 1;
   }
 
   @override
   void didUpdateWidget(covariant ZoomDrawer oldWidget) {
     if (oldWidget.isRtl != widget.isRtl) {
-      _rtlSlide = widget.isRtl  ? -1 : 1;
+      _rtlSlide = widget.isRtl ? -1 : 1;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -282,8 +286,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
         if (_state == DrawerState.open &&
-            ((details.delta.dx < -6 && !widget.isRtl ) ||
-                (details.delta.dx < 6 && widget.isRtl ))) {
+            ((details.delta.dx < -(widget.swipeOffset) && !widget.isRtl) ||
+                (details.delta.dx > widget.swipeOffset && widget.isRtl))) {
           toggle();
         }
       },
@@ -342,7 +346,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final slidePercent = widget.isRtl  ? MediaQuery.of(context).size.width * .1 : 15.0;
+    final slidePercent =
+        widget.isRtl ? MediaQuery.of(context).size.width * .1 : 15.0;
     return Stack(
       children: [
         widget.menuScreen,
@@ -502,10 +507,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        final slideWidth = widget.isRtl  ? widget.slideWidth : widget.slideWidth / 2;
+        final slideWidth =
+            widget.isRtl ? widget.slideWidth : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
-        double scale =
-            1 - (_percentOpen * widget.mainScreenScale);
+        double scale = 1 - (_percentOpen * widget.mainScreenScale);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
 
@@ -537,10 +542,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       animation: _animationController!,
       builder: (context, child) {
         final slideWidth =
-        widget.isRtl  ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
+            widget.isRtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
         double x = _percentOpen * slideWidth * _rtlSlide;
-        double scale =
-            1 - (_percentOpen * widget.mainScreenScale);
+        double scale = 1 - (_percentOpen * widget.mainScreenScale);
         double rotate = _percentOpen * (pi / 4);
         final cornerRadius = widget.borderRadius * _percentOpen;
         return Stack(
