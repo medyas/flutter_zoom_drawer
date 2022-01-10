@@ -1,3 +1,8 @@
+# [2.2.0]
+
+* Added overlayColor, overlayBlend, mainScreenTapClose and boxShadow
+* Restructured mainScreen effects stack, cleaned up bugs, added Style8 from a fork
+
 # [2.1.2]
 
 * fixed swipe to close issue

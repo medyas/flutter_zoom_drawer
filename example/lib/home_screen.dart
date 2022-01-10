@@ -44,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
       swipeOffset: 2.0,
       slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
       isRtl: isRtl,
+      mainScreenTapClose: true,
+      overlayColor: Colors.brown.withOpacity(0.5),
+      overlayBlend: BlendMode.darken,
+      boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 12)],
     );
   }
 
