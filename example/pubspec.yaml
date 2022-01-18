@@ -25,8 +25,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_zoom_drawer:
     path: ../
-  flutter_platform_widgets: ^1.0.1-nullsafety.0
-  provider: ^5.0.0
+  flutter_platform_widgets: ^1.12.1
+  provider: ^6.0.2
 
   flutter_localizations:
     sdk: flutter

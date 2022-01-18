@@ -1,5 +1,10 @@
-# [2.2.0]
+# [2.2.1]
 
+* Added `shadowLayer1Color` & `shadowLayer2Color`
+* Fixed `Style8` RTL support
+
+# [2.2.0]
+**Thanks to @Skquark for his contribution**
 * Added overlayColor, overlayBlend, mainScreenTapClose and boxShadow
 * Restructured mainScreen effects stack, cleaned up bugs, added Style8 from a fork
 
