@@ -36,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       mainScreen: MainScreen(),
       openCurve: Curves.fastOutSlowIn,
-      borderRadius: 0.0,
-      style: DrawerStyle.Style8,
+      borderRadius: 32.0,
+      style: DrawerStyle.Style1,
       showShadow: true,
       mainScreenScale: .3,
       angle: 0.0,
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isRtl: isRtl,
       mainScreenTapClose: true,
       overlayColor: Colors.brown.withOpacity(0.5),
-      overlayBlend: BlendMode.darken,
+      // overlayBlend: BlendMode.darken,
       boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 12)],
     );
   }

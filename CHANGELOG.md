@@ -1,3 +1,7 @@
+# [2.2.2]
+
+* Fixed `Style1` border radius
+
 # [2.2.1]
 
 * Added `shadowLayer1Color` & `shadowLayer2Color`

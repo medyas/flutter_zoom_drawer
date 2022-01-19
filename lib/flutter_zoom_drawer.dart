@@ -250,8 +250,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ///
   /// * [slide] is the sliding amount of the drawer
   ///
-  Widget _zoomAndSlideContent(Widget? container,
-      {double? angle, double? scale, double slide = 0}) {
+  Widget _zoomAndSlideContent(
+    Widget? container, {
+    double? angle,
+    double? scale,
+    double slide = 0,
+    bool isMain = false,
+  }) {
     double slidePercent, scalePercent;
 
     /// determine current slide percent based on the MenuStatus
@@ -294,7 +299,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         ..rotateZ(rotationAngle)
         ..scale(contentScale, contentScale),
       alignment: Alignment.centerLeft,
-      child: container,
+      child: isMain
+          ? container
+          : ClipRRect(
+              borderRadius: BorderRadius.circular(cornerRadius),
+              child: container,
+            ),
     );
   }
 
@@ -303,42 +313,45 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     _mainScreenContent = widget.mainScreen;
     final cornerRadius = widget.borderRadius * _percentOpen;
 
-    if (_percentOpen != 0) {
-      if (widget.overlayColor != null) {
-        _overlayColor = ColorTween(
-            begin: widget.overlayColor!.withOpacity(0.0),
-            end: widget.overlayColor);
-        _mainScreenContent = ColorFiltered(
-          colorFilter: ColorFilter.mode(_overlayColor.lerp(_percentOpen)!,
-              widget.overlayBlend ?? BlendMode.screen),
-          child: _mainScreenContent,
-        );
-      }
-      if (widget.mainScreenTapClose) {
-        _mainScreenContent = GestureDetector(
-          onTapDown: (_) => close(),
-          child: AbsorbPointer(child: _mainScreenContent),
-        );
-      }
-      if (widget.borderRadius != 0) {
-        _mainScreenContent = ClipRRect(
-            borderRadius: BorderRadius.circular(cornerRadius),
-            child: _mainScreenContent);
-      }
-      if (widget.boxShadow != null) {
-        // Could use [hasShadow], but seems redundant
-        _mainScreenContent = Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(cornerRadius),
-              boxShadow: widget.boxShadow ??
-                  [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.5), blurRadius: 5)
-                  ]),
-          child: _mainScreenContent,
-        );
-      }
+    if (widget.overlayColor != null) {
+      _overlayColor = ColorTween(
+          begin: widget.overlayColor!.withOpacity(0.0),
+          end: widget.overlayColor);
+      _mainScreenContent = ColorFiltered(
+        colorFilter: ColorFilter.mode(_overlayColor.lerp(_percentOpen)!,
+            widget.overlayBlend ?? BlendMode.screen),
+        child: _mainScreenContent,
+      );
     }
+    if (widget.mainScreenTapClose && _state == DrawerState.open) {
+      _mainScreenContent = GestureDetector(
+        onTap: () => close(),
+        child: AbsorbPointer(child: _mainScreenContent),
+      );
+    }
+    if (widget.borderRadius != 0) {
+      _mainScreenContent = ClipRRect(
+        borderRadius: BorderRadius.circular(cornerRadius),
+        child: _mainScreenContent,
+      );
+    }
+    if (widget.boxShadow != null) {
+      // Could use [hasShadow], but seems redundant
+      _mainScreenContent = Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(cornerRadius),
+          boxShadow: widget.boxShadow ??
+              [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 5,
+                )
+              ],
+        ),
+        child: _mainScreenContent,
+      );
+    }
+
     return _mainScreenContent;
   }
 
@@ -445,14 +458,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Displaying the main screen
         AnimatedBuilder(
           animation: _animationController!,
-          builder: (_, w) => _zoomAndSlideContent(w),
-          child: GestureDetector(
-            child: mainScreenContent,
-            onTap: () {
-              if (_state == DrawerState.open) {
-                toggle();
-              }
-            },
+          builder: (_, __) => _zoomAndSlideContent(
+            mainScreenContent,
+            isMain: true,
           ),
         ),
       ],
