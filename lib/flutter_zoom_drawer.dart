@@ -137,7 +137,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       const Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
   ColorTween _overlayColor =
       ColorTween(begin: Colors.transparent, end: Colors.black38);
-  late Widget _mainScreenContent;
 
   /// check the slide direction
   late int _rtlSlide;
@@ -217,7 +216,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       widget.controller!.isOpen = isOpen;
       widget.controller!.stateNotifier = stateNotifier;
     }
-    _mainScreenContent = widget.mainScreen;
     _rtlSlide = widget.isRtl ? -1 : 1;
   }
 
@@ -310,13 +308,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Builds the layers of decorations on mainScreen
   Widget get mainScreenContent {
-    _mainScreenContent = widget.mainScreen;
-    final cornerRadius = widget.borderRadius * _percentOpen;
-
+    Widget _mainScreenContent = widget.mainScreen;
     if (widget.overlayColor != null) {
       _overlayColor = ColorTween(
-          begin: widget.overlayColor!.withOpacity(0.0),
-          end: widget.overlayColor);
+        begin: widget.overlayColor!.withOpacity(0.0),
+        end: widget.overlayColor,
+      );
       _mainScreenContent = ColorFiltered(
         colorFilter: ColorFilter.mode(_overlayColor.lerp(_percentOpen)!,
             widget.overlayBlend ?? BlendMode.screen),
@@ -330,12 +327,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
     if (widget.borderRadius != 0) {
+      final cornerRadius = widget.borderRadius * _percentOpen;
       _mainScreenContent = ClipRRect(
         borderRadius: BorderRadius.circular(cornerRadius),
         child: _mainScreenContent,
       );
     }
     if (widget.boxShadow != null) {
+      final cornerRadius = widget.borderRadius * _percentOpen;
       // Could use [hasShadow], but seems redundant
       _mainScreenContent = Container(
         decoration: BoxDecoration(
@@ -351,7 +350,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         child: _mainScreenContent,
       );
     }
-
     return _mainScreenContent;
   }
 
@@ -460,7 +458,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           animation: _animationController!,
           builder: (_, __) => _zoomAndSlideContent(
             mainScreenContent,
-            isMain: true,
+            isMain: false,
           ),
         ),
       ],

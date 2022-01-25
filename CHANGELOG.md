@@ -1,3 +1,8 @@
+# [2.2.2+1]
+
+* Fixed `Style1` state
+
+
 # [2.2.2]
 
 * Fixed `Style1` border radius
