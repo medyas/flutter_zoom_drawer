@@ -334,6 +334,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Builds the layers of decorations on mainScreen
   Widget get mainScreenContent {
+    if (_percentOpen == 0) return widget.mainScreen;
     Widget _mainScreenContent = widget.mainScreen;
     if (widget.shrinkMainScreen) {
       var mainSize = MediaQuery.of(context).size.width - (widget.slideWidth * _percentOpen);
@@ -451,6 +452,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       },
     );
   }
+  
   Widget renderDefault() {
     return AnimatedBuilder(
       animation: _animationController!,
