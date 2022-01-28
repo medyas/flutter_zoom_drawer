@@ -1,6 +1,7 @@
 library flutter_zoom_drawer;
 
 import 'dart:math' show pi;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class ZoomDrawerController {
@@ -44,8 +45,11 @@ class ZoomDrawer extends StatefulWidget {
     this.swipeOffset = 6.0,
     this.overlayColor,
     this.overlayBlend,
+    this.overlayBlur,
     this.mainScreenTapClose = false,
     this.boxShadow,
+    this.shrinkMainScreen = false,
+    this.drawerStyleBuilder,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
   /// Layout style
@@ -112,11 +116,33 @@ class ZoomDrawer extends StatefulWidget {
   /// The BlendMode of the [overlayColor] filter (default BlendMode.screen)
   final BlendMode? overlayBlend;
 
+  /// Apply a Blur amount to the mainScreen
+  final double? overlayBlur;
+
   /// The Shadow of the mainScreenContent
   final List<BoxShadow>? boxShadow;
 
   /// Close drawer when tapping mainScreen
   final bool mainScreenTapClose;
+
+  /// Shrinks the mainScreen by [slideWidth], good for use on desktop with Style2
+  final bool shrinkMainScreen;
+
+  /// Build custom animated style to override [DrawerStyle]
+  /// ```dart
+  /// drawerStyleBuilder: (context, percentOpen, slideWidth, menuScreen, mainScreen) {
+  ///     double slide = slideWidth * percentOpen;
+  ///     return Stack(
+  ///       children: [
+  ///         menuScreen,
+  ///         Transform(
+  ///           transform: Matrix4.identity()..translate(slide),
+  ///           alignment: Alignment.center,
+  ///           child: mainScreen,
+  ///         )]);
+  ///   },
+  /// ```
+  final DrawerStyleBuilder? drawerStyleBuilder;
 
   @override
   _ZoomDrawerState createState() => _ZoomDrawerState();
@@ -309,6 +335,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Builds the layers of decorations on mainScreen
   Widget get mainScreenContent {
     Widget _mainScreenContent = widget.mainScreen;
+    if (widget.shrinkMainScreen) {
+      var mainSize = MediaQuery.of(context).size.width - (widget.slideWidth * _percentOpen);
+      _mainScreenContent = SizedBox(
+        width: mainSize,
+        child: _mainScreenContent,
+      );
+    }
     if (widget.overlayColor != null) {
       _overlayColor = ColorTween(
         begin: widget.overlayColor!.withOpacity(0.0),
@@ -350,6 +383,21 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         child: _mainScreenContent,
       );
     }
+    if (widget.angle != 0 && widget.style != DrawerStyle.Style1) {
+      final rotationAngle = (((widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
+      _mainScreenContent = Transform.rotate(
+        angle: rotationAngle,
+        alignment: widget.isRtl ? AlignmentDirectional.topEnd : AlignmentDirectional.topStart,
+        child: _mainScreenContent,
+      );
+    }
+    if (widget.overlayBlur != null) {
+      final blurAmount = widget.overlayBlur! * _percentOpen;
+      _mainScreenContent = ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+        child: _mainScreenContent,
+      );
+    }
     return _mainScreenContent;
   }
 
@@ -371,6 +419,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderLayout() {
+    if (widget.drawerStyleBuilder != null)
+      return renderCustomStyle();
     switch (widget.style) {
       case DrawerStyle.Style1:
         return renderStyle1();
@@ -393,6 +443,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
+  Widget renderCustomStyle() {
+    return AnimatedBuilder(
+      animation: _animationController!,
+      builder: (context, child) {
+        return widget.drawerStyleBuilder!(context, _percentOpen, widget.slideWidth, widget.menuScreen, mainScreenContent);
+      },
+    );
+  }
   Widget renderDefault() {
     return AnimatedBuilder(
       animation: _animationController!,
@@ -661,5 +719,8 @@ enum DrawerStyle {
   Style5,
   Style6,
   Style7,
-  Style8
+  Style8,
 }
+
+/// Build custom style with (context, percentOpen, slideWidth, menuScreen, mainScreen) {}
+typedef DrawerStyleBuilder = Widget Function(BuildContext context, double percentOpen, double slideWidth, Widget menuScreen, Widget mainScreen);

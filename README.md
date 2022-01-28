@@ -139,7 +139,13 @@ class MyDrawerController extends GetxController {
 | `isRtl`            | `bool`                 |    No     | Boolean, display the drawer in RTL             |
 | `openCurve`        | `Curve`                |    No     | open animation curve - defaults to `Curves.easeOut`                         |
 | `closeCurve`       | `Curve`                |    No     | close animation curve - defaults to `Curves.easeOut`                        |
-
+| `mainScreenTapClose` | `bool`               |    No     | Close drawer when tapping mainScreen             |
+| `overlayColor`     | `Color`                |    No     | Color of the main screen's cover overlay                  |
+| `overlayBlend`     | `BlendMode`            |    No     | The BlendMode of the `overlayColor` filter (default BlendMode.screen)      |
+| `boxShadow`        | `BoxShadow`            |    No     | The Shadow of the mainScreenContent                        |
+| `overlayBlur`      | `double`               |    No     | The Blur amount of the mainScreen option             |
+| `shrinkMainScreen` | `bool`                 |    No     | Shrinks the mainScreen by [slideWidth], good on desktop with Style2         |
+| `drawerStyleBuilder`| `DrawerStyleBuilder`  |    No     | Build custom animated style to override [DrawerStyle]             |
 
 ### Controlling the drawer
 
