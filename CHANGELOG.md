@@ -1,3 +1,8 @@
+# [2.2.3]
+
+* Added `overlayBlur`, `shrinkMainScreen` and `drawerStyleBuilder`
+* Fixed `angle` to rotate all styles, not just Style1
+
 # [2.2.2+1]
 
 * Fixed `Style1` state
@@ -14,7 +19,7 @@
 
 # [2.2.0]
 **Thanks to @Skquark for his contribution**
-* Added overlayColor, overlayBlend, mainScreenTapClose and boxShadow
+* Added `overlayColor`, `overlayBlend`, `mainScreenTapClose` and `boxShadow`
 * Restructured mainScreen effects stack, cleaned up bugs, added Style8 from a fork
 
 # [2.1.2]
