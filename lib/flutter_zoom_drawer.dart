@@ -337,7 +337,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (_percentOpen == 0) return widget.mainScreen;
     Widget _mainScreenContent = widget.mainScreen;
     if (widget.shrinkMainScreen) {
-      var mainSize = MediaQuery.of(context).size.width - (widget.slideWidth * _percentOpen);
+      final mainSize = MediaQuery.of(context).size.width - (widget.slideWidth * _percentOpen);
       _mainScreenContent = SizedBox(
         width: mainSize,
         child: _mainScreenContent,
