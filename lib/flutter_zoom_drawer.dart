@@ -337,7 +337,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (_percentOpen == 0) return widget.mainScreen;
     Widget _mainScreenContent = widget.mainScreen;
     if (widget.shrinkMainScreen) {
-      final mainSize = MediaQuery.of(context).size.width - (widget.slideWidth * _percentOpen);
+      final mainSize = MediaQuery.of(context).size.width -
+          (widget.slideWidth * _percentOpen);
       _mainScreenContent = SizedBox(
         width: mainSize,
         child: _mainScreenContent,
@@ -385,10 +386,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
     if (widget.angle != 0 && widget.style != DrawerStyle.Style1) {
-      final rotationAngle = (((widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
+      final rotationAngle =
+          (((widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
       _mainScreenContent = Transform.rotate(
         angle: rotationAngle,
-        alignment: widget.isRtl ? AlignmentDirectional.topEnd : AlignmentDirectional.topStart,
+        alignment: widget.isRtl
+            ? AlignmentDirectional.topEnd
+            : AlignmentDirectional.topStart,
         child: _mainScreenContent,
       );
     }
@@ -420,8 +424,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderLayout() {
-    if (widget.drawerStyleBuilder != null)
-      return renderCustomStyle();
+    if (widget.drawerStyleBuilder != null) return renderCustomStyle();
     switch (widget.style) {
       case DrawerStyle.Style1:
         return renderStyle1();
@@ -448,11 +451,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        return widget.drawerStyleBuilder!(context, _percentOpen, widget.slideWidth, widget.menuScreen, mainScreenContent);
+        return widget.drawerStyleBuilder!(context, _percentOpen,
+            widget.slideWidth, widget.menuScreen, mainScreenContent);
       },
     );
   }
-  
+
   Widget renderDefault() {
     return AnimatedBuilder(
       animation: _animationController!,
@@ -725,4 +729,9 @@ enum DrawerStyle {
 }
 
 /// Build custom style with (context, percentOpen, slideWidth, menuScreen, mainScreen) {}
-typedef DrawerStyleBuilder = Widget Function(BuildContext context, double percentOpen, double slideWidth, Widget menuScreen, Widget mainScreen);
+typedef DrawerStyleBuilder = Widget Function(
+    BuildContext context,
+    double percentOpen,
+    double slideWidth,
+    Widget menuScreen,
+    Widget mainScreen);

@@ -1,4 +1,4 @@
-# [2.2.3]
+# [2.3.0]
 
 * Added `overlayBlur`, `shrinkMainScreen` and `drawerStyleBuilder`
 * Fixed `angle` to rotate all styles, not just Style1
