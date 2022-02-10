@@ -334,7 +334,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Builds the layers of decorations on mainScreen
   Widget get mainScreenContent {
-    if (_percentOpen == 0) return widget.mainScreen;
+    // if (_percentOpen == 0) return widget.mainScreen;
     Widget _mainScreenContent = widget.mainScreen;
     if (widget.shrinkMainScreen) {
       final mainSize = MediaQuery.of(context).size.width -
@@ -350,8 +350,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         end: widget.overlayColor,
       );
       _mainScreenContent = ColorFiltered(
-        colorFilter: ColorFilter.mode(_overlayColor.lerp(_percentOpen)!,
-            widget.overlayBlend ?? BlendMode.screen),
+        colorFilter: ColorFilter.mode(
+          _overlayColor.lerp(_percentOpen)!,
+          widget.overlayBlend ?? BlendMode.screen,
+        ),
         child: _mainScreenContent,
       );
     }
@@ -522,7 +524,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           animation: _animationController!,
           builder: (_, __) => _zoomAndSlideContent(
             mainScreenContent,
-            isMain: false,
+            isMain: true,
           ),
         ),
       ],

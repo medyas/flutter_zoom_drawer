@@ -1,3 +1,7 @@
+# [2.3.1]
+
+* Fix `mainScreen` state destruction
+
 # [2.3.0]
 
 * Added `overlayBlur`, `shrinkMainScreen` and `drawerStyleBuilder`
