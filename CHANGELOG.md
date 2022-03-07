@@ -1,3 +1,7 @@
+# [2.3.1+1]
+
+* Fix `mainScreen` state rebuild
+
 # [2.3.1]
 
 * Fix `mainScreen` state destruction

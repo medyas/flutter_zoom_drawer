@@ -357,12 +357,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         child: _mainScreenContent,
       );
     }
-    if (widget.mainScreenTapClose && _state == DrawerState.open) {
-      _mainScreenContent = GestureDetector(
-        onTap: () => close(),
-        child: AbsorbPointer(child: _mainScreenContent),
-      );
-    }
     if (widget.borderRadius != 0) {
       final cornerRadius = widget.borderRadius * _percentOpen;
       _mainScreenContent = ClipRRect(
@@ -421,6 +415,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           toggle();
         }
       },
+      onTap: (widget.mainScreenTapClose && _state == DrawerState.open)? 
+        () => toggle(): null,
       child: renderLayout(),
     );
   }
