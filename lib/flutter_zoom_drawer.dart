@@ -2,6 +2,7 @@ library flutter_zoom_drawer;
 
 import 'dart:math' show pi;
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class ZoomDrawerController {
@@ -415,8 +416,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           toggle();
         }
       },
-      onTap: (widget.mainScreenTapClose && _state == DrawerState.open)? 
-        () => toggle(): null,
+      onTap: (widget.mainScreenTapClose && _state == DrawerState.open)
+          ? () => close()
+          : null,
       child: renderLayout(),
     );
   }
