@@ -3,7 +3,6 @@ import 'dart:math' show pi;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:example/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -28,7 +27,7 @@ class PageStructure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).accentColor;
+    final color = Theme.of(context).colorScheme.secondary;
     final angle = context.locale.languageCode == "ar" ? 180 * pi / 180 : 0.0;
     final _currentPage =
         context.select<MenuProvider, int>((provider) => provider.currentPage);
@@ -65,26 +64,28 @@ class PageStructure extends StatelessWidget {
           selectedLabelStyle: TextStyle(color: color),
         ),
         currentIndex: _currentPage,
-        itemChanged: (index) => Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index),
+        itemChanged: (index) =>
+            Provider.of<MenuProvider>(context, listen: false)
+                .updateCurrentPage(index),
         items: HomeScreen.mainMenu
             .map(
               (item) => BottomNavigationBarItem(
-            label: item.title,
-            icon: Icon(
-              item.icon,
-              color: color,
-            ),
-          ),
-        )
+                label: item.title,
+                icon: Icon(
+                  item.icon,
+                  color: color,
+                ),
+              ),
+            )
             .toList(),
       ),
       body: kIsWeb
           ? container
           : Platform.isAndroid
-          ? container
-          : SafeArea(
-        child: container,
-      ),
+              ? container
+              : SafeArea(
+                  child: container,
+                ),
     );
   }
 }
