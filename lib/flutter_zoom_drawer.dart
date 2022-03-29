@@ -416,9 +416,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           toggle();
         }
       },
-      onTap: (widget.mainScreenTapClose && _state == DrawerState.open)
-          ? () => close()
-          : null,
+      onTap: () {
+        if (widget.mainScreenTapClose && _state == DrawerState.open)
+          return close();
+      },
       child: renderLayout(),
     );
   }
