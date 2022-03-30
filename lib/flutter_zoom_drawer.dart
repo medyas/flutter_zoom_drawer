@@ -48,6 +48,7 @@ class ZoomDrawer extends StatefulWidget {
     this.overlayBlend,
     this.overlayBlur,
     this.mainScreenTapClose = false,
+    this.mainScreenAbsorbPointer = false,
     this.boxShadow,
     this.shrinkMainScreen = false,
     this.drawerStyleBuilder,
@@ -126,6 +127,9 @@ class ZoomDrawer extends StatefulWidget {
   /// Close drawer when tapping mainScreen
   final bool mainScreenTapClose;
 
+  /// Prevent touches to mainScreen while drawer is open
+  final bool mainScreenAbsorbPointer;
+
   /// Shrinks the mainScreen by [slideWidth], good for use on desktop with Style2
   final bool shrinkMainScreen;
 
@@ -157,6 +161,8 @@ class ZoomDrawer extends StatefulWidget {
 
 class _ZoomDrawerState extends State<ZoomDrawer>
     with SingleTickerProviderStateMixin {
+  late final ValueNotifier<bool> _isAbsorbing;
+
   final Curve _scaleDownCurve = const Interval(0.0, 0.3, curve: Curves.easeOut);
   final Curve _scaleUpCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
@@ -188,8 +194,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Toggle drawer
   void toggle() {
     if (_state == DrawerState.open) {
+      _isAbsorbing.value = false;
       close();
     } else if (_state == DrawerState.closed) {
+      _isAbsorbing.value = widget.mainScreenAbsorbPointer;
       open();
     }
   }
@@ -204,7 +212,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   @override
   void initState() {
     super.initState();
-
+    _isAbsorbing = ValueNotifier(widget.mainScreenAbsorbPointer);
     stateNotifier = ValueNotifier(_state);
 
     /// Initialize the animation controller
@@ -260,6 +268,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   void dispose() {
+    _isAbsorbing.dispose();
     _animationController!.dispose();
     super.dispose();
   }
@@ -401,7 +410,30 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         child: _mainScreenContent,
       );
     }
-    return _mainScreenContent;
+    return Stack(
+      children: [
+        _mainScreenContent,
+
+        /// Prevents any touches to mainScreen while drawer is open
+        /// Will apply only if widget.mainScreenAbsorbPointer is true
+        if (widget.mainScreenAbsorbPointer)
+          ValueListenableBuilder(
+            valueListenable: _isAbsorbing,
+            builder: (_, bool _valueNotifier, ___) {
+              if (_valueNotifier && _state == DrawerState.open) {
+                return AbsorbPointer(
+                  child: Container(
+                    color: Colors.transparent,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+      ],
+    );
   }
 
   @override
