@@ -63,8 +63,7 @@ class PageStructure extends StatelessWidget {
         ),
         currentIndex: _currentPage,
         itemChanged: (index) =>
-            Provider.of<MenuProvider>(context, listen: false)
-                .updateCurrentPage(index),
+            context.read<MenuProvider>().updateCurrentPage(index),
         items: HomeScreen.mainMenu
             .map(
               (item) => BottomNavigationBarItem(
