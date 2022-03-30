@@ -175,6 +175,83 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ColorTween _overlayColor =
       ColorTween(begin: Colors.transparent, end: Colors.black38);
 
+  static const _maxSlide = 255;
+  static const _dragRightStartVal = 120;
+  static const _dragLeftStartVal = _maxSlide - 120;
+  static bool _shouldDrag = false;
+
+  void _onDragStart(DragStartDetails startDetails) {
+    final _isDraggingFromLeft = _animationController.isDismissed &&
+        startDetails.globalPosition.dx < _dragRightStartVal;
+    final _isDraggingFromRight = _animationController.isCompleted &&
+        startDetails.globalPosition.dx > _dragLeftStartVal;
+    _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
+  }
+
+  void _onDragStartRTL(DragStartDetails startDetails) {
+    final _isDraggingFromRight = _animationController.isDismissed &&
+        startDetails.globalPosition.dx > _dragLeftStartVal;
+    final _isDraggingFromLeft = _animationController.isCompleted &&
+        startDetails.globalPosition.dx < _dragRightStartVal;
+    _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
+  }
+
+  void _onDragUpdate(DragUpdateDetails updateDetails) {
+    if (_shouldDrag == false) {
+      return;
+    }
+    final _delta = updateDetails.primaryDelta ?? 0 / _maxSlide;
+
+    _animationController.value += _delta / 425;
+  }
+
+  void _onDragUpdateRTL(DragUpdateDetails updateDetails) {
+    if (_shouldDrag == false) {
+      return;
+    }
+    final _delta = updateDetails.primaryDelta ?? 0 / _maxSlide;
+
+    _animationController.value -= _delta / 425;
+  }
+
+  void _onDragEnd(DragEndDetails dragEndDetails) {
+    if (_animationController.isDismissed || _animationController.isCompleted) {
+      return;
+    }
+
+    const _kMinFlingVelocity = 365.0;
+    final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
+
+    if (_dragVelocity >= _kMinFlingVelocity) {
+      final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
+          MediaQuery.of(context).size.width;
+      _animationController.fling(velocity: visualVelocityInPx);
+    } else if (_animationController.value < 0.3) {
+      close();
+    } else {
+      open();
+    }
+  }
+
+  void _onDragEndRTL(DragEndDetails dragEndDetails) {
+    if (_animationController.isDismissed || _animationController.isCompleted) {
+      return;
+    }
+
+    const _kMinFlingVelocity = 365.0;
+    final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
+
+    if (_dragVelocity <= _kMinFlingVelocity) {
+      final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
+          MediaQuery.of(context).size.width;
+      _animationController.fling(velocity: visualVelocityInPx);
+    } else if (_animationController.value < 0.3) {
+      close();
+    } else {
+      open();
+    }
+  }
+
   /// check the slide direction
   late int _rtlSlide;
 
@@ -458,13 +535,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (widget.disableGesture) return renderLayout();
 
     return GestureDetector(
-      /// Detecting the slide amount to close the drawer in RTL & LTR
-      onPanUpdate: (details) {
-        if (_state == DrawerState.open &&
-            ((details.delta.dx < -widget.swipeOffset && !widget.isRtl) ||
-                (details.delta.dx > widget.swipeOffset && widget.isRtl))) {
-          toggle();
-        }
+      onHorizontalDragStart: (dragStartDetails) {
+        if (widget.isRtl) return _onDragStartRTL(dragStartDetails);
+        return _onDragStart(dragStartDetails);
+      },
+      onHorizontalDragUpdate: (dragUpdateDetails) {
+        if (widget.isRtl) return _onDragUpdateRTL(dragUpdateDetails);
+        return _onDragUpdate(dragUpdateDetails);
+      },
+      onHorizontalDragEnd: (dragEndDetails) {
+        if (widget.isRtl) return _onDragEndRTL(dragEndDetails);
+        return _onDragEnd(dragEndDetails);
       },
       onTap: () {
         if (widget.mainScreenTapClose && _state == DrawerState.open) {
