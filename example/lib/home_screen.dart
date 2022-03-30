@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = context.locale.languageCode == "ar";
+    final _isRtl = context.locale.languageCode == "ar";
     return ZoomDrawer(
       controller: _drawerController,
       menuScreen: MenuScreen(
@@ -38,8 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
       showShadow: true,
       angle: 0.0,
       swipeOffset: 2.0,
-      slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
-      isRtl: isRtl,
+      slideWidth: MediaQuery.of(context).size.width * (_isRtl ? .55 : 0.65),
+      isRtl: _isRtl,
       mainScreenTapClose: true,
       overlayColor: Colors.brown.withOpacity(0.5),
       // overlayBlend: BlendMode.darken,
