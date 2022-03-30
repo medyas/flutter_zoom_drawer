@@ -48,6 +48,7 @@ class ZoomDrawer extends StatefulWidget {
     this.overlayBlend,
     this.overlayBlur,
     this.mainScreenTapClose = false,
+    this.menuScreenTapClose = false,
     this.mainScreenAbsorbPointer = false,
     this.boxShadow,
     this.shrinkMainScreen = false,
@@ -123,6 +124,9 @@ class ZoomDrawer extends StatefulWidget {
 
   /// The Shadow of the mainScreenContent
   final List<BoxShadow>? boxShadow;
+
+  /// Close drawer when tapping menuScreen
+  final bool menuScreenTapClose;
 
   /// Close drawer when tapping mainScreen
   final bool mainScreenTapClose;
@@ -343,6 +347,19 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
+  /// Builds menuScreenContent
+  Widget get menuScreenContent {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (widget.menuScreenTapClose && _state == DrawerState.open) {
+          return close();
+        }
+      },
+      child: widget.menuScreen,
+    );
+  }
+
   /// Builds the layers of decorations on mainScreen
   Widget get mainScreenContent {
     // if (_percentOpen == 0) return widget.mainScreen;
@@ -490,7 +507,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           context,
           _percentOpen,
           widget.slideWidth,
-          widget.menuScreen,
+          menuScreenContent,
           mainScreenContent,
         );
       },
@@ -506,7 +523,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenContent,
             Transform(
               transform: Matrix4.identity()
                 ..translate(_slide)
@@ -525,7 +542,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         widget.isRtl ? MediaQuery.of(context).size.width * .1 : 15.0;
     return Stack(
       children: [
-        widget.menuScreen,
+        menuScreenContent,
         if (widget.showShadow) ...[
           /// Displaying the first shadow
           AnimatedBuilder(
@@ -577,7 +594,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenContent,
             Transform(
               transform: Matrix4.identity()..translate(_slide),
               alignment: Alignment.center,
@@ -607,7 +624,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               offset: Offset(-_left, 0),
               child: SizedBox(
                 width: widget.slideWidth,
-                child: widget.menuScreen,
+                child: menuScreenContent,
               ),
             ),
           ],
@@ -629,7 +646,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               offset: Offset(-_left, 0),
               child: SizedBox(
                 width: widget.slideWidth,
-                child: widget.menuScreen,
+                child: menuScreenContent,
               ),
             ),
           ],
@@ -648,7 +665,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenContent,
             Transform(
               transform: Matrix4.identity()
                 ..translate(_slide, _top)
@@ -674,7 +691,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenContent,
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
@@ -702,7 +719,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenContent,
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
@@ -743,7 +760,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               offset: Offset(-_left, 0),
               child: SizedBox(
                 width: _rightSlide,
-                child: widget.menuScreen,
+                child: menuScreenContent,
               ),
             ),
           ],
