@@ -176,7 +176,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       ColorTween(begin: Colors.transparent, end: Colors.black38);
 
   static const _maxSlide = 255;
-  static const _dragRightStartVal = 120;
+  static const _dragRightStartVal = 300;
   static const _dragLeftStartVal = _maxSlide - 120;
   static bool _shouldDrag = false;
 
@@ -190,9 +190,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   void _onDragStartRTL(DragStartDetails startDetails) {
     final _isDraggingFromRight = _animationController.isDismissed &&
-        startDetails.globalPosition.dx > _dragLeftStartVal;
+        startDetails.globalPosition.dx > _maxSlide;
     final _isDraggingFromLeft = _animationController.isCompleted &&
-        startDetails.globalPosition.dx < _dragRightStartVal;
+        startDetails.globalPosition.dx < _maxSlide;
     _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
   }
 
@@ -209,7 +209,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (_shouldDrag == false) {
       return;
     }
-    final _delta = updateDetails.primaryDelta ?? 0 / _maxSlide;
+    final _delta = updateDetails.primaryDelta ?? 0 / _dragRightStartVal;
 
     _animationController.value -= _delta / 425;
   }
