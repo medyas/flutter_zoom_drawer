@@ -15,13 +15,11 @@ class HomeScreen extends StatefulWidget {
   ];
 
   @override
-  _HomeScreenState createState() => new _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final _drawerController = ZoomDrawerController();
-
-  int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +29,13 @@ class _HomeScreenState extends State<HomeScreen> {
       menuScreen: MenuScreen(
         HomeScreen.mainMenu,
         callback: _updatePage,
-        current: _currentPage,
+        current: 0,
       ),
       mainScreen: MainScreen(),
       openCurve: Curves.fastOutSlowIn,
       borderRadius: 32.0,
-      style: DrawerStyle.Style8,
+      style: DrawerStyle.style8,
       showShadow: true,
-      mainScreenScale: .3,
       angle: 0.0,
       swipeOffset: 2.0,
       slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
@@ -50,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _updatePage(index) {
-    Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index);
+  void _updatePage(int index) {
+    context.read<MenuProvider>().updateCurrentPage(index);
     _drawerController.toggle?.call();
   }
 }
@@ -74,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
         );
       },
       child: GestureDetector(
-        child: PageStructure(),
+        child: const PageStructure(),
         onPanUpdate: (details) {
           if (details.delta.dx < 6 && !rtl || details.delta.dx < -6 && rtl) {
             ZoomDrawer.of(context)?.toggle.call();
@@ -91,9 +88,8 @@ class MenuProvider extends ChangeNotifier {
   int get currentPage => _currentPage;
 
   void updateCurrentPage(int index) {
-    if (index != currentPage) {
-      _currentPage = index;
-      notifyListeners();
-    }
+    if (index == currentPage) return;
+    _currentPage = index;
+    notifyListeners();
   }
 }

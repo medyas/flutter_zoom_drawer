@@ -46,10 +46,12 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
   runApp(const MyApp());
 }
 
@@ -62,13 +64,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Corona Out',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          primaryColor: p,
-        ),
-        home: const Zoom());
+      debugShowCheckedModeBanner: false,
+      title: 'Corona Out',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: p,
+      ),
+      home: const Zoom(),
+    );
   }
 }
 
@@ -87,16 +90,12 @@ class _ZoomState extends State<Zoom> {
     return ZoomDrawer(
       controller: z,
       borderRadius: 24,
-      style: DrawerStyle.Style1,
+      style: DrawerStyle.style1,
       openCurve: Curves.fastOutSlowIn,
-      disableGesture: false,
-      mainScreenTapClose: false,
       slideWidth: MediaQuery.of(context).size.width * 0.65,
       duration: const Duration(milliseconds: 500),
-      backgroundColor: Colors.white,
       showShadow: true,
       angle: 0.0,
-      clipMainScreen: true,
       mainScreen: const Body(),
       menuScreen: Theme(
         data: ThemeData.dark(),
@@ -175,20 +174,25 @@ class TwoPanels extends StatefulWidget {
 }
 
 class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
-  static const header_height = 32.0;
+  static const _headerHeight = 32.0;
   late TabController tabController = TabController(length: 3, vsync: this);
 
   Animation<RelativeRect> getPanelAnimation(BoxConstraints constraints) {
-    final height = constraints.biggest.height;
-    final backPanelHeight = height - header_height;
-    const frontPanelHeight = -header_height;
+    final _height = constraints.biggest.height;
+    final _backPanelHeight = _height - _headerHeight;
+    const _frontPanelHeight = -_headerHeight;
 
     return RelativeRectTween(
-            begin: RelativeRect.fromLTRB(
-                0.0, backPanelHeight, 0.0, frontPanelHeight),
-            end: RelativeRect.fromLTRB(0.0, 100, 0.0, 0.0))
-        .animate(
-            CurvedAnimation(parent: widget.controller, curve: Curves.linear));
+      begin: RelativeRect.fromLTRB(
+        0.0,
+        _backPanelHeight,
+        0.0,
+        _frontPanelHeight,
+      ),
+      end: const RelativeRect.fromLTRB(0.0, 100, 0.0, 0.0),
+    ).animate(
+      CurvedAnimation(parent: widget.controller, curve: Curves.linear),
+    );
   }
 
   @override
@@ -199,101 +203,101 @@ class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
 
   Widget bothPanels(BuildContext context, BoxConstraints constraints) {
     final ThemeData theme = Theme.of(context);
-    return Container(
-      child: Stack(
-        children: <Widget>[
-          Scaffold(
-            appBar: AppBar(
-              title: const Text("Backdrop"),
-              elevation: 0.0,
-              leading: IconButton(
-                icon: Icon(Icons.menu),
-                onPressed: () {
-                  z.toggle!();
-                },
-              ),
-              bottom: TabBar(
-                controller: tabController,
-                tabs: [
-                  Tab(
-                    //icon: Icon(Icons.home_filled),
-                    text: 'lll',
-                  ),
-                  Tab(
-                    icon: Icon(Icons.home_filled),
-                    //text: 'lll',
-                  ),
-                  Tab(
-                    icon: Icon(Icons.home_filled),
-                    text: 'lll',
-                  )
-                ],
-              ),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          appBar: AppBar(
+            title: const Text("Backdrop"),
+            elevation: 0.0,
+            leading: IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                z.toggle!();
+              },
             ),
-            body: TabBarView(
+            bottom: TabBar(
               controller: tabController,
-              children: [
-                Container(
-                  color: theme.primaryColor,
+              tabs: const [
+                Tab(
+                  //icon: Icon(Icons.home_filled),
+                  text: 'lll',
+                ),
+                Tab(
+                  icon: Icon(Icons.home_filled),
+                  //text: 'lll',
+                ),
+                Tab(
+                  icon: Icon(Icons.home_filled),
+                  text: 'lll',
+                )
+              ],
+            ),
+          ),
+          body: TabBarView(
+            controller: tabController,
+            children: [
+              Container(
+                color: theme.primaryColor,
+                child: const Center(
+                  child: Text(
+                    "Back Panel",
+                    style: TextStyle(fontSize: 24.0, color: Colors.white),
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.pink,
+                child: const Center(
+                  child: Text(
+                    "Back Panel",
+                    style: TextStyle(fontSize: 24.0, color: Colors.white),
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.brown,
+                child: const Center(
+                  child: Text(
+                    "Back Panel",
+                    style: TextStyle(fontSize: 24.0, color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        PositionedTransition(
+          rect: getPanelAnimation(constraints),
+          child: Material(
+            elevation: 12.0,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: _headerHeight,
                   child: Center(
                     child: Text(
-                      "Back Panel",
-                      style: TextStyle(fontSize: 24.0, color: Colors.white),
+                      "Shop Here",
+                      style: Theme.of(context).textTheme.button,
                     ),
                   ),
                 ),
-                Container(
-                  color: Colors.pink,
+                const Expanded(
                   child: Center(
                     child: Text(
-                      "Back Panel",
-                      style: TextStyle(fontSize: 24.0, color: Colors.white),
-                    ),
-                  ),
-                ),
-                Container(
-                  color: Colors.brown,
-                  child: Center(
-                    child: Text(
-                      "Back Panel",
-                      style: TextStyle(fontSize: 24.0, color: Colors.white),
+                      "Front Panel",
+                      style: TextStyle(fontSize: 24.0, color: Colors.black),
                     ),
                   ),
                 )
               ],
             ),
           ),
-          PositionedTransition(
-            rect: getPanelAnimation(constraints),
-            child: Material(
-              elevation: 12.0,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16.0),
-                  topRight: Radius.circular(16.0)),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    height: header_height,
-                    child: Center(
-                      child: Text(
-                        "Shop Here",
-                        style: Theme.of(context).textTheme.button,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text("Front Panel",
-                          style:
-                              TextStyle(fontSize: 24.0, color: Colors.black)),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
+        )
+      ],
     );
   }
 

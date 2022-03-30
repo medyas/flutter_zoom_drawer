@@ -4,7 +4,7 @@ A new Flutter project demonstrating the use of Flutter Zoom Drawer package.
 
 ## Getting Started
 
-The checkout the full example :memo: [Example Code](https://github.com/medyas/flutter_zoom_drawer/tree/master/example/) 
+The checkout the full example :memo: [Example Code](https://github.com/medyas/flutter_zoom_drawer/tree/master/example/)
 
 ```dart
 class HomeScreen extends StatefulWidget {
@@ -44,9 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _updatePage(index) {
-    Provider.of<MenuProvider>(context, listen: false).updateCurrentPage(index);
+    context.read<MenuProvider>().updateCurrentPage(index);
     _drawerController.toggle();
   }
 }
 ```
-

@@ -49,9 +49,7 @@ class PageStructure extends StatelessWidget {
         leading: Transform.rotate(
           angle: angle,
           child: PlatformIconButton(
-            icon: Icon(
-              Icons.menu,
-            ),
+            icon: const Icon(Icons.menu),
             onPressed: () {
               ZoomDrawer.of(context)!.toggle();
             },
@@ -65,8 +63,7 @@ class PageStructure extends StatelessWidget {
         ),
         currentIndex: _currentPage,
         itemChanged: (index) =>
-            Provider.of<MenuProvider>(context, listen: false)
-                .updateCurrentPage(index),
+            context.read<MenuProvider>().updateCurrentPage(index),
         items: HomeScreen.mainMenu
             .map(
               (item) => BottomNavigationBarItem(
