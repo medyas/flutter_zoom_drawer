@@ -555,7 +555,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             ),
             child: Container(
               color: widget.shadowLayer1Color ??
-                  widget.backgroundColor.withAlpha(31),
+                  widget.backgroundColor.withAlpha(60),
             ),
           ),
 
@@ -569,7 +569,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               slide: _slidePercent,
             ),
             child: Container(
-              color: widget.shadowLayer2Color ?? widget.backgroundColor,
+              color: widget.shadowLayer2Color ??
+                  widget.backgroundColor.withAlpha(180),
             ),
           )
         ],
