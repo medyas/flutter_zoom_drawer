@@ -6,37 +6,30 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MenuScreen extends StatefulWidget {
+class MenuScreen extends StatelessWidget {
   final List<MenuItem> mainMenu;
-  final Function(int)? callback;
+  final void Function(int)? callback;
   final int? current;
 
-  MenuScreen(
+  const MenuScreen(
     this.mainMenu, {
-    Key? key,
     this.callback,
     this.current,
   });
 
   @override
-  _MenuScreenState createState() => _MenuScreenState();
-}
-
-class _MenuScreenState extends State<MenuScreen> {
-  final widthBox = SizedBox(
-    width: 16.0,
-  );
-
-  @override
   Widget build(BuildContext context) {
-    final TextStyle androidStyle = const TextStyle(
-        fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white);
-    final TextStyle iosStyle = const TextStyle(color: Colors.white);
+    const _androidStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    );
+    const _iosStyle = TextStyle(color: Colors.white);
     final style = kIsWeb
-        ? androidStyle
+        ? _androidStyle
         : Platform.isAndroid
-            ? androidStyle
-            : iosStyle;
+            ? _androidStyle
+            : _iosStyle;
 
     return Scaffold(
       body: Container(
@@ -60,7 +53,10 @@ class _MenuScreenState extends State<MenuScreen> {
                 // Spacer(),
                 Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 24.0, left: 24.0, right: 24.0),
+                    bottom: 24.0,
+                    left: 24.0,
+                    right: 24.0,
+                  ),
                   child: Container(
                     width: 80,
                     height: 80,
@@ -72,10 +68,13 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 36.0, left: 24.0, right: 24.0),
+                    bottom: 36.0,
+                    left: 24.0,
+                    right: 24.0,
+                  ),
                   child: Text(
                     tr("name"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 22,
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
@@ -88,15 +87,17 @@ class _MenuScreenState extends State<MenuScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ...widget.mainMenu
-                          .map((item) => MenuItemWidget(
-                                key: Key(item.index.toString()),
-                                item: item,
-                                callback: widget.callback,
-                                widthBox: widthBox,
-                                style: style,
-                                selected: index == item.index,
-                              ))
+                      ...mainMenu
+                          .map(
+                            (item) => MenuItemWidget(
+                              key: Key(item.index.toString()),
+                              item: item,
+                              callback: callback,
+                              widthBox: const SizedBox(width: 16.0),
+                              style: style,
+                              selected: index == item.index,
+                            ),
+                          )
                           .toList()
                     ],
                   ),
@@ -105,18 +106,12 @@ class _MenuScreenState extends State<MenuScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                   child: OutlinedButton(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        tr("logout"),
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.white, width: 2.0),
+                      side: const BorderSide(color: Colors.white, width: 2.0),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0)),
-                      textStyle: TextStyle(color: Colors.white),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      textStyle: const TextStyle(color: Colors.white),
                     ),
                     onPressed: () {
                       final languageCode =
@@ -124,6 +119,13 @@ class _MenuScreenState extends State<MenuScreen> {
 
                       context.setLocale(Locale(languageCode));
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        tr("logout"),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
                   ),
                 ),
                 // Spacer(),
@@ -140,10 +142,8 @@ class MenuItemWidget extends StatelessWidget {
   final MenuItem? item;
   final Widget? widthBox;
   final TextStyle? style;
-  final Function? callback;
+  final void Function(int)? callback;
   final bool? selected;
-
-  final white = Colors.white;
 
   const MenuItemWidget({
     Key? key,
@@ -159,16 +159,14 @@ class MenuItemWidget extends StatelessWidget {
     return TextButton(
       onPressed: () => callback!(item!.index),
       style: TextButton.styleFrom(
-        primary: selected! ? Color(0x44000000) : null,
+        primary: selected! ? const Color(0x44000000) : null,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Icon(
             item!.icon,
-            color: white,
+            color: Colors.white,
             size: 24,
           ),
           widthBox!,

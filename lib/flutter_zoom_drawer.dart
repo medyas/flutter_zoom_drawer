@@ -13,7 +13,7 @@ class ZoomDrawerController {
   Function? close;
 
   /// callback function to toggle the drawer
-  Function? toggle;
+  void Function()? toggle;
 
   /// callback function to determine the status of the drawer
   Function? isOpen;
@@ -25,7 +25,7 @@ class ZoomDrawerController {
 
 class ZoomDrawer extends StatefulWidget {
   const ZoomDrawer({
-    this.style = DrawerStyle.DefaultStyle,
+    this.style = DrawerStyle.defaultStyle,
     this.controller,
     required this.menuScreen,
     required this.mainScreen,
@@ -71,7 +71,7 @@ class ZoomDrawer extends StatefulWidget {
   /// Sliding width of the drawer - defaults to 275.0
   final double slideWidth;
 
-  /// Border radius of the slided content - defaults to 16.0
+  /// Border radius of the slide content - defaults to 16.0
   final double borderRadius;
 
   /// Rotation angle of the drawer - defaults to -12.0
@@ -174,19 +174,19 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   double get _percentOpen => _animationController!.value;
 
   /// Open drawer
-  open() {
+  void open() {
     _animationController!.forward();
   }
 
   /// Close drawer
-  close() {
+  void close() {
     _animationController!.reverse();
   }
 
   AnimationController? get animationController => _animationController;
 
   /// Toggle drawer
-  toggle() {
+  void toggle() {
     if (_state == DrawerState.open) {
       close();
     } else if (_state == DrawerState.closed) {
@@ -254,7 +254,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     super.didUpdateWidget(oldWidget);
   }
 
-  _updateStatusNotifier() {
+  void _updateStatusNotifier() {
     stateNotifier!.value = _state;
   }
 
@@ -282,7 +282,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     double slide = 0,
     bool isMain = false,
   }) {
-    double slidePercent, scalePercent;
+    double slidePercent;
+    double scalePercent;
 
     /// determine current slide percent based on the MenuStatus
     switch (_state) {
@@ -382,7 +383,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         child: _mainScreenContent,
       );
     }
-    if (widget.angle != 0 && widget.style != DrawerStyle.Style1) {
+    if (widget.angle != 0 && widget.style != DrawerStyle.style1) {
       final rotationAngle =
           (((widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
       _mainScreenContent = Transform.rotate(
@@ -411,14 +412,15 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       /// Detecting the slide amount to close the drawer in RTL & LTR
       onPanUpdate: (details) {
         if (_state == DrawerState.open &&
-            ((details.delta.dx < -(widget.swipeOffset) && !widget.isRtl) ||
+            ((details.delta.dx < -widget.swipeOffset && !widget.isRtl) ||
                 (details.delta.dx > widget.swipeOffset && widget.isRtl))) {
           toggle();
         }
       },
       onTap: () {
-        if (widget.mainScreenTapClose && _state == DrawerState.open)
+        if (widget.mainScreenTapClose && _state == DrawerState.open) {
           return close();
+        }
       },
       child: renderLayout(),
     );
@@ -427,21 +429,21 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderLayout() {
     if (widget.drawerStyleBuilder != null) return renderCustomStyle();
     switch (widget.style) {
-      case DrawerStyle.Style1:
+      case DrawerStyle.style1:
         return renderStyle1();
-      case DrawerStyle.Style2:
+      case DrawerStyle.style2:
         return renderStyle2();
-      case DrawerStyle.Style3:
+      case DrawerStyle.style3:
         return renderStyle3();
-      case DrawerStyle.Style4:
+      case DrawerStyle.style4:
         return renderStyle4();
-      case DrawerStyle.Style5:
+      case DrawerStyle.style5:
         return renderStyle5();
-      case DrawerStyle.Style6:
+      case DrawerStyle.style6:
         return renderStyle6();
-      case DrawerStyle.Style7:
+      case DrawerStyle.style7:
         return renderStyle7();
-      case DrawerStyle.Style8:
+      case DrawerStyle.style8:
         return renderStyle8();
       default:
         return renderDefault();
@@ -452,8 +454,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        return widget.drawerStyleBuilder!(context, _percentOpen,
-            widget.slideWidth, widget.menuScreen, mainScreenContent);
+        return widget.drawerStyleBuilder!(
+          context,
+          _percentOpen,
+          widget.slideWidth,
+          widget.menuScreen,
+          mainScreenContent,
+        );
       },
     );
   }
@@ -462,16 +469,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double slide = widget.slideWidth * _percentOpen * _rtlSlide;
-        double scale = 1 - (_percentOpen * widget.mainScreenScale);
+        final _slide = widget.slideWidth * _percentOpen * _rtlSlide;
+        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
 
         return Stack(
           children: [
             widget.menuScreen,
             Transform(
               transform: Matrix4.identity()
-                ..translate(slide)
-                ..scale(scale),
+                ..translate(_slide)
+                ..scale(_scale),
               alignment: Alignment.center,
               child: mainScreenContent,
             ),
@@ -482,7 +489,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final slidePercent =
+    final _slidePercent =
         widget.isRtl ? MediaQuery.of(context).size.width * .1 : 15.0;
     return Stack(
       children: [
@@ -495,7 +502,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
               scale: .9,
-              slide: slidePercent * 2,
+              slide: _slidePercent * 2,
             ),
             child: Container(
               color: widget.shadowLayer1Color ??
@@ -510,7 +517,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
               scale: .95,
-              slide: slidePercent,
+              slide: _slidePercent,
             ),
             child: Container(
               color: widget.shadowLayer2Color ?? widget.backgroundColor,
@@ -534,13 +541,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double slide = widget.slideWidth * _rtlSlide * _percentOpen;
+        final _slide = widget.slideWidth * _rtlSlide * _percentOpen;
 
         return Stack(
           children: [
             widget.menuScreen,
             Transform(
-              transform: Matrix4.identity()..translate(slide),
+              transform: Matrix4.identity()..translate(_slide),
               alignment: Alignment.center,
               child: mainScreenContent,
             ),
@@ -554,18 +561,18 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double slide = widget.slideWidth * _percentOpen * _rtlSlide;
-        double left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
+        final _slide = widget.slideWidth * _percentOpen * _rtlSlide;
+        final _left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
 
         return Stack(
           children: [
             Transform(
-              transform: Matrix4.identity()..translate(slide),
+              transform: Matrix4.identity()..translate(_slide),
               alignment: Alignment.center,
               child: mainScreenContent,
             ),
             Transform.translate(
-              offset: Offset(-left, 0),
+              offset: Offset(-_left, 0),
               child: SizedBox(
                 width: widget.slideWidth,
                 child: widget.menuScreen,
@@ -581,13 +588,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
+        final _left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
 
         return Stack(
           children: [
             mainScreenContent,
             Transform.translate(
-              offset: Offset(-left, 0),
+              offset: Offset(-_left, 0),
               child: SizedBox(
                 width: widget.slideWidth,
                 child: widget.menuScreen,
@@ -603,17 +610,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double slide = widget.slideWidth * _rtlSlide * _percentOpen;
-        double scale = 1 - (_percentOpen * widget.mainScreenScale);
-        double top = _percentOpen * widget.slideWidth;
+        final _slide = widget.slideWidth * _rtlSlide * _percentOpen;
+        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
+        final _top = _percentOpen * widget.slideWidth;
 
         return Stack(
           children: [
             widget.menuScreen,
             Transform(
               transform: Matrix4.identity()
-                ..translate(slide, top)
-                ..scale(scale),
+                ..translate(_slide, _top)
+                ..scale(_scale),
               alignment: Alignment.center,
               child: mainScreenContent,
             ),
@@ -629,9 +636,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       builder: (context, child) {
         final slideWidth =
             widget.isRtl ? widget.slideWidth : widget.slideWidth / 2;
-        double x = _percentOpen * slideWidth * _rtlSlide;
-        double scale = 1 - (_percentOpen * widget.mainScreenScale);
-        double rotate = _percentOpen * (pi / 4);
+        final _x = _percentOpen * slideWidth * _rtlSlide;
+        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
+        final _rotate = _percentOpen * (pi / 4);
 
         return Stack(
           children: [
@@ -639,9 +646,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(x)
-                ..scale(scale)
-                ..rotateY(rotate * _rtlSlide),
+                ..translate(_x)
+                ..scale(_scale)
+                ..rotateY(_rotate * _rtlSlide),
               alignment: Alignment.centerRight,
               child: mainScreenContent,
             ),
@@ -655,11 +662,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        final slideWidth =
+        final _slideWidth =
             widget.isRtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
-        double x = _percentOpen * slideWidth * _rtlSlide;
-        double scale = 1 - (_percentOpen * widget.mainScreenScale);
-        double rotate = _percentOpen * (pi / 4);
+        final _x = _percentOpen * _slideWidth * _rtlSlide;
+        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
+        final _rotate = _percentOpen * (pi / 4);
 
         return Stack(
           children: [
@@ -667,9 +674,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(x)
-                ..scale(scale)
-                ..rotateY(-rotate * _rtlSlide),
+                ..translate(_x)
+                ..scale(_scale)
+                ..rotateY(-_rotate * _rtlSlide),
               alignment: Alignment.centerRight,
               child: mainScreenContent,
             ),
@@ -680,30 +687,30 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle8() {
-    final width = MediaQuery.of(context).size.width;
-    final rightSlide = (width) *
-        ((width < 500)
+    final _width = MediaQuery.of(context).size.width;
+    final _rightSlide = _width *
+        ((_width < 500)
             ? .6
-            : (width > 500 && (width < 1000))
+            : (_width > 500 && (_width < 1000))
                 ? .4
                 : .2);
     return AnimatedBuilder(
       animation: _animationController!,
       builder: (context, child) {
-        double slide = rightSlide * _animationController!.value * _rtlSlide;
-        double left =
-            (1 - _animationController!.value) * rightSlide * _rtlSlide;
+        final _slide = _rightSlide * _animationController!.value * _rtlSlide;
+        final _left =
+            (1 - _animationController!.value) * _rightSlide * _rtlSlide;
         return Stack(
           children: [
             Transform(
-              transform: Matrix4.identity()..translate(slide),
+              transform: Matrix4.identity()..translate(_slide),
               alignment: Alignment.center,
               child: mainScreenContent,
             ),
             Transform.translate(
-              offset: Offset(-left, 0),
+              offset: Offset(-_left, 0),
               child: SizedBox(
-                width: rightSlide,
+                width: _rightSlide,
                 child: widget.menuScreen,
               ),
             ),
@@ -718,21 +725,22 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 enum DrawerState { opening, closing, open, closed }
 
 enum DrawerStyle {
-  DefaultStyle,
-  Style1,
-  Style2,
-  Style3,
-  Style4,
-  Style5,
-  Style6,
-  Style7,
-  Style8,
+  defaultStyle,
+  style1,
+  style2,
+  style3,
+  style4,
+  style5,
+  style6,
+  style7,
+  style8,
 }
 
 /// Build custom style with (context, percentOpen, slideWidth, menuScreen, mainScreen) {}
 typedef DrawerStyleBuilder = Widget Function(
-    BuildContext context,
-    double percentOpen,
-    double slideWidth,
-    Widget menuScreen,
-    Widget mainScreen);
+  BuildContext context,
+  double percentOpen,
+  double slideWidth,
+  Widget menuScreen,
+  Widget mainScreen,
+);

@@ -49,9 +49,7 @@ class PageStructure extends StatelessWidget {
         leading: Transform.rotate(
           angle: angle,
           child: PlatformIconButton(
-            icon: Icon(
-              Icons.menu,
-            ),
+            icon: const Icon(Icons.menu),
             onPressed: () {
               ZoomDrawer.of(context)!.toggle();
             },
