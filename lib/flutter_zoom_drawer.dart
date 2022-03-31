@@ -235,7 +235,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
           MediaQuery.of(context).size.width;
       _animationController.fling(velocity: visualVelocityInPx);
-    } else if (_animationController.value < 0.3) {
+    } else if (_state == DrawerState.opening &&
+        _animationController.value < 0.75) {
       close();
     } else {
       open();
@@ -532,36 +533,53 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (widget.disableGesture) return renderLayout();
 
     return GestureDetector(
-      onHorizontalDragStart: _onDragStart,
-      onHorizontalDragUpdate: _onDragUpdate,
-      onHorizontalDragEnd: _onDragEnd,
       onTap: _onTap,
       child: renderLayout(),
     );
   }
 
   Widget renderLayout() {
-    if (widget.drawerStyleBuilder != null) return renderCustomStyle();
+    Widget _parentWidget = renderDefault();
+
+    if (widget.drawerStyleBuilder != null) _parentWidget = renderCustomStyle();
     switch (widget.style) {
       case DrawerStyle.style1:
-        return renderStyle1();
+        _parentWidget = renderStyle1();
+        break;
       case DrawerStyle.style2:
-        return renderStyle2();
+        _parentWidget = renderStyle2();
+        break;
       case DrawerStyle.style3:
-        return renderStyle3();
+        _parentWidget = renderStyle3();
+        break;
       case DrawerStyle.style4:
-        return renderStyle4();
+        _parentWidget = renderStyle4();
+        break;
       case DrawerStyle.style5:
-        return renderStyle5();
+        _parentWidget = renderStyle5();
+        break;
       case DrawerStyle.style6:
-        return renderStyle6();
+        _parentWidget = renderStyle6();
+        break;
       case DrawerStyle.style7:
-        return renderStyle7();
+        _parentWidget = renderStyle7();
+        break;
       case DrawerStyle.style8:
-        return renderStyle8();
+        _parentWidget = renderStyle8();
+        break;
       default:
-        return renderDefault();
+        _parentWidget = renderDefault();
     }
+
+    if (widget.disableGesture) return _parentWidget;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragStart: _onDragStart,
+      onHorizontalDragUpdate: _onDragUpdate,
+      onHorizontalDragEnd: _onDragEnd,
+      child: _parentWidget,
+    );
   }
 
   Widget renderCustomStyle() {
