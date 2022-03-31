@@ -179,7 +179,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   late final ValueNotifier<bool> _isAbsorbingMainScreen;
 
-  /// When to start drag animation
+  /// To detect last action from drawer if it was opened or closed
+  /// This will help us later for animation calculations based on drawer last action
+  bool _drawerHasOpened = false;
+
+  /// Triggers drag animation
   void _onDragStart(DragStartDetails startDetails) {
     final _maxDragSlide = widget.isRtl
         ? MediaQuery.of(context).size.width - widget.dragOffset
@@ -198,27 +202,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
   }
 
-  /// Update animation value
+  /// Update animation value continuesly upon draging
   void _onDragUpdate(DragUpdateDetails updateDetails) {
     if (_shouldDrag == false) {
       return;
     }
 
-    /// Because drawer state is always DrawerState.opening on _onDragUpdate,
-    /// We use updateDetails.delta.dx to find in which direction the drawer is going
-    /// Here _drawerIsOpening is similar to DrawerState.opening and DrawerState.closing
-    final _drawerIsOpening =
-        widget.isRtl ? updateDetails.delta.dx < 0 : updateDetails.delta.dx > 0;
+    final _dragSensitivity = _drawerHasOpened
+        ? widget.closeDragSensitivity
+        : widget.openDragSensitivity;
 
-    final _dragSensitivity = _drawerIsOpening
-        ? widget.openDragSensitivity
-        : widget.closeDragSensitivity;
-
-    final _maxDragSlide = widget.isRtl
-        ? widget.dragOffset
-        : MediaQuery.of(context).size.width - widget.dragOffset;
-
-    final _delta = updateDetails.primaryDelta ?? 0 / _maxDragSlide;
+    final _delta = updateDetails.primaryDelta ?? 0 / widget.dragOffset;
 
     if (widget.isRtl) {
       _animationController.value -= _delta / _dragSensitivity;
@@ -227,28 +221,41 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
-  /// On drag end
+  /// Case _onDragUpdate didn't complete its full drawer animation
+  /// _onDragEnd will decide where the drawer should go
+  /// Whether to continue its direction or return to its start
   void _onDragEnd(DragEndDetails dragEndDetails) {
     if (_animationController.isDismissed || _animationController.isCompleted) {
       return;
     }
 
-    const _kMinFlingVelocity = 365.0;
+    const _minFlingVelocity = 350.0;
     final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
-
-    final _willFling = widget.isRtl
-        ? _dragVelocity <= _kMinFlingVelocity
-        : _dragVelocity >= _kMinFlingVelocity;
+    final _willFling = _dragVelocity > _minFlingVelocity;
 
     if (_willFling) {
-      final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
+      // Strong swipe will cause the animation continue to its destination
+      final _visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
           MediaQuery.of(context).size.width;
-      _animationController.fling(velocity: visualVelocityInPx);
-    } else if (_state == DrawerState.opening &&
-        _animationController.value < 0.75) {
+
+      final _visualVelocityInPxRTL = -_visualVelocityInPx;
+
+      _animationController.fling(
+        velocity: widget.isRtl ? _visualVelocityInPxRTL : _visualVelocityInPx,
+        animationBehavior: AnimationBehavior.normal,
+      );
+    } else if (_drawerHasOpened && _animationController.value < 0.6) {
+      // Continue animation to close the drawer
       close();
-    } else {
+    } else if (!_drawerHasOpened && _animationController.value > 0.15) {
+      // Continue animation to open the drawer
       open();
+    } else if (_drawerHasOpened) {
+      // Return back to open
+      open();
+    } else if (!_drawerHasOpened) {
+      // Return back to close
+      close();
     }
   }
 
@@ -322,10 +329,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             break;
           case AnimationStatus.completed:
             _state = DrawerState.open;
+            _drawerHasOpened = true;
             _updateStatusNotifier();
             break;
           case AnimationStatus.dismissed:
             _state = DrawerState.closed;
+            _drawerHasOpened = false;
             _updateStatusNotifier();
             break;
         }
