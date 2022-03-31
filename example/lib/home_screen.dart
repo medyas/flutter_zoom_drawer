@@ -37,12 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
       style: DrawerStyle.style8,
       showShadow: true,
       angle: 0.0,
-      dragOffset: 2.0,
       slideWidth: MediaQuery.of(context).size.width * (_isRtl ? .55 : 0.65),
       isRtl: _isRtl,
       mainScreenTapClose: true,
       overlayColor: Colors.brown.withOpacity(0.5),
-      // overlayBlend: BlendMode.darken,
       boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 12)],
     );
   }

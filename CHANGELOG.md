@@ -2,10 +2,12 @@
 
 - Added `mainScreenAbsorbPointer` to absorb mainScreen tap events while drawer is open
 - Added `menuScreenTapClose` to close drawer from menuScreen tap
-- Added `dragSensitivity` to control drawer sensitivity in response to dragging
 - Drawer is now responsive to dragging
+- Added `dragSensitivity` to control drawer sensitivity in response to dragging
+- Added more color options
+- Replaced backgroundColor with drawerShadowsBackgroundColor
 - Replaced swipeOffset with dragOffset
-- Fix `mainScreen` bug resulted in opening instead of closing
+- Fix `mainScreen` bug resulted in opening drawer instead of closing
 - Fix `mainScreenTapClose` is being ignored on app start or Hot restarts
 - Code improvements and followed lint package rules
 
