@@ -562,7 +562,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderLayout() {
     Widget _parentWidget = renderDefault();
 
-    if (widget.drawerStyleBuilder != null) _parentWidget = renderCustomStyle();
     switch (widget.style) {
       case DrawerStyle.style1:
         _parentWidget = renderStyle1();
@@ -591,6 +590,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       default:
         _parentWidget = renderDefault();
     }
+
+    if (widget.drawerStyleBuilder != null) _parentWidget = renderCustomStyle();
 
     return WillPopScope(
       onWillPop: () async {
