@@ -236,7 +236,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (_willFling) {
       // Strong swipe will cause the animation continue to its destination
       final _visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
-          MediaQuery.of(context).size.width;
+          (MediaQuery.of(context).size.width * 50);
 
       final _visualVelocityInPxRTL = -_visualVelocityInPx;
 
