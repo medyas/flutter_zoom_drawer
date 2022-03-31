@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 /// Drawer State enum
 enum DrawerState { opening, closing, open, closed }
 
+/// Drawer last action enum
+/// To detect last action from drawer if it was opened or closed
+/// This will help for animation calculations based on drawer last action
+enum DrawerLastAction { opened, closed }
+
 class ZoomDrawerController {
   /// callback function to open the drawer
   Function? open;

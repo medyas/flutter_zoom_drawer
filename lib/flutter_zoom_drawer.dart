@@ -179,10 +179,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   late final ValueNotifier<bool> _isAbsorbingMainScreen;
 
-  /// To detect last action from drawer if it was opened or closed
-  /// This will help us later for animation calculations based on drawer last action
-  bool _drawerHasOpened = false;
-
   /// Triggers drag animation
   void _onDragStart(DragStartDetails startDetails) {
     final _maxDragSlide = widget.isRtl
@@ -208,7 +204,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       return;
     }
 
-    final _dragSensitivity = _drawerHasOpened
+    final _dragSensitivity = _lastAction == DrawerLastAction.opened
         ? widget.closeDragSensitivity
         : widget.openDragSensitivity;
 
@@ -223,7 +219,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Case _onDragUpdate didn't complete its full drawer animation
   /// _onDragEnd will decide where the drawer should go
-  /// Whether to continue its direction or return to its start
+  /// Whether to continue its direction or return to its position
   void _onDragEnd(DragEndDetails dragEndDetails) {
     if (_animationController.isDismissed || _animationController.isCompleted) {
       return;
@@ -244,16 +240,18 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         velocity: widget.isRtl ? _visualVelocityInPxRTL : _visualVelocityInPx,
         animationBehavior: AnimationBehavior.normal,
       );
-    } else if (_drawerHasOpened && _animationController.value < 0.6) {
+    } else if (_lastAction == DrawerLastAction.opened &&
+        _animationController.value < 0.6) {
       // Continue animation to close the drawer
       close();
-    } else if (!_drawerHasOpened && _animationController.value > 0.15) {
+    } else if (_lastAction == DrawerLastAction.closed &&
+        _animationController.value > 0.15) {
       // Continue animation to open the drawer
       open();
-    } else if (_drawerHasOpened) {
+    } else if (_lastAction == DrawerLastAction.opened) {
       // Return back to open
       open();
-    } else if (!_drawerHasOpened) {
+    } else if (_lastAction == DrawerLastAction.closed) {
       // Return back to close
       close();
     }
@@ -271,6 +269,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   late final AnimationController _animationController;
   DrawerState _state = DrawerState.closed;
+  DrawerLastAction _lastAction = DrawerLastAction.closed;
 
   double get _percentOpen => _animationController.value;
 
@@ -329,12 +328,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             break;
           case AnimationStatus.completed:
             _state = DrawerState.open;
-            _drawerHasOpened = true;
+            _lastAction = DrawerLastAction.opened;
+
             _updateStatusNotifier();
             break;
           case AnimationStatus.dismissed:
             _state = DrawerState.closed;
-            _drawerHasOpened = false;
+            _lastAction = DrawerLastAction.closed;
             _updateStatusNotifier();
             break;
         }
