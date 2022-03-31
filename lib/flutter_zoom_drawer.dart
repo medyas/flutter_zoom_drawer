@@ -43,7 +43,7 @@ class ZoomDrawer extends StatefulWidget {
     this.disableGesture = false,
     this.isRtl = false,
     this.clipMainScreen = true,
-    this.swipeOffset = 6.0,
+    this.dragOffset = 60.0,
     this.overlayColor,
     this.overlayBlend,
     this.overlayBlur,
@@ -110,8 +110,8 @@ class ZoomDrawer extends StatefulWidget {
   /// Depreciated: Set [borderRadius] to 0 instead
   final bool clipMainScreen;
 
-  /// The swipe offset to trigger drawer close
-  final double swipeOffset;
+  /// The offset to trigger drawer drag
+  final double dragOffset;
 
   /// Color of the main screen's cover overlay
   final Color? overlayColor;
@@ -165,55 +165,57 @@ class ZoomDrawer extends StatefulWidget {
 
 class _ZoomDrawerState extends State<ZoomDrawer>
     with SingleTickerProviderStateMixin {
-  late final ValueNotifier<bool> _isAbsorbing;
-
   final Curve _scaleDownCurve = const Interval(0.0, 0.3, curve: Curves.easeOut);
   final Curve _scaleUpCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
   final Curve _slideOutCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideInCurve =
-      const Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
+  final Curve _slideInCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
   ColorTween _overlayColor =
       ColorTween(begin: Colors.transparent, end: Colors.black38);
 
-  static const _maxSlide = 255;
-  static const _dragRightStartVal = 300;
-  static const _dragLeftStartVal = _maxSlide - 120;
   static bool _shouldDrag = false;
 
+  late final ValueNotifier<bool> _isAbsorbingMainScreen;
+
+  /// On drag start
   void _onDragStart(DragStartDetails startDetails) {
-    final _isDraggingFromLeft = _animationController.isDismissed &&
-        startDetails.globalPosition.dx < _dragRightStartVal;
-    final _isDraggingFromRight = _animationController.isCompleted &&
-        startDetails.globalPosition.dx > _dragLeftStartVal;
+    final _maxDragSlide = widget.isRtl
+        ? (MediaQuery.of(context).size.width - widget.dragOffset)
+        : widget.dragOffset;
+
+    final _toggleValue = widget.isRtl
+        ? _animationController.isCompleted
+        : _animationController.isDismissed;
+
+    final _isDraggingFromLeft =
+        _toggleValue && startDetails.globalPosition.dx < _maxDragSlide;
+
+    final _isDraggingFromRight =
+        !_toggleValue && startDetails.globalPosition.dx > _maxDragSlide;
+
     _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
   }
 
-  void _onDragStartRTL(DragStartDetails startDetails) {
-    final _isDraggingFromRight = _animationController.isDismissed &&
-        startDetails.globalPosition.dx > _maxSlide;
-    final _isDraggingFromLeft = _animationController.isCompleted &&
-        startDetails.globalPosition.dx < _maxSlide;
-    _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
-  }
-
+  /// On drag update
   void _onDragUpdate(DragUpdateDetails updateDetails) {
     if (_shouldDrag == false) {
       return;
     }
-    final _delta = updateDetails.primaryDelta ?? 0 / _maxSlide;
+    final _maxSlide = widget.isRtl
+        ? (MediaQuery.of(context).size.width - widget.dragOffset)
+        : widget.dragOffset;
 
-    _animationController.value += _delta / 425;
-  }
+    final _maxDragSlide = widget.isRtl ? widget.dragOffset : _maxSlide;
 
-  void _onDragUpdateRTL(DragUpdateDetails updateDetails) {
-    if (_shouldDrag == false) {
-      return;
+    final _delta = updateDetails.primaryDelta ?? 0 / _maxDragSlide;
+
+    if (widget.isRtl) {
+      _animationController.value -= _delta / 425;
+    } else {
+      _animationController.value += _delta / 425;
     }
-    final _delta = updateDetails.primaryDelta ?? 0 / _dragRightStartVal;
-
-    _animationController.value -= _delta / 425;
   }
 
+  /// On drag end
   void _onDragEnd(DragEndDetails dragEndDetails) {
     if (_animationController.isDismissed || _animationController.isCompleted) {
       return;
@@ -222,7 +224,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     const _kMinFlingVelocity = 365.0;
     final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
 
-    if (_dragVelocity >= _kMinFlingVelocity) {
+    final _willFling = widget.isRtl
+        ? _dragVelocity <= _kMinFlingVelocity
+        : _dragVelocity >= _kMinFlingVelocity;
+
+    if (_willFling) {
       final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
           MediaQuery.of(context).size.width;
       _animationController.fling(velocity: visualVelocityInPx);
@@ -233,26 +239,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
-  void _onDragEndRTL(DragEndDetails dragEndDetails) {
-    if (_animationController.isDismissed || _animationController.isCompleted) {
-      return;
-    }
-
-    const _kMinFlingVelocity = 365.0;
-    final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
-
-    if (_dragVelocity <= _kMinFlingVelocity) {
-      final visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
-          MediaQuery.of(context).size.width;
-      _animationController.fling(velocity: visualVelocityInPx);
-    } else if (_animationController.value < 0.3) {
-      close();
-    } else {
-      open();
+  // Whether to close drawer on Tap
+  void _onTap() {
+    if (widget.mainScreenTapClose && _state == DrawerState.open) {
+      return close();
     }
   }
 
-  /// check the slide direction
+  /// Check the slide direction
   late int _rtlSlide;
 
   late final AnimationController _animationController;
@@ -275,10 +269,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Toggle drawer
   void toggle() {
     if (_state == DrawerState.open) {
-      _isAbsorbing.value = false;
+      _isAbsorbingMainScreen.value = false;
       close();
     } else if (_state == DrawerState.closed) {
-      _isAbsorbing.value = widget.mainScreenAbsorbPointer;
+      _isAbsorbingMainScreen.value = widget.mainScreenAbsorbPointer;
       open();
     }
   }
@@ -293,7 +287,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   @override
   void initState() {
     super.initState();
-    _isAbsorbing = ValueNotifier(widget.mainScreenAbsorbPointer);
+    _isAbsorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
     stateNotifier = ValueNotifier(_state);
 
     /// Initialize the animation controller
@@ -349,7 +343,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   void dispose() {
-    _isAbsorbing.dispose();
+    _isAbsorbingMainScreen.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -512,7 +506,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Will apply only if widget.mainScreenAbsorbPointer is true
         if (widget.mainScreenAbsorbPointer)
           ValueListenableBuilder(
-            valueListenable: _isAbsorbing,
+            valueListenable: _isAbsorbingMainScreen,
             builder: (_, bool _valueNotifier, ___) {
               if (_valueNotifier && _state == DrawerState.open) {
                 return AbsorbPointer(
@@ -535,23 +529,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (widget.disableGesture) return renderLayout();
 
     return GestureDetector(
-      onHorizontalDragStart: (dragStartDetails) {
-        if (widget.isRtl) return _onDragStartRTL(dragStartDetails);
-        return _onDragStart(dragStartDetails);
-      },
-      onHorizontalDragUpdate: (dragUpdateDetails) {
-        if (widget.isRtl) return _onDragUpdateRTL(dragUpdateDetails);
-        return _onDragUpdate(dragUpdateDetails);
-      },
-      onHorizontalDragEnd: (dragEndDetails) {
-        if (widget.isRtl) return _onDragEndRTL(dragEndDetails);
-        return _onDragEnd(dragEndDetails);
-      },
-      onTap: () {
-        if (widget.mainScreenTapClose && _state == DrawerState.open) {
-          return close();
-        }
-      },
+      onHorizontalDragStart: _onDragStart,
+      onHorizontalDragUpdate: _onDragUpdate,
+      onHorizontalDragEnd: _onDragEnd,
+      onTap: _onTap,
       child: renderLayout(),
     );
   }
