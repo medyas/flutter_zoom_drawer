@@ -3,7 +3,8 @@
 - Added `mainScreenAbsorbPointer` to absorb mainScreen tap events while drawer is open
 - Added `menuScreenTapClose` to close drawer from menuScreen tap
 - Drawer is now responsive to dragging
-- Added `dragSensitivity` to control drawer sensitivity in response to dragging
+- Added `openDragSensitivity` and `closeDragSensitivity` to control drawer sensitivity in response to dragging
+- Added `androidCloseOnBackTap` to close drawer on android back tap
 - Added more color options
 - Replaced backgroundColor with drawerShadowsBackgroundColor
 - Replaced swipeOffset with dragOffset

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:example/menu_page.dart';
 import 'package:example/page_structure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 

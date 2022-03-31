@@ -4,24 +4,7 @@ import 'dart:math' show pi;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-class ZoomDrawerController {
-  /// callback function to open the drawer
-  Function? open;
-
-  /// callback function to close the drawer
-  Function? close;
-
-  /// callback function to toggle the drawer
-  void Function()? toggle;
-
-  /// callback function to determine the status of the drawer
-  Function? isOpen;
-
-  /// Drawer state notifier
-  /// opening, closing, open, closed
-  ValueNotifier<DrawerState>? stateNotifier;
-}
+import 'package:flutter_zoom_drawer/config.dart';
 
 class ZoomDrawer extends StatefulWidget {
   const ZoomDrawer({
@@ -39,6 +22,7 @@ class ZoomDrawer extends StatefulWidget {
     this.shadowLayer1Color,
     this.shadowLayer2Color,
     this.showShadow = false,
+    this.androidCloseOnBackTap = true,
     this.openCurve,
     this.closeCurve,
     this.duration,
@@ -46,7 +30,8 @@ class ZoomDrawer extends StatefulWidget {
     this.isRtl = false,
     this.clipMainScreen = true,
     this.dragOffset = 60.0,
-    this.dragSensitivity = 425,
+    this.openDragSensitivity = 425,
+    this.closeDragSensitivity = 425,
     this.overlayColor,
     this.overlayBlend,
     this.overlayBlur,
@@ -101,6 +86,9 @@ class ZoomDrawer extends StatefulWidget {
   /// Boolean, whether to show the drawer shadows - Applies to Style1
   final bool showShadow;
 
+  /// Close drawer on android back button
+  final bool androidCloseOnBackTap;
+
   /// Drawer slide out curve
   final Curve? openCurve;
 
@@ -122,8 +110,11 @@ class ZoomDrawer extends StatefulWidget {
   /// The offset to trigger drawer drag
   final double dragOffset;
 
-  /// How fast the drag in response to a touch, the lower the more sensitive
-  final double dragSensitivity;
+  /// How fast the opening drawer drag in response to a touch, the lower the more sensitive
+  final double openDragSensitivity;
+
+  /// How fast the closing drawer drag in response to a touch, the lower the more sensitive
+  final double closeDragSensitivity;
 
   /// Color of the main screen's cover overlay
   final Color? overlayColor;
@@ -213,6 +204,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       return;
     }
 
+    /// Because drawer state is always DrawerState.opening on _onDragUpdate,
+    /// We use updateDetails.delta.dx to find in which direction the drawer is going
+    /// Here _drawerIsOpening is similar to DrawerState.opening and DrawerState.closing
+    final _drawerIsOpening =
+        widget.isRtl ? updateDetails.delta.dx < 0 : updateDetails.delta.dx > 0;
+
+    final _dragSensitivity = _drawerIsOpening
+        ? widget.openDragSensitivity
+        : widget.closeDragSensitivity;
+
     final _maxDragSlide = widget.isRtl
         ? widget.dragOffset
         : MediaQuery.of(context).size.width - widget.dragOffset;
@@ -220,9 +221,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     final _delta = updateDetails.primaryDelta ?? 0 / _maxDragSlide;
 
     if (widget.isRtl) {
-      _animationController.value -= _delta / widget.dragSensitivity;
+      _animationController.value -= _delta / _dragSensitivity;
     } else {
-      _animationController.value += _delta / widget.dragSensitivity;
+      _animationController.value += _delta / _dragSensitivity;
     }
   }
 
@@ -582,17 +583,25 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         _parentWidget = renderDefault();
     }
 
-    return Material(
-      color: widget.mainBackgroundColor,
-      child: widget.disableGesture
-          ? _parentWidget
-          : GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onHorizontalDragStart: _onDragStart,
-              onHorizontalDragUpdate: _onDragUpdate,
-              onHorizontalDragEnd: _onDragEnd,
-              child: _parentWidget,
-            ),
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.androidCloseOnBackTap && _state == DrawerState.open) {
+          close();
+        }
+        return false;
+      },
+      child: Material(
+        color: widget.mainBackgroundColor,
+        child: widget.disableGesture
+            ? _parentWidget
+            : GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onHorizontalDragStart: _onDragStart,
+                onHorizontalDragUpdate: _onDragUpdate,
+                onHorizontalDragEnd: _onDragEnd,
+                child: _parentWidget,
+              ),
+      ),
     );
   }
 
@@ -867,27 +876,3 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 }
-
-/// Drawer State enum
-enum DrawerState { opening, closing, open, closed }
-
-enum DrawerStyle {
-  defaultStyle,
-  style1,
-  style2,
-  style3,
-  style4,
-  style5,
-  style6,
-  style7,
-  style8,
-}
-
-/// Build custom style with (context, percentOpen, slideWidth, menuScreen, mainScreen) {}
-typedef DrawerStyleBuilder = Widget Function(
-  BuildContext context,
-  double percentOpen,
-  double slideWidth,
-  Widget menuScreen,
-  Widget mainScreen,
-);
