@@ -33,7 +33,9 @@ class ZoomDrawer extends StatefulWidget {
     this.slideWidth = 275.0,
     this.borderRadius = 16.0,
     this.angle = -12.0,
-    this.backgroundColor = const Color(0xffffffff),
+    this.drawerShadowsBackgroundColor = const Color(0xffffffff),
+    this.mainBackgroundColor = Colors.blue,
+    this.menuBackgroundColor = Colors.blueGrey,
     this.shadowLayer1Color,
     this.shadowLayer2Color,
     this.showShadow = false,
@@ -80,8 +82,14 @@ class ZoomDrawer extends StatefulWidget {
   /// Rotation angle of the drawer - defaults to -12.0
   final double angle;
 
+  /// Background color of the parent widget (mainScreen and menuScreen together) - defaults to blue
+  final Color mainBackgroundColor;
+
+  /// Background color of the menuScreen - defaults to blueGrey
+  final Color menuBackgroundColor;
+
   /// Background color of the drawer shadows - defaults to white
-  final Color backgroundColor;
+  final Color drawerShadowsBackgroundColor;
 
   /// First shadow background color
   final Color? shadowLayer1Color;
@@ -424,14 +432,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Builds menuScreenContent
   Widget get menuScreenContent {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (widget.menuScreenTapClose && _state == DrawerState.open) {
-          return close();
-        }
-      },
-      child: widget.menuScreen,
+    return Material(
+      color: widget.menuBackgroundColor,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (widget.menuScreenTapClose && _state == DrawerState.open) {
+            return close();
+          }
+        },
+        child: widget.menuScreen,
+      ),
     );
   }
 
@@ -571,14 +582,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         _parentWidget = renderDefault();
     }
 
-    if (widget.disableGesture) return _parentWidget;
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onHorizontalDragStart: _onDragStart,
-      onHorizontalDragUpdate: _onDragUpdate,
-      onHorizontalDragEnd: _onDragEnd,
-      child: _parentWidget,
+    return Material(
+      color: widget.mainBackgroundColor,
+      child: widget.disableGesture
+          ? _parentWidget
+          : GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragStart: _onDragStart,
+              onHorizontalDragUpdate: _onDragUpdate,
+              onHorizontalDragEnd: _onDragEnd,
+              child: _parentWidget,
+            ),
     );
   }
 
@@ -638,7 +652,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             ),
             child: Container(
               color: widget.shadowLayer1Color ??
-                  widget.backgroundColor.withAlpha(60),
+                  widget.drawerShadowsBackgroundColor.withAlpha(60),
             ),
           ),
 
@@ -653,7 +667,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             ),
             child: Container(
               color: widget.shadowLayer2Color ??
-                  widget.backgroundColor.withAlpha(180),
+                  widget.drawerShadowsBackgroundColor.withAlpha(180),
             ),
           )
         ],
