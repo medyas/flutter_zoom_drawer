@@ -44,6 +44,7 @@ class ZoomDrawer extends StatefulWidget {
     this.isRtl = false,
     this.clipMainScreen = true,
     this.dragOffset = 60.0,
+    this.dragSensitivity = 425,
     this.overlayColor,
     this.overlayBlend,
     this.overlayBlur,
@@ -113,6 +114,9 @@ class ZoomDrawer extends StatefulWidget {
   /// The offset to trigger drawer drag
   final double dragOffset;
 
+  /// How fast the drag in response to a touch, the lower the more sensitive
+  final double dragSensitivity;
+
   /// Color of the main screen's cover overlay
   final Color? overlayColor;
 
@@ -176,10 +180,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   late final ValueNotifier<bool> _isAbsorbingMainScreen;
 
-  /// On drag start
+  /// When to start drag animation
   void _onDragStart(DragStartDetails startDetails) {
     final _maxDragSlide = widget.isRtl
-        ? (MediaQuery.of(context).size.width - widget.dragOffset)
+        ? MediaQuery.of(context).size.width - widget.dragOffset
         : widget.dragOffset;
 
     final _toggleValue = widget.isRtl
@@ -195,23 +199,22 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
   }
 
-  /// On drag update
+  /// Update animation value
   void _onDragUpdate(DragUpdateDetails updateDetails) {
     if (_shouldDrag == false) {
       return;
     }
-    final _maxSlide = widget.isRtl
-        ? (MediaQuery.of(context).size.width - widget.dragOffset)
-        : widget.dragOffset;
 
-    final _maxDragSlide = widget.isRtl ? widget.dragOffset : _maxSlide;
+    final _maxDragSlide = widget.isRtl
+        ? widget.dragOffset
+        : MediaQuery.of(context).size.width - widget.dragOffset;
 
     final _delta = updateDetails.primaryDelta ?? 0 / _maxDragSlide;
 
     if (widget.isRtl) {
-      _animationController.value -= _delta / 425;
+      _animationController.value -= _delta / widget.dragSensitivity;
     } else {
-      _animationController.value += _delta / 425;
+      _animationController.value += _delta / widget.dragSensitivity;
     }
   }
 
