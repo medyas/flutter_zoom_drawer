@@ -177,14 +177,17 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   static bool _shouldDrag = false;
 
-  late final ValueNotifier<bool> _isAbsorbingMainScreen;
+  late final ValueNotifier<bool> _absorbingMainScreen;
 
   /// Triggers drag animation
   void _onDragStart(DragStartDetails startDetails) {
+    // Offset decided by user to open drawer
     final _maxDragSlide = widget.isRtl
         ? MediaQuery.of(context).size.width - widget.dragOffset
         : widget.dragOffset;
 
+    // Will help us to set the offset according to RTL value
+    // Without this user can open the drawer without respecing initial offset required
     final _toggleValue = widget.isRtl
         ? _animationController.isCompleted
         : _animationController.isDismissed;
@@ -249,10 +252,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       // Continue animation to open the drawer
       open();
     } else if (_lastAction == DrawerLastAction.opened) {
-      // Return back to open
+      // Return back to initial position
       open();
     } else if (_lastAction == DrawerLastAction.closed) {
-      // Return back to close
+      // Return back to initial position
       close();
     }
   }
@@ -288,10 +291,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Toggle drawer
   void toggle() {
     if (_state == DrawerState.open) {
-      _isAbsorbingMainScreen.value = false;
       close();
     } else if (_state == DrawerState.closed) {
-      _isAbsorbingMainScreen.value = widget.mainScreenAbsorbPointer;
       open();
     }
   }
@@ -306,7 +307,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   @override
   void initState() {
     super.initState();
-    _isAbsorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
+    _absorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
     stateNotifier = ValueNotifier(_state);
 
     /// Initialize the animation controller
@@ -329,12 +330,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           case AnimationStatus.completed:
             _state = DrawerState.open;
             _lastAction = DrawerLastAction.opened;
+            _absorbingMainScreen.value = widget.mainScreenAbsorbPointer;
 
             _updateStatusNotifier();
             break;
           case AnimationStatus.dismissed:
             _state = DrawerState.closed;
             _lastAction = DrawerLastAction.closed;
+            _absorbingMainScreen.value = false;
             _updateStatusNotifier();
             break;
         }
@@ -365,7 +368,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   @override
   void dispose() {
-    _isAbsorbingMainScreen.dispose();
+    _absorbingMainScreen.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -388,37 +391,38 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     double slide = 0,
     bool isMain = false,
   }) {
-    double slidePercent;
-    double scalePercent;
+    double _slidePercent;
+    double _scalePercent;
 
     /// determine current slide percent based on the MenuStatus
     switch (_state) {
       case DrawerState.closed:
-        slidePercent = 0.0;
-        scalePercent = 0.0;
+        _slidePercent = 0.0;
+        _scalePercent = 0.0;
         break;
       case DrawerState.open:
-        slidePercent = 1.0;
-        scalePercent = 1.0;
+        _slidePercent = 1.0;
+        _scalePercent = 1.0;
         break;
       case DrawerState.opening:
-        slidePercent =
+        _slidePercent =
             (widget.openCurve ?? _slideOutCurve).transform(_animationValue);
-        scalePercent = _scaleDownCurve.transform(_animationValue);
+        _scalePercent = _scaleDownCurve.transform(_animationValue);
         break;
       case DrawerState.closing:
-        slidePercent =
+        _slidePercent =
             (widget.closeCurve ?? _slideInCurve).transform(_animationValue);
-        scalePercent = _scaleUpCurve.transform(_animationValue);
+        _scalePercent = _scaleUpCurve.transform(_animationValue);
         break;
     }
 
     /// calculated sliding amount based on the RTL and animation value
-    final _slideAmount = (widget.slideWidth - slide) * slidePercent * _rtlSlide;
+    final _slideAmount =
+        (widget.slideWidth - slide) * _slidePercent * _rtlSlide;
 
     /// calculated scale amount based on the provided scale and animation value
     final _contentScale =
-        (scale ?? 1.0) - (widget.mainScreenScale * scalePercent);
+        (scale ?? 1.0) - (widget.mainScreenScale * _scalePercent);
 
     /// calculated radius based on the provided radius and animation value
     final _cornerRadius = widget.borderRadius * _animationValue;
@@ -532,7 +536,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Will apply only if widget.mainScreenAbsorbPointer is true
         if (widget.mainScreenAbsorbPointer)
           ValueListenableBuilder(
-            valueListenable: _isAbsorbingMainScreen,
+            valueListenable: _absorbingMainScreen,
             builder: (_, bool _valueNotifier, ___) {
               if (_valueNotifier && _state == DrawerState.open) {
                 return AbsorbPointer(
