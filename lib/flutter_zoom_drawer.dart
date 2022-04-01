@@ -6,6 +6,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 
+extension ZoomDrawerContext on BuildContext {
+  DrawerLastAction? get drawerLastAction =>
+      ZoomDrawer.of(this)?.drawerLastAction;
+  DrawerState? get drawerState => ZoomDrawer.of(this)?.stateNotifier.value;
+  _ZoomDrawerState? get drawer => ZoomDrawer.of(this);
+}
+
 class ZoomDrawer extends StatefulWidget {
   const ZoomDrawer({
     this.style = DrawerStyle.defaultStyle,
@@ -292,7 +299,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
-  /// check whether drawer is open
+  /// Check whether drawer is open
   bool isOpen() => stateNotifier.value == DrawerState.open;
 
   /// Open drawer
@@ -304,8 +311,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   void close() {
     _animationController.reverse();
   }
-
-  AnimationController get animationController => _animationController;
 
   /// Toggle drawer,
   /// forceToggle: Will toggle even if it's currently animating - defaults to false
@@ -343,10 +348,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     /// add status listener to update the menuStatus
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.duration is Duration
-          ? widget.duration
-          : const Duration(milliseconds: 250),
-    )..addStatusListener((AnimationStatus status) {
+      duration: widget.duration ?? const Duration(milliseconds: 250),
+    )..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.forward:
             stateNotifier.value = DrawerState.opening;
@@ -480,10 +483,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     // if (_animationValue == 0) return widget.mainScreen;
     Widget _mainScreenContent = widget.mainScreen;
     if (widget.shrinkMainScreen) {
-      final mainSize = MediaQuery.of(context).size.width -
+      final _mainSize = MediaQuery.of(context).size.width -
           (widget.slideWidth * _animationValue);
       _mainScreenContent = SizedBox(
-        width: mainSize,
+        width: _mainSize,
         child: _mainScreenContent,
       );
     }
@@ -501,18 +504,18 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
     if (widget.borderRadius != 0) {
-      final cornerRadius = widget.borderRadius * _animationValue;
+      final _cornerRadius = widget.borderRadius * _animationValue;
       _mainScreenContent = ClipRRect(
-        borderRadius: BorderRadius.circular(cornerRadius),
+        borderRadius: BorderRadius.circular(_cornerRadius),
         child: _mainScreenContent,
       );
     }
     if (widget.boxShadow != null) {
-      final cornerRadius = widget.borderRadius * _animationValue;
+      final _cornerRadius = widget.borderRadius * _animationValue;
       // Could use [hasShadow], but seems redundant
       _mainScreenContent = Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cornerRadius),
+          borderRadius: BorderRadius.circular(_cornerRadius),
           boxShadow: widget.boxShadow ??
               [
                 BoxShadow(
@@ -525,10 +528,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
     if (widget.angle != 0 && widget.style != DrawerStyle.style1) {
-      final rotationAngle =
+      final _rotationAngle =
           (((widget.angle) * pi * _rtlSlide) / 180) * _animationValue;
       _mainScreenContent = Transform.rotate(
-        angle: rotationAngle,
+        angle: _rotationAngle,
         alignment: widget.isRtl
             ? AlignmentDirectional.topEnd
             : AlignmentDirectional.topStart,
@@ -536,9 +539,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
     if (widget.overlayBlur != null) {
-      final blurAmount = widget.overlayBlur! * _animationValue;
+      final _blurAmount = widget.overlayBlur! * _animationValue;
       _mainScreenContent = ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+        imageFilter: ImageFilter.blur(sigmaX: _blurAmount, sigmaY: _blurAmount),
         child: _mainScreenContent,
       );
     }
@@ -640,7 +643,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderCustomStyle() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (context, _) {
         return widget.drawerStyleBuilder!(
           context,
           _animationValue,
@@ -655,7 +658,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderDefault() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slide = widget.slideWidth * _animationValue * _rtlSlide;
         final _scale = 1 - (_animationValue * widget.mainScreenScale);
 
@@ -728,7 +731,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle2() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slide = widget.slideWidth * _rtlSlide * _animationValue;
 
         return Stack(
@@ -748,7 +751,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle3() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slide = widget.slideWidth * _animationValue * _rtlSlide;
         final _left = (1 - _animationValue) * widget.slideWidth * _rtlSlide;
 
@@ -775,7 +778,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle4() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _left = (1 - _animationValue) * widget.slideWidth * _rtlSlide;
 
         return Stack(
@@ -797,7 +800,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle5() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slide = widget.slideWidth * _rtlSlide * _animationValue;
         final _scale = 1 - (_animationValue * widget.mainScreenScale);
         final _top = _animationValue * widget.slideWidth;
@@ -821,7 +824,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle6() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final slideWidth =
             widget.isRtl ? widget.slideWidth : widget.slideWidth / 2;
         final _x = _animationValue * slideWidth * _rtlSlide;
@@ -849,7 +852,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget renderStyle7() {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slideWidth =
             widget.isRtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
         final _x = _animationValue * _slideWidth * _rtlSlide;
@@ -884,7 +887,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 : .2);
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
+      builder: (_, __) {
         final _slide = _rightSlide * _animationController.value * _rtlSlide;
         final _left =
             (1 - _animationController.value) * _rightSlide * _rtlSlide;

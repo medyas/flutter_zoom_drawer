@@ -59,7 +59,7 @@ class MyHomePage extends GetView<MyDrawerController> {
         borderRadius: 24.0,
         showShadow: true,
         angle: -12.0,
-        backgroundColor: Colors.grey,
+        drawerShadowsBackgroundColor: Colors.grey,
         slideWidth: MediaQuery.of(context).size.width * 0.65,
       ),
     );
@@ -116,35 +116,35 @@ class MyDrawerController extends GetxController {
       borderRadius: 24.0,
       showShadow: true,
       angle: -12.0,
-      backgroundColor: Colors.grey[300],
+      drawerShadowsBackgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width*.65,
       openCurve: Curves.fastOutSlowIn,
       closeCurve: Curves.bounceIn,
     )
 ```
 
-| Parameters           | Value                  | Required | Docs                                                                      |
-| -------------------- | ---------------------- | :------: | ------------------------------------------------------------------------- | --- |
-| `controller`         | `ZoomDrawerController` |    No    | Controller to have access to the open/close/toggle function of the drawer |
-| `style`              | `DrawerStyle`          |    No    | the drawer style to be displayed (check the `DrawerStyle` enum)           |
-| `mainScreen`         | `Widget`               |   Yes    | Screen containing the main content to display                             |
-| `menuScreen`         | `Widget`               |   Yes    | Screen containing the menu/bottom screen                                  |
-| `slideWidth`         | `double`               |    No    | Sliding width of the drawer - defaults to 275.0                           |
-| `mainScreenScale`    | `double`               |    No    | MainScreen scale - defaults to 0.3                                        |
-| `borderRadius`       | `double`               |    No    | Border radius of the slided content - defaults to 16.0                    |
-| `angle`              | `double`               |    No    | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0 |
-| `disableGesture`     | `bool`                 |    No    | Disable the home page swipe to open drawer gesture - defaults to `false`  |
-| `backgroundColor`    | `Color`                |    No    | Background color of the drawer shadows - defaults to white                |
-| `showShadow`         | `bool`                 |    No    | Boolean, whether to show the drawer shadows - defaults to false           |     |
-| `openCurve`          | `Curve`                |    No    | open animation curve - defaults to `Curves.easeOut`                       |
-| `closeCurve`         | `Curve`                |    No    | close animation curve - defaults to `Curves.easeOut`                      |
-| `mainScreenTapClose` | `bool`                 |    No    | Close drawer when tapping mainScreen                                      |
-| `overlayColor`       | `Color`                |    No    | Color of the main screen's cover overlay                                  |
-| `overlayBlend`       | `BlendMode`            |    No    | The BlendMode of the `overlayColor` filter (default BlendMode.screen)     |
-| `boxShadow`          | `BoxShadow`            |    No    | The Shadow of the mainScreenContent                                       |
-| `overlayBlur`        | `double`               |    No    | The Blur amount of the mainScreen option                                  |
-| `shrinkMainScreen`   | `bool`                 |    No    | Shrinks the mainScreen by [slideWidth], good on desktop with Style2       |
-| `drawerStyleBuilder` | `DrawerStyleBuilder`   |    No    | Build custom animated style to override [DrawerStyle]                     |
+| Parameters                     | Value                  | Required | Docs                                                                      |
+| ------------------------------ | ---------------------- | :------: | ------------------------------------------------------------------------- | --- |
+| `controller`                   | `ZoomDrawerController` |    No    | Controller to have access to the open/close/toggle function of the drawer |
+| `style`                        | `DrawerStyle`          |    No    | the drawer style to be displayed (check the `DrawerStyle` enum)           |
+| `mainScreen`                   | `Widget`               |   Yes    | Screen containing the main content to display                             |
+| `menuScreen`                   | `Widget`               |   Yes    | Screen containing the menu/bottom screen                                  |
+| `slideWidth`                   | `double`               |    No    | Sliding width of the drawer - defaults to 275.0                           |
+| `mainScreenScale`              | `double`               |    No    | MainScreen scale - defaults to 0.3                                        |
+| `borderRadius`                 | `double`               |    No    | Border radius of the slided content - defaults to 16.0                    |
+| `angle`                        | `double`               |    No    | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0 |
+| `disableGesture`               | `bool`                 |    No    | Disable the home page swipe to open drawer gesture - defaults to `false`  |
+| `drawerShadowsBackgroundColor` | `Color`                |    No    | Background color of the drawer shadows - defaults to white                |
+| `showShadow`                   | `bool`                 |    No    | Boolean, whether to show the drawer shadows - defaults to false           |     |
+| `openCurve`                    | `Curve`                |    No    | open animation curve - defaults to `Curves.easeOut`                       |
+| `closeCurve`                   | `Curve`                |    No    | close animation curve - defaults to `Curves.easeOut`                      |
+| `mainScreenTapClose`           | `bool`                 |    No    | Close drawer when tapping mainScreen                                      |
+| `overlayColor`                 | `Color`                |    No    | Color of the main screen's cover overlay                                  |
+| `overlayBlend`                 | `BlendMode`            |    No    | The BlendMode of the `overlayColor` filter (default BlendMode.screen)     |
+| `boxShadow`                    | `BoxShadow`            |    No    | The Shadow of the mainScreenContent                                       |
+| `overlayBlur`                  | `double`               |    No    | The Blur amount of the mainScreen option                                  |
+| `shrinkMainScreen`             | `bool`                 |    No    | Shrinks the mainScreen by [slideWidth], good on desktop with Style2       |
+| `drawerStyleBuilder`           | `DrawerStyleBuilder`   |    No    | Build custom animated style to override [DrawerStyle]                     |
 
 ### Controlling the drawer
 
@@ -188,7 +188,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
       borderRadius: 24.0,
       showShadow: false,
       angle: 0.0,
-      backgroundColor: Colors.grey[300],
+      drawerShadowsBackgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width * 0.65,
     )
 ```
@@ -205,7 +205,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
       borderRadius: 24.0,
       showShadow: true,
       angle: 0.0,
-      backgroundColor: Colors.grey[300],
+      drawerShadowsBackgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width * 0.65,
     )
 ```
@@ -222,7 +222,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
       borderRadius: 24.0,
       showShadow: false,
       angle: -12.0,
-      backgroundColor: Colors.grey[300],
+      drawerShadowsBackgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width * 0.65,
     )
 ```
@@ -239,7 +239,7 @@ To get access to the drawer, and be able to control it, there are 2 ways:
       borderRadius: 24.0,
       showShadow: true,
       angle: -12.0,
-      backgroundColor: Colors.grey[300],
+      drawerShadowsBackgroundColor: Colors.grey[300],
       slideWidth: MediaQuery.of(context).size.width * 0.65,
     )
 ```
