@@ -62,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final rtl = context.locale.languageCode == "ar";
     return ValueListenableBuilder<DrawerState>(
-      valueListenable: ZoomDrawer.of(context)!.stateNotifier!,
+      valueListenable: ZoomDrawer.of(context)!.stateNotifier,
       builder: (context, state, child) {
         return AbsorbPointer(
           absorbing: state != DrawerState.closed,

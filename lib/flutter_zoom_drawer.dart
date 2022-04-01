@@ -87,6 +87,9 @@ class ZoomDrawer extends StatefulWidget {
   final bool showShadow;
 
   /// Close drawer on android back button
+  /// Note: This won't work if you are using WillPopScope in mainScreen,
+  /// If that is the case, you have to manually close the drawer from there
+  /// By using ZoomDrawer.of(context)?.close()
   final bool androidCloseOnBackTap;
 
   /// Drawer slide out curve
@@ -177,16 +180,20 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   static bool _shouldDrag = false;
 
-  late final ValueNotifier<bool> _absorbingMainScreen;
-
   /// Check the slide direction
   late int _rtlSlide;
 
   late final AnimationController _animationController;
-  DrawerState _state = DrawerState.closed;
-  DrawerLastAction _lastAction = DrawerLastAction.closed;
-
   double get _animationValue => _animationController.value;
+
+  DrawerLastAction drawerLastAction = DrawerLastAction.closed;
+
+  /// Drawer state
+  final ValueNotifier<DrawerState> stateNotifier =
+      ValueNotifier(DrawerState.closed);
+
+  /// Absorbing value
+  late final ValueNotifier<bool> _absorbingMainScreen;
 
   /// Triggers drag animation
   void _onDragStart(DragStartDetails startDetails) {
@@ -216,7 +223,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       return;
     }
 
-    final _dragSensitivity = _lastAction == DrawerLastAction.opened
+    final _dragSensitivity = drawerLastAction == DrawerLastAction.opened
         ? widget.closeDragSensitivity
         : widget.openDragSensitivity;
 
@@ -231,7 +238,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Case _onDragUpdate didn't complete its full drawer animation
   /// _onDragEnd will decide where the drawer should go
-  /// Whether continue to its direction or return to initial position
+  /// Whether continue to its destination or return to initial position
   void _onDragEnd(DragEndDetails dragEndDetails) {
     if (_animationController.isDismissed || _animationController.isCompleted) {
       return;
@@ -257,18 +264,22 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         velocity: widget.isRtl ? _visualVelocityInPxRTL : _visualVelocityInPx,
         animationBehavior: AnimationBehavior.normal,
       );
-    } else if (_lastAction == DrawerLastAction.opened &&
+    }
+
+    /// We use DrawerLastAction instead of DrawerState,
+    /// because on draging, Drawer state is always equal to DrawerState.opening
+    else if (drawerLastAction == DrawerLastAction.opened &&
         _animationController.value < 0.6) {
       // Continue animation to close the drawer
       close();
-    } else if (_lastAction == DrawerLastAction.closed &&
+    } else if (drawerLastAction == DrawerLastAction.closed &&
         _animationController.value > 0.15) {
       // Continue animation to open the drawer
       open();
-    } else if (_lastAction == DrawerLastAction.opened) {
+    } else if (drawerLastAction == DrawerLastAction.opened) {
       // Return back to initial position
       open();
-    } else if (_lastAction == DrawerLastAction.closed) {
+    } else if (drawerLastAction == DrawerLastAction.closed) {
       // Return back to initial position
       close();
     }
@@ -276,10 +287,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   // Whether to close drawer on Tap
   void _onTap() {
-    if (widget.mainScreenTapClose && _state == DrawerState.open) {
+    if (widget.mainScreenTapClose && stateNotifier.value == DrawerState.open) {
       return close();
     }
   }
+
+  /// check whether drawer is open
+  bool isOpen() => stateNotifier.value == DrawerState.open;
 
   /// Open drawer
   void open() {
@@ -298,27 +312,32 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   void toggle({
     bool forceToggle = false,
   }) {
-    if (_state == DrawerState.open ||
-        (forceToggle && _lastAction == DrawerLastAction.opened)) {
+    /// We use DrawerLastAction instead of DrawerState,
+    /// because on draging, Drawer state is always equal to DrawerState.opening
+    if (stateNotifier.value == DrawerState.open ||
+        (forceToggle && drawerLastAction == DrawerLastAction.opened)) {
       close();
-    } else if (_state == DrawerState.closed ||
-        (forceToggle && _lastAction == DrawerLastAction.closed)) {
+    } else if (stateNotifier.value == DrawerState.closed ||
+        (forceToggle && drawerLastAction == DrawerLastAction.closed)) {
       open();
     }
   }
 
-  /// check whether drawer is open
-  bool isOpen() =>
-      _state == DrawerState.open /* || _state == DrawerState.opening*/;
+  /// Assign controller function to the widget methods
+  void _assignToController() {
+    if (widget.controller == null) return;
 
-  /// Drawer state
-  ValueNotifier<DrawerState>? _stateNotifier;
+    widget.controller!.open = open;
+    widget.controller!.close = close;
+    widget.controller!.toggle = toggle;
+    widget.controller!.isOpen = isOpen;
+    widget.controller!.stateNotifier = stateNotifier;
+  }
 
   @override
   void initState() {
     super.initState();
     _absorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
-    _stateNotifier = ValueNotifier(_state);
 
     /// Initialize the animation controller
     /// add status listener to update the menuStatus
@@ -330,37 +349,24 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     )..addStatusListener((AnimationStatus status) {
         switch (status) {
           case AnimationStatus.forward:
-            _state = DrawerState.opening;
-            _updateStatusNotifier();
+            stateNotifier.value = DrawerState.opening;
             break;
           case AnimationStatus.reverse:
-            _state = DrawerState.closing;
-            _updateStatusNotifier();
+            stateNotifier.value = DrawerState.closing;
             break;
           case AnimationStatus.completed:
-            _state = DrawerState.open;
-            _lastAction = DrawerLastAction.opened;
+            stateNotifier.value = DrawerState.open;
+            drawerLastAction = DrawerLastAction.opened;
             _absorbingMainScreen.value = widget.mainScreenAbsorbPointer;
-
-            _updateStatusNotifier();
             break;
           case AnimationStatus.dismissed:
-            _state = DrawerState.closed;
-            _lastAction = DrawerLastAction.closed;
+            stateNotifier.value = DrawerState.closed;
+            drawerLastAction = DrawerLastAction.closed;
             _absorbingMainScreen.value = false;
-            _updateStatusNotifier();
             break;
         }
       });
-
-    /// assign controller function to the widget methods
-    if (widget.controller != null) {
-      widget.controller!.open = open;
-      widget.controller!.close = close;
-      widget.controller!.toggle = toggle;
-      widget.controller!.isOpen = isOpen;
-      widget.controller!.stateNotifier = _stateNotifier;
-    }
+    _assignToController();
     _rtlSlide = widget.isRtl ? -1 : 1;
   }
 
@@ -372,12 +378,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     super.didUpdateWidget(oldWidget);
   }
 
-  void _updateStatusNotifier() {
-    _stateNotifier!.value = _state;
-  }
-
   @override
   void dispose() {
+    stateNotifier.dispose();
     _absorbingMainScreen.dispose();
     _animationController.dispose();
     super.dispose();
@@ -405,7 +408,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     double _scalePercent;
 
     /// determine current slide percent based on the MenuStatus
-    switch (_state) {
+    switch (stateNotifier.value) {
       case DrawerState.closed:
         _slidePercent = 0.0;
         _scalePercent = 0.0;
@@ -462,7 +465,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          if (widget.menuScreenTapClose && _state == DrawerState.open) {
+          if (widget.menuScreenTapClose &&
+              stateNotifier.value == DrawerState.open) {
             return close();
           }
         },
@@ -548,7 +552,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           ValueListenableBuilder(
             valueListenable: _absorbingMainScreen,
             builder: (_, bool _valueNotifier, ___) {
-              if (_valueNotifier && _state == DrawerState.open) {
+              if (_valueNotifier && stateNotifier.value == DrawerState.open) {
                 return AbsorbPointer(
                   child: Container(
                     color: Colors.transparent,
@@ -610,7 +614,10 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     return WillPopScope(
       onWillPop: () async {
-        if (widget.androidCloseOnBackTap && _state == DrawerState.open) {
+        // Case drawer is opened or will open, either way will close
+        if (widget.androidCloseOnBackTap &&
+            [DrawerState.open, DrawerState.opening]
+                .contains(stateNotifier.value)) {
           close();
         }
         return false;
