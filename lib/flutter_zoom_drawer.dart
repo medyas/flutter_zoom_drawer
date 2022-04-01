@@ -37,7 +37,7 @@ class ZoomDrawer extends StatefulWidget {
     this.overlayBlur,
     this.mainScreenTapClose = false,
     this.menuScreenTapClose = false,
-    this.mainScreenAbsorbPointer = false,
+    this.mainScreenAbsorbPointer = true,
     this.boxShadow,
     this.shrinkMainScreen = false,
     this.drawerStyleBuilder,
@@ -179,6 +179,15 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   late final ValueNotifier<bool> _absorbingMainScreen;
 
+  /// Check the slide direction
+  late int _rtlSlide;
+
+  late final AnimationController _animationController;
+  DrawerState _state = DrawerState.closed;
+  DrawerLastAction _lastAction = DrawerLastAction.closed;
+
+  double get _animationValue => _animationController.value;
+
   /// Triggers drag animation
   void _onDragStart(DragStartDetails startDetails) {
     // Offset decided by user to open drawer
@@ -222,14 +231,19 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Case _onDragUpdate didn't complete its full drawer animation
   /// _onDragEnd will decide where the drawer should go
-  /// Whether to continue its direction or return to its position
+  /// Whether continue to its direction or return to initial position
   void _onDragEnd(DragEndDetails dragEndDetails) {
     if (_animationController.isDismissed || _animationController.isCompleted) {
       return;
     }
 
+    /// Min swipe strength
     const _minFlingVelocity = 350.0;
+
+    /// Actual swipe strength
     final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
+
+    // Shall continue to its direction?
     final _willFling = _dragVelocity > _minFlingVelocity;
 
     if (_willFling) {
@@ -267,15 +281,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
   }
 
-  /// Check the slide direction
-  late int _rtlSlide;
-
-  late final AnimationController _animationController;
-  DrawerState _state = DrawerState.closed;
-  DrawerLastAction _lastAction = DrawerLastAction.closed;
-
-  double get _animationValue => _animationController.value;
-
   /// Open drawer
   void open() {
     _animationController.forward();
@@ -288,11 +293,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   AnimationController get animationController => _animationController;
 
-  /// Toggle drawer
-  void toggle() {
-    if (_state == DrawerState.open) {
+  /// Toggle drawer,
+  /// forceToggle: Will toggle even if it's currently animating - defaults to false
+  void toggle({
+    bool forceToggle = false,
+  }) {
+    if (_state == DrawerState.open ||
+        (forceToggle && _lastAction == DrawerLastAction.opened)) {
       close();
-    } else if (_state == DrawerState.closed) {
+    } else if (_state == DrawerState.closed ||
+        (forceToggle && _lastAction == DrawerLastAction.closed)) {
       open();
     }
   }
@@ -302,13 +312,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       _state == DrawerState.open /* || _state == DrawerState.opening*/;
 
   /// Drawer state
-  ValueNotifier<DrawerState>? stateNotifier;
+  ValueNotifier<DrawerState>? _stateNotifier;
 
   @override
   void initState() {
     super.initState();
     _absorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
-    stateNotifier = ValueNotifier(_state);
+    _stateNotifier = ValueNotifier(_state);
 
     /// Initialize the animation controller
     /// add status listener to update the menuStatus
@@ -349,7 +359,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       widget.controller!.close = close;
       widget.controller!.toggle = toggle;
       widget.controller!.isOpen = isOpen;
-      widget.controller!.stateNotifier = stateNotifier;
+      widget.controller!.stateNotifier = _stateNotifier;
     }
     _rtlSlide = widget.isRtl ? -1 : 1;
   }
@@ -363,7 +373,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   void _updateStatusNotifier() {
-    stateNotifier!.value = _state;
+    _stateNotifier!.value = _state;
   }
 
   @override
