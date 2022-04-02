@@ -16,7 +16,7 @@ class ZoomDrawerController {
   void Function()? toggle;
 
   /// callback function to determine the status of the drawer
-  Function? isOpen;
+  bool Function()? isOpen;
 
   /// Drawer state notifier
   /// opening, closing, open, closed
