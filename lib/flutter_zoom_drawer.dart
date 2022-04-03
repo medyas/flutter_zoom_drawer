@@ -49,6 +49,7 @@ class ZoomDrawer extends StatefulWidget {
     this.openCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
     this.closeCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
     this.duration = const Duration(milliseconds: 250),
+    this.reverseDuration = const Duration(milliseconds: 250),
     this.androidCloseOnBackTap = true,
     this.disableDragGesture = false,
     this.isRtl = false,
@@ -101,7 +102,7 @@ class ZoomDrawer extends StatefulWidget {
   final Color? shadowLayer2Color;
 
   /// Depreciated: Set [boxShadow] to show shadow on [mainScreen]
-  /// Boolean, whether to show the drawer shadows - Applies to Style1
+  /// Boolean, whether to show the drawer shadows - Applies to defaultStyle
   final bool showShadow;
 
   /// Close drawer on android back button
@@ -116,8 +117,11 @@ class ZoomDrawer extends StatefulWidget {
   /// Drawer slide in curve
   final Curve closeCurve;
 
-  /// Drawer Duration
+  /// Drawer forward Duration
   final Duration duration;
+
+  /// Drawer reverse Duration
+  final Duration reverseDuration;
 
   /// Disable swipe gesture
   final bool disableDragGesture;
@@ -380,6 +384,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     _animationController = AnimationController(
       vsync: this,
       duration: widget.duration,
+      reverseDuration: widget.duration,
     )..addStatusListener(_animationStatusListener);
 
     _assignToController();
@@ -435,22 +440,23 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         break;
       case DrawerState.opening:
         _slidePercent = (widget.openCurve).transform(animationValue);
-        _scalePercent = const Interval(0.0, 0.3, curve: Curves.easeOut)
+        _scalePercent = Interval(0.0, 0.3, curve: widget.openCurve)
             .transform(animationValue);
         break;
       case DrawerState.closing:
         _slidePercent = (widget.closeCurve).transform(animationValue);
-        _scalePercent = const Interval(0.0, 1.0, curve: Curves.easeOut)
+        _scalePercent = Interval(0.0, 1.0, curve: widget.closeCurve)
             .transform(animationValue);
         break;
     }
 
     /// calculated sliding amount based on the RTL and animation value
-    final _slideAmount =
-        ((widget.slideWidth - slide) * _slidePercent) * _slideDirection;
+    final _slidePercentage =
+        ((widget.slideWidth - slide) * animationValue * _slideDirection) *
+            _slidePercent;
 
     /// calculated scale amount based on the provided scale and animation value
-    final _contentScale = scale - (widget.mainScreenScale * _scalePercent);
+    final _scalePercentage = scale - (widget.mainScreenScale * _scalePercent);
 
     /// calculated radius based on the provided radius and animation value
     final _cornerRadius = widget.borderRadius * animationValue;
@@ -461,9 +467,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             _slideDirection;
 
     return Transform(
-      transform: Matrix4.translationValues(_slideAmount, 0.0, 0.0)
+      transform: Matrix4.translationValues(_slidePercentage, 0.0, 0.0)
         ..rotateZ(_rotationAngle)
-        ..scale(_contentScale, _contentScale),
+        ..scale(_scalePercentage, _scalePercentage),
       alignment: widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(_cornerRadius),
@@ -564,8 +570,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
 
     // Add layer - Angle
-    // Works on Style 1 only
-    if (widget.angle != 0 && widget.style != DrawerStyle.style1) {
+    // Works on Default Style only
+    if (widget.angle != 0 && widget.style != DrawerStyle.defaultStyle) {
       final _rotationAngle =
           (((widget.angle) * pi * _slideDirection) / 180) * animationValue;
       _mainScreen = Transform.rotate(
@@ -647,9 +653,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         case DrawerStyle.style6:
           _parentWidget = renderStyle6();
           break;
-        case DrawerStyle.style7:
-          _parentWidget = renderStyle7();
-          break;
         default:
           _parentWidget = renderDefault();
       }
@@ -700,36 +703,20 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderDefault() {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (_, __) {
-        final _slide = widget.slideWidth * animationValue * _slideDirection;
-        final _scale = 1 - (animationValue * widget.mainScreenScale);
-
-        return Stack(
-          children: [
-            menuScreenWidget,
-            Transform(
-              transform: Matrix4.identity()
-                ..translate(_slide)
-                ..scale(_scale),
-              alignment: Alignment.center,
-              child: mainScreenWidget,
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle1() {
     const _slidePercent = 15.0;
     return Stack(
       children: [
         /// Displaying Menu screen
         AnimatedBuilder(
           animation: _animationController,
-          builder: (_, __) => menuScreenWidget,
+          builder: (_, __) {
+            final _left =
+                (1 - animationValue) * widget.slideWidth * _slideDirection;
+            return Transform.translate(
+              offset: Offset(-_left, 0),
+              child: menuScreenWidget,
+            );
+          },
         ),
 
         if (widget.showShadow) ...[
@@ -775,7 +762,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle2() {
+  Widget renderStyle1() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -795,7 +782,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle3() {
+  Widget renderStyle2() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -823,7 +810,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle4() {
+  Widget renderStyle3() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -846,7 +833,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle5() {
+  Widget renderStyle4() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -870,7 +857,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle6() {
+  Widget renderStyle5() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -898,7 +885,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle7() {
+  Widget renderStyle6() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
