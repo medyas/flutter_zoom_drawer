@@ -417,14 +417,13 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   Widget _zoomAndSlideContent(
     Widget? container, {
     double? angle,
-    double? scale,
+    double scale = 1,
     double slide = 0,
-    bool isMain = false,
   }) {
     double _slidePercent;
     double _scalePercent;
 
-    /// determine current slide percent based on the MenuStatus
+    /// Determine current slide percent based on the MenuStatus
     switch (stateNotifier.value) {
       case DrawerState.closed:
         _slidePercent = 0.0;
@@ -448,31 +447,28 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     /// calculated sliding amount based on the RTL and animation value
     final _slideAmount =
-        (widget.slideWidth - slide) * _slidePercent * _slideDirection;
+        ((widget.slideWidth - slide) * _slidePercent) * _slideDirection;
 
     /// calculated scale amount based on the provided scale and animation value
-    final _contentScale =
-        (scale ?? 1.0) - (widget.mainScreenScale * _scalePercent);
+    final _contentScale = scale - (widget.mainScreenScale * _scalePercent);
 
     /// calculated radius based on the provided radius and animation value
     final _cornerRadius = widget.borderRadius * animationValue;
 
     /// calculated rotation amount based on the provided angle and animation value
     final _rotationAngle =
-        (((angle ?? widget.angle) * pi * _slideDirection) / 180) *
-            animationValue;
+        ((((angle ?? widget.angle) * pi) / 180) * animationValue) *
+            _slideDirection;
 
     return Transform(
       transform: Matrix4.translationValues(_slideAmount, 0.0, 0.0)
         ..rotateZ(_rotationAngle)
         ..scale(_contentScale, _contentScale),
-      alignment: Alignment.centerLeft,
-      child: isMain
-          ? container
-          : ClipRRect(
-              borderRadius: BorderRadius.circular(_cornerRadius),
-              child: container,
-            ),
+      alignment: widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_cornerRadius),
+        child: container,
+      ),
     );
   }
 
@@ -727,7 +723,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final _slidePercent = widget.isRtl ? context._screenWidth * .1 : 15.0;
+    const _slidePercent = 15.0;
     return Stack(
       children: [
         /// Displaying Menu screen
@@ -773,7 +769,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           animation: _animationController,
           builder: (_, __) => _zoomAndSlideContent(
             mainScreenWidget,
-            isMain: true,
           ),
         ),
       ],
