@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
       mainScreen: MainScreen(),
       openCurve: Curves.fastOutSlowIn,
       borderRadius: 32.0,
-      style: DrawerStyle.style8,
+      style: DrawerStyle.style3,
       showShadow: true,
       angle: 0.0,
       slideWidth: MediaQuery.of(context).size.width * (_isRtl ? .55 : 0.65),

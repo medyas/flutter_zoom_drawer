@@ -18,6 +18,9 @@ extension ZoomDrawerContext on BuildContext {
 
   ValueNotifier<DrawerState>? get drawerStateNotifier =>
       ZoomDrawer.of(this)?.stateNotifier;
+
+  double get _screenWidth => MediaQuery.of(this).size.width;
+  double get _screenHeight => MediaQuery.of(this).size.height;
 }
 
 class ZoomDrawer extends StatefulWidget {
@@ -30,31 +33,31 @@ class ZoomDrawer extends StatefulWidget {
     this.slideWidth = 275.0,
     this.borderRadius = 16.0,
     this.angle = -12.0,
-    this.drawerShadowsBackgroundColor = const Color(0xffffffff),
-    this.mainBackgroundColor = Colors.blue,
-    this.menuBackgroundColor = Colors.blueGrey,
-    this.shadowLayer1Color,
-    this.shadowLayer2Color,
-    this.showShadow = false,
-    this.androidCloseOnBackTap = true,
-    this.openCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
-    this.closeCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
-    this.duration = const Duration(milliseconds: 250),
-    this.disableDragGesture = false,
-    this.isRtl = false,
-    this.clipMainScreen = true,
     this.dragOffset = 60.0,
     this.openDragSensitivity = 425,
     this.closeDragSensitivity = 425,
+    this.drawerShadowsBackgroundColor = const Color(0xffffffff),
+    this.mainBackgroundColor = Colors.blue,
+    this.menuBackgroundColor = Colors.blueGrey,
     this.mainScreenOverlayColor,
     this.menuScreenOverlayColor,
     this.overlayBlend,
     this.overlayBlur,
+    this.shadowLayer1Color,
+    this.shadowLayer2Color,
+    this.showShadow = false,
+    this.openCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
+    this.closeCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
+    this.duration = const Duration(milliseconds: 250),
+    this.androidCloseOnBackTap = true,
+    this.disableDragGesture = false,
+    this.isRtl = false,
+    this.clipMainScreen = true,
     this.mainScreenTapClose = false,
     this.menuScreenTapClose = false,
     this.mainScreenAbsorbPointer = true,
-    this.boxShadow,
     this.shrinkMainScreen = false,
+    this.boxShadow,
     this.drawerStyleBuilder,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
@@ -219,7 +222,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   void _onHorizontalDragStart(DragStartDetails startDetails) {
     // Offset decided by user to open drawer
     final _maxDragSlide = widget.isRtl
-        ? MediaQuery.of(context).size.width - widget.dragOffset
+        ? context._screenWidth - widget.dragOffset
         : widget.dragOffset;
 
     // Will help us to set the offset according to RTL value
@@ -275,7 +278,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     if (_willFling) {
       // Strong swipe will cause the animation continue to its destination
       final _visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
-          (MediaQuery.of(context).size.width * 50);
+          (context._screenWidth * 50);
 
       final _visualVelocityInPxRTL = -_visualVelocityInPx;
 
@@ -513,8 +516,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     // Add layer - Shrink Screen
     if (widget.shrinkMainScreen) {
-      final _mainSize = MediaQuery.of(context).size.width -
-          (widget.slideWidth * animationValue);
+      final _mainSize =
+          context._screenWidth - (widget.slideWidth * animationValue);
       _mainScreen = SizedBox(
         width: _mainSize,
         child: _mainScreen,
@@ -600,8 +603,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 return AbsorbPointer(
                   child: Container(
                     color: Colors.transparent,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    width: context._screenWidth,
+                    height: context._screenHeight,
                   ),
                 );
               }
@@ -650,9 +653,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           break;
         case DrawerStyle.style7:
           _parentWidget = renderStyle7();
-          break;
-        case DrawerStyle.style8:
-          _parentWidget = renderStyle8();
           break;
         default:
           _parentWidget = renderDefault();
@@ -727,8 +727,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   }
 
   Widget renderStyle1() {
-    final _slidePercent =
-        widget.isRtl ? MediaQuery.of(context).size.width * .1 : 15.0;
+    final _slidePercent = widget.isRtl ? context._screenWidth * .1 : 15.0;
     return Stack(
       children: [
         /// Displaying Menu screen
@@ -925,41 +924,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..rotateY(-_rotate * _slideDirection),
               alignment: Alignment.centerRight,
               child: mainScreenWidget,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle8() {
-    final _width = MediaQuery.of(context).size.width;
-    final _rightSlide = _width *
-        ((_width < 500)
-            ? .6
-            : (_width > 500 && (_width < 1000))
-                ? .4
-                : .2);
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (_, __) {
-        final _slide =
-            _rightSlide * _animationController.value * _slideDirection;
-        final _left =
-            (1 - _animationController.value) * _rightSlide * _slideDirection;
-        return Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenWidget,
-            ),
-            Transform.translate(
-              offset: Offset(-_left, 0),
-              child: SizedBox(
-                width: _rightSlide,
-                child: menuScreenWidget,
-              ),
             ),
           ],
         );
