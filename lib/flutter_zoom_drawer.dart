@@ -31,13 +31,13 @@ class ZoomDrawer extends StatefulWidget {
     this.controller,
     this.mainScreenScale = 0.3,
     this.slideWidth = 275.0,
+    this.menuScreenWidth,
     this.borderRadius = 16.0,
     this.angle = -12.0,
     this.dragOffset = 60.0,
     this.openDragSensitivity = 425,
     this.closeDragSensitivity = 425,
     this.drawerShadowsBackgroundColor = const Color(0xffffffff),
-    this.mainBackgroundColor = Colors.blue,
     this.menuBackgroundColor = Colors.transparent,
     this.mainScreenOverlayColor,
     this.menuScreenOverlayColor,
@@ -81,14 +81,14 @@ class ZoomDrawer extends StatefulWidget {
   /// Sliding width of the drawer - defaults to 275.0
   final double slideWidth;
 
+  /// menuScreen Width
+  final double? menuScreenWidth;
+
   /// Border radius of the slide content - defaults to 16.0
   final double borderRadius;
 
   /// Rotation angle of the drawer - defaults to -12.0
   final double angle;
-
-  /// Background color of the parent widget (mainScreen and menuScreen together) - defaults to blue
-  final Color mainBackgroundColor;
 
   /// Background color of the menuScreen - defaults to transparent
   final Color menuBackgroundColor;
@@ -495,7 +495,20 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             return context.drawer?.close();
           }
         },
-        child: widget.menuScreen,
+        child: SizedBox(
+          width: context._screenWidth,
+          height: context._screenHeight,
+          child: Align(
+            alignment: widget.isRtl ? Alignment.topRight : Alignment.topLeft,
+            child: SizedBox(
+              width: widget.menuScreenWidth ??
+                  widget.slideWidth -
+                      (context._screenWidth / widget.slideWidth) -
+                      50,
+              child: widget.menuScreen,
+            ),
+          ),
+        ),
       ),
     );
 
@@ -504,6 +517,22 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       final _left = (1 - animationValue) * widget.slideWidth * _slideDirection;
       _menuScreen = Transform.translate(
         offset: Offset(-_left, 0),
+        child: _menuScreen,
+      );
+    }
+
+    // Add layer - Overlay color
+    if (widget.menuScreenOverlayColor != null) {
+      final _overlayColor = ColorTween(
+        begin: widget.menuScreenOverlayColor,
+        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
+      );
+
+      _menuScreen = ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          _overlayColor.lerp(animationValue)!,
+          widget.overlayBlend ?? BlendMode.screen,
+        ),
         child: _menuScreen,
       );
     }
@@ -677,47 +706,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
 
-    // _backGroundWidget has two purposes
-    // 1. Add mainBackgroundColor
-    // 2. Add menuScreenOverlayColor
-    // Full width/hight fixes size conflict between mainScreen and menuScreen resulting in wrong colors diplay
-    // Will fix menuScreenOverlayColor won't render behind mainScreen
-    Widget _backGroundWidget = Material(
-      color: widget.mainBackgroundColor,
-      child: SizedBox(
-        width: context._screenWidth,
-        height: context._screenHeight,
-      ),
-    );
-
-    // Add layer to _backGroundWidget - Overlay color
-    if (widget.menuScreenOverlayColor != null) {
-      final _overlayColor = ColorTween(
-        begin: widget.menuScreenOverlayColor,
-        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
-      );
-
-      _backGroundWidget = AnimatedBuilder(
-        animation: _animationController,
-        builder: (newContext, __) => ColorFiltered(
-          colorFilter: ColorFilter.mode(
-            _overlayColor.lerp(animationValue)!,
-            widget.overlayBlend ?? BlendMode.screen,
-          ),
-          child: Material(
-            color: widget.mainBackgroundColor,
-            child: SizedBox(
-              width: newContext._screenWidth,
-              height: newContext._screenHeight,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Stack(
-      children: [_backGroundWidget, _parentWidget],
-    );
+    return _parentWidget;
   }
 
   Widget renderCustomStyle() {
