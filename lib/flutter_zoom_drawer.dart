@@ -496,8 +496,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           }
         },
         child: SizedBox(
-          width: context._screenWidth,
-          height: context._screenHeight,
+          width: double.infinity,
+          height: double.infinity,
           child: Align(
             alignment: widget.isRtl ? Alignment.topRight : Alignment.topLeft,
             child: SizedBox(
@@ -644,16 +644,20 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
 
+    // Add layer - GestureDetector
+    if (widget.mainScreenTapClose) {
+      _mainScreen = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _onTap,
+        child: _mainScreen,
+      );
+    }
+
     return _mainScreen;
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _onTap,
-      child: renderLayout(),
-    );
-  }
+  Widget build(BuildContext context) => renderLayout();
 
   Widget renderLayout() {
     Widget? _parentWidget;
@@ -698,7 +702,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     // Add layer - GestureDetector
     if (!widget.disableDragGesture) {
       _parentWidget = GestureDetector(
-        behavior: HitTestBehavior.opaque,
+        behavior: HitTestBehavior.translucent,
         onHorizontalDragStart: _onHorizontalDragStart,
         onHorizontalDragUpdate: _onHorizontalDragUpdate,
         onHorizontalDragEnd: _onHorizontalDragEnd,
@@ -706,7 +710,18 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
 
-    return _parentWidget;
+    return Material(
+      color: widget.menuBackgroundColor,
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (_, __) => menuScreenWidget,
+          ),
+          _parentWidget,
+        ],
+      ),
+    );
   }
 
   Widget renderCustomStyle() {
@@ -728,12 +743,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     const _slidePercent = 15.0;
     return Stack(
       children: [
-        /// Displaying Menu screen
-        AnimatedBuilder(
-          animation: _animationController,
-          builder: (_, __) => menuScreenWidget,
-        ),
-
         if (widget.showShadow) ...[
           /// Displaying the first shadow
           AnimatedBuilder(
@@ -789,8 +798,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             mainScreenWidget,
             Transform.translate(
               offset: Offset(-_left, 0),
-              child: SizedBox(
+              child: Container(
                 width: widget.slideWidth,
+                color: widget.menuBackgroundColor,
                 child: menuScreenWidget,
               ),
             ),
@@ -808,17 +818,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         final _scale = 1 - (animationValue * widget.mainScreenScale);
         final _top = animationValue * widget.slideWidth;
 
-        return Stack(
-          children: [
-            menuScreenWidget,
-            Transform(
-              transform: Matrix4.identity()
-                ..translate(_slide, _top)
-                ..scale(_scale),
-              alignment: Alignment.center,
-              child: mainScreenWidget,
-            ),
-          ],
+        return Transform(
+          transform: Matrix4.identity()
+            ..translate(_slide, _top)
+            ..scale(_scale),
+          alignment: Alignment.center,
+          child: mainScreenWidget,
         );
       },
     );
@@ -834,19 +839,14 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         final _scale = 1 - (animationValue * widget.mainScreenScale);
         final _rotate = animationValue * (pi / 4);
 
-        return Stack(
-          children: [
-            menuScreenWidget,
-            Transform(
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.0009)
-                ..translate(_x)
-                ..scale(_scale)
-                ..rotateY(_rotate * _slideDirection),
-              alignment: Alignment.centerRight,
-              child: mainScreenWidget,
-            ),
-          ],
+        return Transform(
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0009)
+            ..translate(_x)
+            ..scale(_scale)
+            ..rotateY(_rotate * _slideDirection),
+          alignment: Alignment.centerRight,
+          child: mainScreenWidget,
         );
       },
     );
@@ -857,24 +857,19 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       animation: _animationController,
       builder: (_, __) {
         final _slideWidth =
-            widget.isRtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
-        final _x = animationValue * _slideWidth * _slideDirection;
+            (widget.slideWidth * 1.2) * animationValue * _slideDirection;
         final _scale = 1 - (animationValue * widget.mainScreenScale);
         final _rotate = animationValue * (pi / 4);
 
-        return Stack(
-          children: [
-            menuScreenWidget,
-            Transform(
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.0009)
-                ..translate(_x)
-                ..scale(_scale)
-                ..rotateY(-_rotate * _slideDirection),
-              alignment: Alignment.centerRight,
-              child: mainScreenWidget,
-            ),
-          ],
+        return Transform(
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0009)
+            ..translate(_slideWidth)
+            ..scale(_scale)
+            ..rotateY(-_rotate * _slideDirection),
+          alignment:
+              widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
+          child: mainScreenWidget,
         );
       },
     );
