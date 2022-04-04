@@ -38,7 +38,7 @@ class ZoomDrawer extends StatefulWidget {
     this.closeDragSensitivity = 425,
     this.drawerShadowsBackgroundColor = const Color(0xffffffff),
     this.mainBackgroundColor = Colors.blue,
-    this.menuBackgroundColor = Colors.blueGrey,
+    this.menuBackgroundColor = Colors.transparent,
     this.mainScreenOverlayColor,
     this.menuScreenOverlayColor,
     this.overlayBlend,
@@ -51,6 +51,7 @@ class ZoomDrawer extends StatefulWidget {
     this.duration = const Duration(milliseconds: 250),
     this.reverseDuration = const Duration(milliseconds: 250),
     this.androidCloseOnBackTap = true,
+    this.moveMenuScreen = true,
     this.disableDragGesture = false,
     this.isRtl = false,
     this.clipMainScreen = true,
@@ -89,7 +90,7 @@ class ZoomDrawer extends StatefulWidget {
   /// Background color of the parent widget (mainScreen and menuScreen together) - defaults to blue
   final Color mainBackgroundColor;
 
-  /// Background color of the menuScreen - defaults to blueGrey
+  /// Background color of the menuScreen - defaults to transparent
   final Color menuBackgroundColor;
 
   /// Background color of the drawer shadows - defaults to white
@@ -110,6 +111,10 @@ class ZoomDrawer extends StatefulWidget {
   /// If that is the case, you have to manually close the drawer from there
   /// By using ZoomDrawer.of(context)?.close()
   final bool androidCloseOnBackTap;
+
+  /// Make menuScreen slide along with mainScreen animation
+  /// Has no effects to style1
+  final bool moveMenuScreen;
 
   /// Drawer slide out curve
   final Curve openCurve;
@@ -165,7 +170,7 @@ class ZoomDrawer extends StatefulWidget {
   /// Prevent touches to mainScreen while drawer is open
   final bool mainScreenAbsorbPointer;
 
-  /// Shrinks the mainScreen by [slideWidth], good for use on desktop with Style2
+  /// Shrinks the mainScreen by [slideWidth]
   final bool shrinkMainScreen;
 
   /// Build custom animated style to override [DrawerStyle]
@@ -494,17 +499,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       ),
     );
 
-    // Add layer - Overlay color
-    if (widget.menuScreenOverlayColor != null) {
-      final _overlayColor = ColorTween(
-        begin: widget.menuScreenOverlayColor,
-        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
-      );
-      _menuScreen = ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          _overlayColor.lerp(animationValue)!,
-          widget.overlayBlend ?? BlendMode.screen,
-        ),
+    // Add layer - Transform
+    if (widget.moveMenuScreen && widget.style != DrawerStyle.style1) {
+      final _left = (1 - animationValue) * widget.slideWidth * _slideDirection;
+      _menuScreen = Transform.translate(
+        offset: Offset(-_left, 0),
         child: _menuScreen,
       );
     }
@@ -570,7 +569,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
 
     // Add layer - Angle
-    // Works on Default Style only
     if (widget.angle != 0 && widget.style != DrawerStyle.defaultStyle) {
       final _rotationAngle =
           (((widget.angle) * pi * _slideDirection) / 180) * animationValue;
@@ -647,17 +645,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         case DrawerStyle.style4:
           _parentWidget = renderStyle4();
           break;
-        case DrawerStyle.style5:
-          _parentWidget = renderStyle5();
-          break;
-        case DrawerStyle.style6:
-          _parentWidget = renderStyle6();
-          break;
         default:
           _parentWidget = renderDefault();
       }
     }
 
+    // Add layer - WillPopScope
     if (!kIsWeb && Platform.isAndroid) {
       _parentWidget = WillPopScope(
         onWillPop: () async {
@@ -673,17 +666,57 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       );
     }
 
-    return Material(
+    // Add layer - GestureDetector
+    if (!widget.disableDragGesture) {
+      _parentWidget = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragStart: _onHorizontalDragStart,
+        onHorizontalDragUpdate: _onHorizontalDragUpdate,
+        onHorizontalDragEnd: _onHorizontalDragEnd,
+        child: _parentWidget,
+      );
+    }
+
+    // _backGroundWidget has two purposes
+    // 1. Add mainBackgroundColor
+    // 2. Add menuScreenOverlayColor
+    // Full width/hight fixes size conflict between mainScreen and menuScreen resulting in wrong colors diplay
+    // Will fix menuScreenOverlayColor won't render behind mainScreen
+    Widget _backGroundWidget = Material(
       color: widget.mainBackgroundColor,
-      child: widget.disableDragGesture
-          ? _parentWidget
-          : GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onHorizontalDragStart: _onHorizontalDragStart,
-              onHorizontalDragUpdate: _onHorizontalDragUpdate,
-              onHorizontalDragEnd: _onHorizontalDragEnd,
-              child: _parentWidget,
+      child: SizedBox(
+        width: context._screenWidth,
+        height: context._screenHeight,
+      ),
+    );
+
+    // Add layer to _backGroundWidget - Overlay color
+    if (widget.menuScreenOverlayColor != null) {
+      final _overlayColor = ColorTween(
+        begin: widget.menuScreenOverlayColor,
+        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
+      );
+
+      _backGroundWidget = AnimatedBuilder(
+        animation: _animationController,
+        builder: (newContext, __) => ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            _overlayColor.lerp(animationValue)!,
+            widget.overlayBlend ?? BlendMode.screen,
+          ),
+          child: Material(
+            color: widget.mainBackgroundColor,
+            child: SizedBox(
+              width: newContext._screenWidth,
+              height: newContext._screenHeight,
             ),
+          ),
+        ),
+      );
+    }
+
+    return Stack(
+      children: [_backGroundWidget, _parentWidget],
     );
   }
 
@@ -709,14 +742,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Displaying Menu screen
         AnimatedBuilder(
           animation: _animationController,
-          builder: (_, __) {
-            final _left =
-                (1 - animationValue) * widget.slideWidth * _slideDirection;
-            return Transform.translate(
-              offset: Offset(-_left, 0),
-              child: menuScreenWidget,
-            );
-          },
+          builder: (_, __) => menuScreenWidget,
         ),
 
         if (widget.showShadow) ...[
@@ -766,54 +792,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
-        final _slide = widget.slideWidth * _slideDirection * animationValue;
-
-        return Stack(
-          children: [
-            menuScreenWidget,
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenWidget,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle2() {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (_, __) {
-        final _slide = widget.slideWidth * animationValue * _slideDirection;
-        final _left =
-            (1 - animationValue) * widget.slideWidth * _slideDirection;
-
-        return Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenWidget,
-            ),
-            Transform.translate(
-              offset: Offset(-_left, 0),
-              child: SizedBox(
-                width: widget.slideWidth,
-                child: menuScreenWidget,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle3() {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (_, __) {
         final _left =
             (1 - animationValue) * widget.slideWidth * _slideDirection;
 
@@ -833,7 +811,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle4() {
+  Widget renderStyle2() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -857,7 +835,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle5() {
+  Widget renderStyle3() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
@@ -885,7 +863,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle6() {
+  Widget renderStyle4() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {

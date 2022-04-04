@@ -33,8 +33,6 @@ enum DrawerStyle {
   style2,
   style3,
   style4,
-  style5,
-  style6,
 }
 
 /// Build custom style with (context, animationValue, slideWidth, menuScreen, mainScreen) {}
