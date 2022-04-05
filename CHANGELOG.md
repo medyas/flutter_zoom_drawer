@@ -1,15 +1,31 @@
-# [2.4.0]
+# [3.0.0]
 
-- Added `mainScreenAbsorbPointer` to absorb mainScreen tap events while drawer is open
+Breaking changes
+
+- Due to new futures added some styles were removed in favor of `moveMenuScreen` feature, please refer to README
+- Replaced `backgroundColor` with `drawerShadowsBackgroundColor`
+- Replaced `swipeOffset` with `dragOffset`
+
+What's new?
+
+- ZoomDrawer is now responsive to dragging
+- Added `moveMenuScreen` to slide `menuScreen` along with `mainScreen`
+- Added `menuScreenWidth`
+- Added `menuBackgroundColor`
+- Added `reverseDuration`
+- Added `mainScreenOverlayColor` and `menuScreenOverlayColor` to control overlay color while closing and opening
+- Added `mainScreenAbsorbPointer` to prevent mainScreen tap events while drawer is open
 - Added `menuScreenTapClose` to close drawer from menuScreen tap
-- Drawer is now responsive to dragging
 - Added `openDragSensitivity` and `closeDragSensitivity` to control drawer sensitivity in response to dragging
 - Added `androidCloseOnBackTap` to close drawer on android back tap
-- Added more color options
-- Replaced backgroundColor with drawerShadowsBackgroundColor
-- Replaced swipeOffset with dragOffset
+- Added extensions to access drawer, drawerState, and drawerState notifier
+
+Fixes:
+
 - Fix `mainScreen` bug resulted in opening drawer instead of closing
 - Fix `mainScreenTapClose` is being ignored on app start or Hot restarts
+- Fix discrepancy between RTL and LTR styles
+- Fix drawerState notifier wasn't disposed
 - Code improvements and followed lint package rules
 
 # [2.3.1+1]

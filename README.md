@@ -13,6 +13,59 @@ dependencies:
   flutter_zoom_drawer: "<latest_release>"
 ```
 
+## Version 3 Breaking changes
+
+### Style 1 changed to defaultStyle
+
+Before merge:
+`ZoomDrawer( style: DrawerStyle.style1, )`
+Now:
+
+```
+ZoomDrawer(
+style: DrawerStyle.defaultStyle,
+showShadow: true,
+moveMenuScreen: false,
+)
+```
+
+### Style 2 changed to defaultStyle
+
+Before merge:
+`ZoomDrawer( style: DrawerStyle.style2, )`
+Now:
+`ZoomDrawer( style: DrawerStyle.defaultStyle, )`
+
+### Style 3 changed to defaultStyle
+
+Before merge:
+`ZoomDrawer( style: DrawerStyle.style3, )`
+Now:
+`ZoomDrawer( style: DrawerStyle.defaultStyle, moveMenuScreen: false, )`
+
+### Style 4 changed to Style 1
+
+### Style 5 changed to Style 2
+
+### Style 6 changed to Style 3
+
+### Style 7 changed to Style 4
+
+### Style 8 changed to defaultStyle
+
+Before merge:
+`ZoomDrawer( style: DrawerStyle.style8, )`
+
+Now:
+
+```
+ZoomDrawer(
+style: DrawerStyle.defaultStyle,
+moveMenuScreen: false,
+slideWidth: MediaQuery.of(context).screenWidth * 0.5 // set slideWidth
+)
+```
+
 ## Features
 
 - Simple sliding drawer
