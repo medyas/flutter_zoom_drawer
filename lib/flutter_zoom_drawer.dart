@@ -234,9 +234,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Check whether drawer is open
   bool isOpen() => stateNotifier.value == DrawerState.open;
 
-  /// Decides if drag animation should start
+  /// Decides if drag animation should start according to dragOffset
   void _onHorizontalDragStart(DragStartDetails startDetails) {
-    // Offset decided by user to open drawer
+    // Offset required to to open drawer
     final _maxDragSlide = widget.isRtl
         ? context._screenWidth - widget.dragOffset
         : widget.dragOffset;
@@ -256,10 +256,15 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
   }
 
-  /// If drag animation is triggered, this will
-  /// update animation value continuesly upon draging
+  /// Update animation value continuesly upon draging.
   void _onHorizontalDragUpdate(DragUpdateDetails updateDetails) {
-    if (_shouldDrag == false) return;
+    /// Drag animation can be triggered when _shouldDrag is true,
+    /// or when DrawerState is opening or closing
+    if (_shouldDrag == false &&
+        ![DrawerState.opening, DrawerState.closing]
+            .contains(_stateNotifier.value)) {
+      return;
+    }
 
     final _dragSensitivity = drawerLastAction == DrawerLastAction.open
         ? widget.closeDragSensitivity
