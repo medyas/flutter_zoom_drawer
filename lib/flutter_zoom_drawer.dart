@@ -48,7 +48,7 @@ class ZoomDrawer extends StatefulWidget {
     this.menuBackgroundColor = Colors.transparent,
     this.mainScreenOverlayColor,
     this.menuScreenOverlayColor,
-    this.overlayBlend,
+    this.overlayBlend = BlendMode.srcATop,
     this.overlayBlur,
     this.shadowLayer1Color,
     this.shadowLayer2Color,
@@ -85,22 +85,22 @@ class ZoomDrawer extends StatefulWidget {
   /// MainScreen scale factor
   final double mainScreenScale;
 
-  /// Sliding width of the drawer - defaults to 275.0
+  /// Sliding width of the drawer
   final double slideWidth;
 
   /// menuScreen Width
   final double? menuScreenWidth;
 
-  /// Border radius of the slide content - defaults to 16.0
+  /// Border radius of the slide content
   final double borderRadius;
 
-  /// Rotation angle of the drawer - defaults to -12.0
+  /// Rotation angle of the drawer
   final double angle;
 
-  /// Background color of the menuScreen - defaults to transparent
+  /// Background color of the menuScreen
   final Color menuBackgroundColor;
 
-  /// Background color of the drawer shadows - defaults to white
+  /// Background color of the drawer shadows
   final Color drawerShadowsBackgroundColor;
 
   /// First shadow background color
@@ -110,7 +110,7 @@ class ZoomDrawer extends StatefulWidget {
   final Color? shadowLayer2Color;
 
   /// Depreciated: Set [boxShadow] to show shadow on [mainScreen]
-  /// Boolean, whether to show the drawer shadows - Applies to defaultStyle
+  /// Boolean, whether to show the drawer shadows - Applies to defaultStyle only
   final bool showShadow;
 
   /// Close drawer on android back button
@@ -159,8 +159,8 @@ class ZoomDrawer extends StatefulWidget {
   /// Color of the menu screen's cover overlay
   final Color? menuScreenOverlayColor;
 
-  /// The BlendMode of the [mainScreenOverlayColor] and [menuScreenOverlayColor] filter (default BlendMode.screen)
-  final BlendMode? overlayBlend;
+  /// The BlendMode of the [mainScreenOverlayColor] and [menuScreenOverlayColor] filter
+  final BlendMode overlayBlend;
 
   /// Apply a Blur amount to the mainScreen
   final double? overlayBlur;
@@ -549,7 +549,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       _menuScreen = ColorFiltered(
         colorFilter: ColorFilter.mode(
           _overlayColor.lerp(animationValue)!,
-          widget.overlayBlend ?? BlendMode.screen,
+          widget.overlayBlend,
         ),
         child: Material(
           color: widget.menuBackgroundColor,
@@ -589,7 +589,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       _mainScreen = ColorFiltered(
         colorFilter: ColorFilter.mode(
           _overlayColor.lerp(animationValue)!,
-          widget.overlayBlend ?? BlendMode.screen,
+          widget.overlayBlend,
         ),
         child: _mainScreen,
       );
@@ -597,9 +597,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
     // Add layer - Border radius
     if (widget.borderRadius != 0) {
-      final _cornerRadius = widget.borderRadius * animationValue;
+      final _borderRadius = widget.borderRadius * animationValue;
       _mainScreen = ClipRRect(
-        borderRadius: BorderRadius.circular(_cornerRadius),
+        borderRadius: BorderRadius.circular(_borderRadius),
         child: _mainScreen,
       );
     }
