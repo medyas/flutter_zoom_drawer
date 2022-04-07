@@ -1,55 +1,72 @@
 library flutter_zoom_drawer;
 
+import 'dart:io';
 import 'dart:math' show pi;
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/config.dart';
 
-class ZoomDrawerController {
-  /// callback function to open the drawer
-  Function? open;
+extension ZoomDrawerContext on BuildContext {
+  /// Drawer
+  _ZoomDrawerState? get drawer => ZoomDrawer.of(this);
 
-  /// callback function to close the drawer
-  Function? close;
+  /// drawerLastAction
+  DrawerLastAction? get drawerLastAction =>
+      ZoomDrawer.of(this)?.drawerLastAction;
 
-  /// callback function to toggle the drawer
-  void Function()? toggle;
+  /// drawerState
+  DrawerState? get drawerState => ZoomDrawer.of(this)?.stateNotifier.value;
 
-  /// callback function to determine the status of the drawer
-  Function? isOpen;
+  /// drawerState notifier
+  ValueNotifier<DrawerState>? get drawerStateNotifier =>
+      ZoomDrawer.of(this)?.stateNotifier;
 
-  /// Drawer state notifier
-  /// opening, closing, open, closed
-  ValueNotifier<DrawerState>? stateNotifier;
+  /// Screen Width
+  double get _screenWidth => MediaQuery.of(this).size.width;
+
+  /// Screen Height
+  double get _screenHeight => MediaQuery.of(this).size.height;
 }
 
 class ZoomDrawer extends StatefulWidget {
   const ZoomDrawer({
-    this.style = DrawerStyle.defaultStyle,
-    this.controller,
     required this.menuScreen,
     required this.mainScreen,
+    this.style = DrawerStyle.defaultStyle,
+    this.controller,
     this.mainScreenScale = 0.3,
     this.slideWidth = 275.0,
+    this.menuScreenWidth,
     this.borderRadius = 16.0,
     this.angle = -12.0,
-    this.backgroundColor = const Color(0xffffffff),
+    this.dragOffset = 60.0,
+    this.openDragSensitivity = 425,
+    this.closeDragSensitivity = 425,
+    this.drawerShadowsBackgroundColor = const Color(0xffffffff),
+    this.menuBackgroundColor = Colors.transparent,
+    this.mainScreenOverlayColor,
+    this.menuScreenOverlayColor,
+    this.overlayBlend = BlendMode.srcATop,
+    this.overlayBlur,
     this.shadowLayer1Color,
     this.shadowLayer2Color,
     this.showShadow = false,
-    this.openCurve,
-    this.closeCurve,
-    this.duration,
-    this.disableGesture = false,
+    this.openCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
+    this.closeCurve = const Interval(0.0, 1.0, curve: Curves.easeOut),
+    this.duration = const Duration(milliseconds: 250),
+    this.reverseDuration = const Duration(milliseconds: 250),
+    this.androidCloseOnBackTap = true,
+    this.moveMenuScreen = true,
+    this.disableDragGesture = false,
     this.isRtl = false,
     this.clipMainScreen = true,
-    this.swipeOffset = 6.0,
-    this.overlayColor,
-    this.overlayBlend,
-    this.overlayBlur,
     this.mainScreenTapClose = false,
-    this.boxShadow,
+    this.menuScreenTapClose = false,
+    this.mainScreenAbsorbPointer = true,
     this.shrinkMainScreen = false,
+    this.boxShadow,
     this.drawerStyleBuilder,
   }) : assert(angle <= 0.0 && angle >= -30.0);
 
@@ -68,17 +85,23 @@ class ZoomDrawer extends StatefulWidget {
   /// MainScreen scale factor
   final double mainScreenScale;
 
-  /// Sliding width of the drawer - defaults to 275.0
+  /// Sliding width of the drawer
   final double slideWidth;
 
-  /// Border radius of the slide content - defaults to 16.0
+  /// menuScreen Width
+  final double? menuScreenWidth;
+
+  /// Border radius of the slide content
   final double borderRadius;
 
-  /// Rotation angle of the drawer - defaults to -12.0
+  /// Rotation angle of the drawer
   final double angle;
 
-  /// Background color of the drawer shadows - defaults to white
-  final Color backgroundColor;
+  /// Background color of the menuScreen
+  final Color menuBackgroundColor;
+
+  /// Background color of the drawer shadows
+  final Color drawerShadowsBackgroundColor;
 
   /// First shadow background color
   final Color? shadowLayer1Color;
@@ -87,20 +110,33 @@ class ZoomDrawer extends StatefulWidget {
   final Color? shadowLayer2Color;
 
   /// Depreciated: Set [boxShadow] to show shadow on [mainScreen]
-  /// Boolean, whether to show the drawer shadows - Applies to Style1
+  /// Boolean, whether to show the drawer shadows - Applies to defaultStyle only
   final bool showShadow;
 
+  /// Close drawer on android back button
+  /// Note: This won't work if you are using WillPopScope in mainScreen,
+  /// If that is the case, you have to manually close the drawer from there
+  /// By using ZoomDrawer.of(context)?.close()
+  final bool androidCloseOnBackTap;
+
+  /// Make menuScreen slide along with mainScreen animation
+  /// Has no effects to style1
+  final bool moveMenuScreen;
+
   /// Drawer slide out curve
-  final Curve? openCurve;
+  final Curve openCurve;
 
   /// Drawer slide in curve
-  final Curve? closeCurve;
+  final Curve closeCurve;
 
-  /// Drawer Duration
-  final Duration? duration;
+  /// Drawer forward Duration
+  final Duration duration;
+
+  /// Drawer reverse Duration
+  final Duration reverseDuration;
 
   /// Disable swipe gesture
-  final bool disableGesture;
+  final bool disableDragGesture;
 
   /// display the drawer in RTL
   final bool isRtl;
@@ -108,31 +144,46 @@ class ZoomDrawer extends StatefulWidget {
   /// Depreciated: Set [borderRadius] to 0 instead
   final bool clipMainScreen;
 
-  /// The swipe offset to trigger drawer close
-  final double swipeOffset;
+  /// The offset to trigger drawer drag
+  final double dragOffset;
+
+  /// How fast the opening drawer drag in response to a touch, the lower the more sensitive
+  final double openDragSensitivity;
+
+  /// How fast the closing drawer drag in response to a touch, the lower the more sensitive
+  final double closeDragSensitivity;
 
   /// Color of the main screen's cover overlay
-  final Color? overlayColor;
+  final Color? mainScreenOverlayColor;
 
-  /// The BlendMode of the [overlayColor] filter (default BlendMode.screen)
-  final BlendMode? overlayBlend;
+  /// Color of the menu screen's cover overlay
+  final Color? menuScreenOverlayColor;
+
+  /// The BlendMode of the [mainScreenOverlayColor] and [menuScreenOverlayColor] filter
+  final BlendMode overlayBlend;
 
   /// Apply a Blur amount to the mainScreen
   final double? overlayBlur;
 
-  /// The Shadow of the mainScreenContent
+  /// The Shadow of the mainScreenWidget
   final List<BoxShadow>? boxShadow;
+
+  /// Close drawer when tapping menuScreen
+  final bool menuScreenTapClose;
 
   /// Close drawer when tapping mainScreen
   final bool mainScreenTapClose;
 
-  /// Shrinks the mainScreen by [slideWidth], good for use on desktop with Style2
+  /// Prevent touches to mainScreen while drawer is open
+  final bool mainScreenAbsorbPointer;
+
+  /// Shrinks the mainScreen by [slideWidth]
   final bool shrinkMainScreen;
 
   /// Build custom animated style to override [DrawerStyle]
   /// ```dart
-  /// drawerStyleBuilder: (context, percentOpen, slideWidth, menuScreen, mainScreen) {
-  ///     double slide = slideWidth * percentOpen;
+  /// drawerStyleBuilder: (context, animationValue, slideWidth, menuScreen, mainScreen) {
+  ///     double slide = slideWidth * animationValue;
   ///     return Stack(
   ///       children: [
   ///         menuScreen,
@@ -157,110 +208,226 @@ class ZoomDrawer extends StatefulWidget {
 
 class _ZoomDrawerState extends State<ZoomDrawer>
     with SingleTickerProviderStateMixin {
-  final Curve _scaleDownCurve = const Interval(0.0, 0.3, curve: Curves.easeOut);
-  final Curve _scaleUpCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideOutCurve = const Interval(0.0, 1.0, curve: Curves.easeOut);
-  final Curve _slideInCurve =
-      const Interval(0.0, 1.0, curve: Curves.easeOut); // Curves.bounceOut
-  ColorTween _overlayColor =
-      ColorTween(begin: Colors.transparent, end: Colors.black38);
+  /// Triggers drag animation
+  bool _shouldDrag = false;
 
-  /// check the slide direction
-  late int _rtlSlide;
+  /// Decides where the drawer will reside in screen
+  late int _slideDirection;
 
-  AnimationController? _animationController;
-  DrawerState _state = DrawerState.closed;
+  /// Once drawer is open, _absorbingMainScreen will absorb any pointer to avoid
+  /// mainScreen interactions
+  late final ValueNotifier<bool> _absorbingMainScreen;
 
-  double get _percentOpen => _animationController!.value;
+  /// Drawer state
+  final ValueNotifier<DrawerState> _stateNotifier =
+      ValueNotifier(DrawerState.closed);
+  ValueNotifier<DrawerState> get stateNotifier => _stateNotifier;
+
+  late final AnimationController _animationController;
+  double get animationValue => _animationController.value;
+
+  /// Is similar to DrawerState but with only (open, closed) values
+  /// Very useful case you want to know the drawer is either open or closed
+  DrawerLastAction _drawerLastAction = DrawerLastAction.closed;
+  DrawerLastAction get drawerLastAction => _drawerLastAction;
+
+  /// Check whether drawer is open
+  bool isOpen() => stateNotifier.value == DrawerState.open;
+
+  /// Decides if drag animation should start according to dragOffset
+  void _onHorizontalDragStart(DragStartDetails startDetails) {
+    // Offset required to to open drawer
+    final _maxDragSlide = widget.isRtl
+        ? context._screenWidth - widget.dragOffset
+        : widget.dragOffset;
+
+    // Will help us to set the offset according to RTL value
+    // Without this user can open the drawer without respecing initial offset required
+    final _toggleValue = widget.isRtl
+        ? _animationController.isCompleted
+        : _animationController.isDismissed;
+
+    final _isDraggingFromLeft =
+        _toggleValue && startDetails.globalPosition.dx < _maxDragSlide;
+
+    final _isDraggingFromRight =
+        !_toggleValue && startDetails.globalPosition.dx > _maxDragSlide;
+
+    _shouldDrag = _isDraggingFromLeft || _isDraggingFromRight;
+  }
+
+  /// Update animation value continuesly upon draging.
+  void _onHorizontalDragUpdate(DragUpdateDetails updateDetails) {
+    /// Drag animation can be triggered when _shouldDrag is true,
+    /// or when DrawerState is opening or closing
+    if (_shouldDrag == false &&
+        ![DrawerState.opening, DrawerState.closing]
+            .contains(_stateNotifier.value)) {
+      return;
+    }
+
+    final _dragSensitivity = drawerLastAction == DrawerLastAction.open
+        ? widget.closeDragSensitivity
+        : widget.openDragSensitivity;
+
+    final _delta = updateDetails.primaryDelta ?? 0 / widget.dragOffset;
+
+    if (widget.isRtl) {
+      _animationController.value -= _delta / _dragSensitivity;
+    } else {
+      _animationController.value += _delta / _dragSensitivity;
+    }
+  }
+
+  /// Case _onHorizontalDragUpdate didn't complete its full drawer animation
+  /// _onHorizontalDragEnd will decide where the drawer reside
+  /// Whether continue to its destination or return to initial position
+  void _onHorizontalDragEnd(DragEndDetails dragEndDetails) {
+    if (_animationController.isDismissed || _animationController.isCompleted) {
+      return;
+    }
+
+    /// Min swipe strength
+    const _minFlingVelocity = 350.0;
+
+    /// Actual swipe strength
+    final _dragVelocity = dragEndDetails.velocity.pixelsPerSecond.dx.abs();
+
+    // Shall drawer continue to its destination?
+    final _willFling = _dragVelocity > _minFlingVelocity;
+
+    if (_willFling) {
+      // Strong swipe will cause the animation continue to its destination
+      final _visualVelocityInPx = dragEndDetails.velocity.pixelsPerSecond.dx /
+          (context._screenWidth * 50);
+
+      final _visualVelocityInPxRTL = -_visualVelocityInPx;
+
+      _animationController.fling(
+        velocity: widget.isRtl ? _visualVelocityInPxRTL : _visualVelocityInPx,
+        animationBehavior: AnimationBehavior.normal,
+      );
+    }
+
+    /// We use DrawerLastAction instead of DrawerState,
+    /// because on draging, Drawer state is always equal to DrawerState.opening
+    else if (drawerLastAction == DrawerLastAction.open &&
+        _animationController.value < 0.6) {
+      // Continue animation to close the drawer
+      close();
+    } else if (drawerLastAction == DrawerLastAction.closed &&
+        _animationController.value > 0.15) {
+      // Continue animation to open the drawer
+      open();
+    } else if (drawerLastAction == DrawerLastAction.open) {
+      // Return back to initial position
+      open();
+    } else if (drawerLastAction == DrawerLastAction.closed) {
+      // Return back to initial position
+      close();
+    }
+  }
+
+  /// Close drawer on Tap
+  void _mainScreenTapHandler() {
+    if (widget.mainScreenTapClose && stateNotifier.value == DrawerState.open) {
+      return close();
+    }
+  }
+
+  void _menuScreenTapHandler() {
+    if (widget.menuScreenTapClose && stateNotifier.value == DrawerState.open) {
+      return close();
+    }
+  }
 
   /// Open drawer
   void open() {
-    _animationController!.forward();
+    _animationController.forward();
   }
 
   /// Close drawer
   void close() {
-    _animationController!.reverse();
+    _animationController.reverse();
   }
 
-  AnimationController? get animationController => _animationController;
-
-  /// Toggle drawer
-  void toggle() {
-    if (_state == DrawerState.open) {
+  /// Toggle drawer,
+  /// forceToggle: Will toggle even if it's currently animating - defaults to false
+  void toggle({bool forceToggle = false}) {
+    /// We use DrawerLastAction instead of DrawerState,
+    /// because on draging, Drawer state is always equal to DrawerState.opening
+    if (stateNotifier.value == DrawerState.open ||
+        (forceToggle && drawerLastAction == DrawerLastAction.open)) {
       close();
-    } else if (_state == DrawerState.closed) {
+    } else if (stateNotifier.value == DrawerState.closed ||
+        (forceToggle && drawerLastAction == DrawerLastAction.closed)) {
       open();
     }
   }
 
-  /// check whether drawer is open
-  bool isOpen() =>
-      _state == DrawerState.open /* || _state == DrawerState.opening*/;
+  /// Assign widget methods to controller
+  void _assignToController() {
+    if (widget.controller == null) return;
 
-  /// Drawer state
-  ValueNotifier<DrawerState>? stateNotifier;
+    widget.controller!.open = open;
+    widget.controller!.close = close;
+    widget.controller!.toggle = toggle;
+    widget.controller!.isOpen = isOpen;
+    widget.controller!.stateNotifier = stateNotifier;
+  }
+
+  /// Updates stateNotifier, drawerLastAction, and _absorbingMainScreen
+  void _animationStatusListener(AnimationStatus status) {
+    switch (status) {
+      case AnimationStatus.forward:
+        stateNotifier.value = DrawerState.opening;
+        break;
+      case AnimationStatus.reverse:
+        stateNotifier.value = DrawerState.closing;
+        break;
+      case AnimationStatus.completed:
+        stateNotifier.value = DrawerState.open;
+        _drawerLastAction = DrawerLastAction.open;
+        _absorbingMainScreen.value = widget.mainScreenAbsorbPointer;
+        break;
+      case AnimationStatus.dismissed:
+        stateNotifier.value = DrawerState.closed;
+        _drawerLastAction = DrawerLastAction.closed;
+        _absorbingMainScreen.value = false;
+        break;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    stateNotifier = ValueNotifier(_state);
+    _absorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
 
-    /// Initialize the animation controller
-    /// add status listener to update the menuStatus
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.duration is Duration
-          ? widget.duration
-          : const Duration(milliseconds: 250),
-    )..addStatusListener((AnimationStatus status) {
-        switch (status) {
-          case AnimationStatus.forward:
-            _state = DrawerState.opening;
-            _updateStatusNotifier();
-            break;
-          case AnimationStatus.reverse:
-            _state = DrawerState.closing;
-            _updateStatusNotifier();
-            break;
-          case AnimationStatus.completed:
-            _state = DrawerState.open;
-            _updateStatusNotifier();
-            break;
-          case AnimationStatus.dismissed:
-            _state = DrawerState.closed;
-            _updateStatusNotifier();
-            break;
-        }
-      });
+      duration: widget.duration,
+      reverseDuration: widget.duration,
+    )..addStatusListener(_animationStatusListener);
 
-    /// assign controller function to the widget methods
-    if (widget.controller != null) {
-      widget.controller!.open = open;
-      widget.controller!.close = close;
-      widget.controller!.toggle = toggle;
-      widget.controller!.isOpen = isOpen;
-      widget.controller!.stateNotifier = stateNotifier;
-    }
-    _rtlSlide = widget.isRtl ? -1 : 1;
+    _assignToController();
+
+    _slideDirection = widget.isRtl ? -1 : 1;
   }
 
   @override
   void didUpdateWidget(covariant ZoomDrawer oldWidget) {
     if (oldWidget.isRtl != widget.isRtl) {
-      _rtlSlide = widget.isRtl ? -1 : 1;
+      _slideDirection = widget.isRtl ? -1 : 1;
     }
     super.didUpdateWidget(oldWidget);
   }
 
-  void _updateStatusNotifier() {
-    stateNotifier!.value = _state;
-  }
-
   @override
   void dispose() {
-    _animationController!.dispose();
+    _stateNotifier.dispose();
+    _absorbingMainScreen.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -275,103 +442,175 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ///
   /// * [slide] is the sliding amount of the drawer
   ///
-  Widget _zoomAndSlideContent(
-    Widget? container, {
+  Widget _applyDefaultStyle(
+    Widget? child, {
     double? angle,
-    double? scale,
+    double scale = 1,
     double slide = 0,
-    bool isMain = false,
   }) {
-    double slidePercent;
-    double scalePercent;
+    double _slidePercent;
+    double _scalePercent;
 
-    /// determine current slide percent based on the MenuStatus
-    switch (_state) {
+    /// Determine current slide percent based on the MenuStatus
+    switch (stateNotifier.value) {
       case DrawerState.closed:
-        slidePercent = 0.0;
-        scalePercent = 0.0;
+        _slidePercent = 0.0;
+        _scalePercent = 0.0;
         break;
       case DrawerState.open:
-        slidePercent = 1.0;
-        scalePercent = 1.0;
+        _slidePercent = 1.0;
+        _scalePercent = 1.0;
         break;
       case DrawerState.opening:
-        slidePercent =
-            (widget.openCurve ?? _slideOutCurve).transform(_percentOpen);
-        scalePercent = _scaleDownCurve.transform(_percentOpen);
+        _slidePercent = (widget.openCurve).transform(animationValue);
+        _scalePercent = Interval(0.0, 0.3, curve: widget.openCurve)
+            .transform(animationValue);
         break;
       case DrawerState.closing:
-        slidePercent =
-            (widget.closeCurve ?? _slideInCurve).transform(_percentOpen);
-        scalePercent = _scaleUpCurve.transform(_percentOpen);
+        _slidePercent = (widget.closeCurve).transform(animationValue);
+        _scalePercent = Interval(0.0, 1.0, curve: widget.closeCurve)
+            .transform(animationValue);
         break;
     }
 
-    /// calculated sliding amount based on the RTL and animation value
-    final slideAmount = (widget.slideWidth - slide) * slidePercent * _rtlSlide;
+    /// Sliding
+    final _xPosition =
+        ((widget.slideWidth - slide) * animationValue * _slideDirection) *
+            _slidePercent;
 
-    /// calculated scale amount based on the provided scale and animation value
-    final contentScale = (scale ?? 1.0) - (0.2 * scalePercent);
+    /// Scale
+    final _scalePercentage = scale - (widget.mainScreenScale * _scalePercent);
 
-    /// calculated radius based on the provided radius and animation value
-    final cornerRadius = widget.borderRadius * _percentOpen;
+    /// BorderRadius
+    final _radius = widget.borderRadius * animationValue;
 
-    /// calculated rotation amount based on the provided angle and animation value
-    final rotationAngle =
-        (((angle ?? widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
+    /// Rotation
+    final _rotationAngle =
+        ((((angle ?? widget.angle) * pi) / 180) * animationValue) *
+            _slideDirection;
 
     return Transform(
-      transform: Matrix4.translationValues(slideAmount, 0.0, 0.0)
-        ..rotateZ(rotationAngle)
-        ..scale(contentScale, contentScale),
-      alignment: Alignment.centerLeft,
-      child: isMain
-          ? container
-          : ClipRRect(
-              borderRadius: BorderRadius.circular(cornerRadius),
-              child: container,
-            ),
+      transform: Matrix4.translationValues(_xPosition, 0.0, 0.0)
+        ..rotateZ(_rotationAngle)
+        ..scale(_scalePercentage, _scalePercentage),
+      alignment: widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_radius),
+        child: child,
+      ),
     );
   }
 
-  /// Builds the layers of decorations on mainScreen
-  Widget get mainScreenContent {
-    // if (_percentOpen == 0) return widget.mainScreen;
-    Widget _mainScreenContent = widget.mainScreen;
-    if (widget.shrinkMainScreen) {
-      final mainSize = MediaQuery.of(context).size.width -
-          (widget.slideWidth * _percentOpen);
-      _mainScreenContent = SizedBox(
-        width: mainSize,
-        child: _mainScreenContent,
-      );
-    }
-    if (widget.overlayColor != null) {
-      _overlayColor = ColorTween(
-        begin: widget.overlayColor!.withOpacity(0.0),
-        end: widget.overlayColor,
-      );
-      _mainScreenContent = ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          _overlayColor.lerp(_percentOpen)!,
-          widget.overlayBlend ?? BlendMode.screen,
+  /// Builds the layers of menuScreen
+  Widget get menuScreenWidget {
+    // Add layer - GestureDetector
+    Widget _menuScreen = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      // onTap shouldn't be null to avoid loosing state
+      onTap: _menuScreenTapHandler,
+      // Full width and hight to make menuScreen behind mainScreen
+      child: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        // Without Align, SizedBox won't work
+        child: Align(
+          alignment: widget.isRtl ? Alignment.topRight : Alignment.topLeft,
+          // By default menuScreen width is calculated based on slideWidth
+          // Unless user set menuScreenWidth
+          child: SizedBox(
+            width: widget.menuScreenWidth ??
+                widget.slideWidth -
+                    (context._screenWidth / widget.slideWidth) -
+                    50,
+            child: widget.menuScreen,
+          ),
         ),
-        child: _mainScreenContent,
+      ),
+    );
+
+    // Add layer - Transform
+    if (widget.moveMenuScreen && widget.style != DrawerStyle.style1) {
+      final _left = (1 - animationValue) * widget.slideWidth * _slideDirection;
+      _menuScreen = Transform.translate(
+        offset: Offset(-_left, 0),
+        child: _menuScreen,
       );
     }
+    // Add layer - Overlay color
+    // Material widget needs to be set after ColorFilter,
+    // Storing Material widget in variable will make
+    // ColorFiltered renders only 50% of the width
+    if (widget.menuScreenOverlayColor != null) {
+      final _overlayColor = ColorTween(
+        begin: widget.menuScreenOverlayColor,
+        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
+      );
+
+      _menuScreen = ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          _overlayColor.lerp(animationValue)!,
+          widget.overlayBlend,
+        ),
+        child: Material(
+          color: widget.menuBackgroundColor,
+          child: _menuScreen,
+        ),
+      );
+    } else {
+      _menuScreen = Material(
+        color: widget.menuBackgroundColor,
+        child: _menuScreen,
+      );
+    }
+
+    return _menuScreen;
+  }
+
+  /// Builds the layers of mainScreen
+  Widget get mainScreenWidget {
+    Widget _mainScreen = widget.mainScreen;
+
+    // Add layer - Shrink Screen
+    if (widget.shrinkMainScreen) {
+      final _mainSize =
+          context._screenWidth - (widget.slideWidth * animationValue);
+      _mainScreen = SizedBox(
+        width: _mainSize,
+        child: _mainScreen,
+      );
+    }
+
+    // Add layer - Overlay color
+    if (widget.mainScreenOverlayColor != null) {
+      final _overlayColor = ColorTween(
+        begin: widget.mainScreenOverlayColor!.withOpacity(0.0),
+        end: widget.mainScreenOverlayColor,
+      );
+      _mainScreen = ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          _overlayColor.lerp(animationValue)!,
+          widget.overlayBlend,
+        ),
+        child: _mainScreen,
+      );
+    }
+
+    // Add layer - Border radius
     if (widget.borderRadius != 0) {
-      final cornerRadius = widget.borderRadius * _percentOpen;
-      _mainScreenContent = ClipRRect(
-        borderRadius: BorderRadius.circular(cornerRadius),
-        child: _mainScreenContent,
+      final _borderRadius = widget.borderRadius * animationValue;
+      _mainScreen = ClipRRect(
+        borderRadius: BorderRadius.circular(_borderRadius),
+        child: _mainScreen,
       );
     }
+
+    // Add layer - Box shadow
     if (widget.boxShadow != null) {
-      final cornerRadius = widget.borderRadius * _percentOpen;
-      // Could use [hasShadow], but seems redundant
-      _mainScreenContent = Container(
+      final _radius = widget.borderRadius * animationValue;
+
+      _mainScreen = Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(cornerRadius),
+          borderRadius: BorderRadius.circular(_radius),
           boxShadow: widget.boxShadow ??
               [
                 BoxShadow(
@@ -380,125 +619,155 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 )
               ],
         ),
-        child: _mainScreenContent,
+        child: _mainScreen,
       );
     }
-    if (widget.angle != 0 && widget.style != DrawerStyle.style1) {
-      final rotationAngle =
-          (((widget.angle) * pi * _rtlSlide) / 180) * _percentOpen;
-      _mainScreenContent = Transform.rotate(
-        angle: rotationAngle,
+
+    // Add layer - Angle
+    if (widget.angle != 0 && widget.style != DrawerStyle.defaultStyle) {
+      final _rotationAngle =
+          (((widget.angle) * pi * _slideDirection) / 180) * animationValue;
+      _mainScreen = Transform.rotate(
+        angle: _rotationAngle,
         alignment: widget.isRtl
             ? AlignmentDirectional.topEnd
             : AlignmentDirectional.topStart,
-        child: _mainScreenContent,
+        child: _mainScreen,
       );
     }
+
+    // Add layer - Overlay blur
     if (widget.overlayBlur != null) {
-      final blurAmount = widget.overlayBlur! * _percentOpen;
-      _mainScreenContent = ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-        child: _mainScreenContent,
+      final _blurAmount = widget.overlayBlur! * animationValue;
+      _mainScreen = ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: _blurAmount, sigmaY: _blurAmount),
+        child: _mainScreen,
       );
     }
-    return _mainScreenContent;
+
+    // Add layer - AbsorbPointer
+    /// Prevents touches to mainScreen while drawer is open
+    if (widget.mainScreenAbsorbPointer) {
+      _mainScreen = Stack(
+        children: [
+          _mainScreen,
+          ValueListenableBuilder(
+            valueListenable: _absorbingMainScreen,
+            builder: (_, bool _valueNotifier, ___) {
+              if (_valueNotifier && stateNotifier.value == DrawerState.open) {
+                return AbsorbPointer(
+                  child: Container(
+                    color: Colors.transparent,
+                    width: context._screenWidth,
+                    height: context._screenHeight,
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
+      );
+    }
+
+    // Add layer - GestureDetector
+    if (widget.mainScreenTapClose) {
+      _mainScreen = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _mainScreenTapHandler,
+        child: _mainScreen,
+      );
+    }
+
+    return _mainScreen;
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (widget.disableGesture) return renderLayout();
+  Widget build(BuildContext context) => _renderLayout();
 
-    return GestureDetector(
-      /// Detecting the slide amount to close the drawer in RTL & LTR
-      onPanUpdate: (details) {
-        if (_state == DrawerState.open &&
-            ((details.delta.dx < -widget.swipeOffset && !widget.isRtl) ||
-                (details.delta.dx > widget.swipeOffset && widget.isRtl))) {
-          toggle();
-        }
-      },
-      onTap: () {
-        if (widget.mainScreenTapClose && _state == DrawerState.open) {
-          return close();
-        }
-      },
-      child: renderLayout(),
-    );
-  }
+  Widget _renderLayout() {
+    Widget _parentWidget;
 
-  Widget renderLayout() {
-    if (widget.drawerStyleBuilder != null) return renderCustomStyle();
-    switch (widget.style) {
-      case DrawerStyle.style1:
-        return renderStyle1();
-      case DrawerStyle.style2:
-        return renderStyle2();
-      case DrawerStyle.style3:
-        return renderStyle3();
-      case DrawerStyle.style4:
-        return renderStyle4();
-      case DrawerStyle.style5:
-        return renderStyle5();
-      case DrawerStyle.style6:
-        return renderStyle6();
-      case DrawerStyle.style7:
-        return renderStyle7();
-      case DrawerStyle.style8:
-        return renderStyle8();
-      default:
-        return renderDefault();
+    if (widget.drawerStyleBuilder != null) {
+      _parentWidget = _renderCustomStyle();
+    } else {
+      switch (widget.style) {
+        case DrawerStyle.style1:
+          _parentWidget = _renderStyle1();
+          break;
+        case DrawerStyle.style2:
+          _parentWidget = _renderStyle2();
+          break;
+        case DrawerStyle.style3:
+          _parentWidget = _renderStyle3();
+          break;
+        case DrawerStyle.style4:
+          _parentWidget = _renderStyle4();
+          break;
+        default:
+          _parentWidget = _renderDefault();
+      }
     }
+
+    // Add layer - GestureDetector
+    if (!widget.disableDragGesture) {
+      _parentWidget = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: _onHorizontalDragStart,
+        onHorizontalDragUpdate: _onHorizontalDragUpdate,
+        onHorizontalDragEnd: _onHorizontalDragEnd,
+        child: _parentWidget,
+      );
+    }
+
+    // Add layer - WillPopScope
+    if (!kIsWeb && Platform.isAndroid) {
+      _parentWidget = WillPopScope(
+        onWillPop: () async {
+          // Case drawer is opened or will open, either way will close
+          if (widget.androidCloseOnBackTap &&
+              [DrawerState.open, DrawerState.opening]
+                  .contains(stateNotifier.value)) {
+            close();
+          }
+          return false;
+        },
+        child: _parentWidget,
+      );
+    }
+
+    return _parentWidget;
   }
 
-  Widget renderCustomStyle() {
+  Widget _renderCustomStyle() {
     return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
+      animation: _animationController,
+      builder: (context, _) {
         return widget.drawerStyleBuilder!(
           context,
-          _percentOpen,
+          animationValue,
           widget.slideWidth,
-          widget.menuScreen,
-          mainScreenContent,
+          menuScreenWidget,
+          mainScreenWidget,
         );
       },
     );
   }
 
-  Widget renderDefault() {
-    return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slide = widget.slideWidth * _percentOpen * _rtlSlide;
-        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
+  Widget _renderDefault() {
+    const _slidePercent = 15.0;
 
-        return Stack(
-          children: [
-            widget.menuScreen,
-            Transform(
-              transform: Matrix4.identity()
-                ..translate(_slide)
-                ..scale(_scale),
-              alignment: Alignment.center,
-              child: mainScreenContent,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle1() {
-    final _slidePercent =
-        widget.isRtl ? MediaQuery.of(context).size.width * .1 : 15.0;
     return Stack(
       children: [
-        widget.menuScreen,
+        AnimatedBuilder(
+          animation: _animationController,
+          builder: (_, __) => menuScreenWidget,
+        ),
         if (widget.showShadow) ...[
           /// Displaying the first shadow
           AnimatedBuilder(
-            animation: _animationController!,
-            builder: (_, w) => _zoomAndSlideContent(
+            animation: _animationController,
+            builder: (_, w) => _applyDefaultStyle(
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
               scale: .9,
@@ -506,76 +775,53 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             ),
             child: Container(
               color: widget.shadowLayer1Color ??
-                  widget.backgroundColor.withAlpha(31),
+                  widget.drawerShadowsBackgroundColor.withAlpha(60),
             ),
           ),
 
           /// Displaying the second shadow
           AnimatedBuilder(
-            animation: _animationController!,
-            builder: (_, w) => _zoomAndSlideContent(
+            animation: _animationController,
+            builder: (_, w) => _applyDefaultStyle(
               w,
               angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
               scale: .95,
               slide: _slidePercent,
             ),
             child: Container(
-              color: widget.shadowLayer2Color ?? widget.backgroundColor,
+              color: widget.shadowLayer2Color ??
+                  widget.drawerShadowsBackgroundColor.withAlpha(180),
             ),
           )
         ],
 
-        /// Displaying the main screen
+        /// Displaying the Main screen
         AnimatedBuilder(
-          animation: _animationController!,
-          builder: (_, __) => _zoomAndSlideContent(
-            mainScreenContent,
-            isMain: true,
+          animation: _animationController,
+          builder: (_, __) => _applyDefaultStyle(
+            mainScreenWidget,
           ),
         ),
       ],
     );
   }
 
-  Widget renderStyle2() {
+  Widget _renderStyle1() {
     return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slide = widget.slideWidth * _rtlSlide * _percentOpen;
+      animation: _animationController,
+      builder: (_, __) {
+        final _xOffset =
+            (1 - animationValue) * widget.slideWidth * _slideDirection;
 
         return Stack(
           children: [
-            widget.menuScreen,
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenContent,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle3() {
-    return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slide = widget.slideWidth * _percentOpen * _rtlSlide;
-        final _left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
-
-        return Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenContent,
-            ),
+            mainScreenWidget,
             Transform.translate(
-              offset: Offset(-_left, 0),
-              child: SizedBox(
+              offset: Offset(-_xOffset, 0),
+              child: Container(
                 width: widget.slideWidth,
-                child: widget.menuScreen,
+                color: widget.menuBackgroundColor,
+                child: menuScreenWidget,
               ),
             ),
           ],
@@ -584,45 +830,23 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle4() {
+  Widget _renderStyle2() {
     return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _left = (1 - _percentOpen) * widget.slideWidth * _rtlSlide;
+      animation: _animationController,
+      builder: (_, __) {
+        final _xPosition = widget.slideWidth * _slideDirection * animationValue;
+        final _yPosition = animationValue * widget.slideWidth;
+        final _scalePercentage = 1 - (animationValue * widget.mainScreenScale);
 
         return Stack(
           children: [
-            mainScreenContent,
-            Transform.translate(
-              offset: Offset(-_left, 0),
-              child: SizedBox(
-                width: widget.slideWidth,
-                child: widget.menuScreen,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle5() {
-    return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slide = widget.slideWidth * _rtlSlide * _percentOpen;
-        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
-        final _top = _percentOpen * widget.slideWidth;
-
-        return Stack(
-          children: [
-            widget.menuScreen,
+            menuScreenWidget,
             Transform(
               transform: Matrix4.identity()
-                ..translate(_slide, _top)
-                ..scale(_scale),
+                ..translate(_xPosition, _yPosition)
+                ..scale(_scalePercentage),
               alignment: Alignment.center,
-              child: mainScreenContent,
+              child: mainScreenWidget,
             ),
           ],
         );
@@ -630,27 +854,27 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle6() {
+  Widget _renderStyle3() {
     return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final slideWidth =
-            widget.isRtl ? widget.slideWidth : widget.slideWidth / 2;
-        final _x = _percentOpen * slideWidth * _rtlSlide;
-        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
-        final _rotate = _percentOpen * (pi / 4);
+      animation: _animationController,
+      builder: (_, __) {
+        final _xPosition =
+            (widget.slideWidth / 2) * animationValue * _slideDirection;
+        final _scalePercentage = 1 - (animationValue * widget.mainScreenScale);
+        final _yAngle = animationValue * (pi / 4) * _slideDirection;
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenWidget,
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(_x)
-                ..scale(_scale)
-                ..rotateY(_rotate * _rtlSlide),
-              alignment: Alignment.centerRight,
-              child: mainScreenContent,
+                ..translate(_xPosition)
+                ..scale(_scalePercentage)
+                ..rotateY(_yAngle),
+              alignment:
+                  widget.isRtl ? Alignment.centerLeft : Alignment.centerRight,
+              child: mainScreenWidget,
             ),
           ],
         );
@@ -658,61 +882,27 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 
-  Widget renderStyle7() {
+  Widget _renderStyle4() {
     return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slideWidth =
-            widget.isRtl ? widget.slideWidth * 1.2 : widget.slideWidth / 2;
-        final _x = _percentOpen * _slideWidth * _rtlSlide;
-        final _scale = 1 - (_percentOpen * widget.mainScreenScale);
-        final _rotate = _percentOpen * (pi / 4);
+      animation: _animationController,
+      builder: (_, __) {
+        final _xPosition =
+            (widget.slideWidth * 1.2) * animationValue * _slideDirection;
+        final _scalePercentage = 1 - (animationValue * widget.mainScreenScale);
+        final _yAngle = animationValue * (pi / 4) * _slideDirection;
 
         return Stack(
           children: [
-            widget.menuScreen,
+            menuScreenWidget,
             Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.0009)
-                ..translate(_x)
-                ..scale(_scale)
-                ..rotateY(-_rotate * _rtlSlide),
-              alignment: Alignment.centerRight,
-              child: mainScreenContent,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget renderStyle8() {
-    final _width = MediaQuery.of(context).size.width;
-    final _rightSlide = _width *
-        ((_width < 500)
-            ? .6
-            : (_width > 500 && (_width < 1000))
-                ? .4
-                : .2);
-    return AnimatedBuilder(
-      animation: _animationController!,
-      builder: (context, child) {
-        final _slide = _rightSlide * _animationController!.value * _rtlSlide;
-        final _left =
-            (1 - _animationController!.value) * _rightSlide * _rtlSlide;
-        return Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..translate(_slide),
-              alignment: Alignment.center,
-              child: mainScreenContent,
-            ),
-            Transform.translate(
-              offset: Offset(-_left, 0),
-              child: SizedBox(
-                width: _rightSlide,
-                child: widget.menuScreen,
-              ),
+                ..translate(_xPosition)
+                ..scale(_scalePercentage)
+                ..rotateY(-_yAngle),
+              alignment:
+                  widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
+              child: mainScreenWidget,
             ),
           ],
         );
@@ -720,27 +910,3 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     );
   }
 }
-
-/// Drawer State enum
-enum DrawerState { opening, closing, open, closed }
-
-enum DrawerStyle {
-  defaultStyle,
-  style1,
-  style2,
-  style3,
-  style4,
-  style5,
-  style6,
-  style7,
-  style8,
-}
-
-/// Build custom style with (context, percentOpen, slideWidth, menuScreen, mainScreen) {}
-typedef DrawerStyleBuilder = Widget Function(
-  BuildContext context,
-  double percentOpen,
-  double slideWidth,
-  Widget menuScreen,
-  Widget mainScreen,
-);

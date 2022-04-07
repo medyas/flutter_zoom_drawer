@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:example/menu_page.dart';
 import 'package:example/page_structure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = context.locale.languageCode == "ar";
+    final _isRtl = context.locale.languageCode == "ar";
     return ZoomDrawer(
       controller: _drawerController,
       menuScreen: MenuScreen(
@@ -34,15 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
       mainScreen: MainScreen(),
       openCurve: Curves.fastOutSlowIn,
       borderRadius: 32.0,
-      style: DrawerStyle.style8,
+      style: DrawerStyle.style3,
       showShadow: true,
       angle: 0.0,
-      swipeOffset: 2.0,
-      slideWidth: MediaQuery.of(context).size.width * (isRtl ? .55 : 0.65),
-      isRtl: isRtl,
+      slideWidth: MediaQuery.of(context).size.width * (_isRtl ? .55 : 0.65),
+      isRtl: _isRtl,
       mainScreenTapClose: true,
-      overlayColor: Colors.brown.withOpacity(0.5),
-      // overlayBlend: BlendMode.darken,
+      mainScreenOverlayColor: Colors.brown.withOpacity(0.5),
       boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 12)],
     );
   }
@@ -63,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final rtl = context.locale.languageCode == "ar";
     return ValueListenableBuilder<DrawerState>(
-      valueListenable: ZoomDrawer.of(context)!.stateNotifier!,
+      valueListenable: ZoomDrawer.of(context)!.stateNotifier,
       builder: (context, state, child) {
         return AbsorbPointer(
           absorbing: state != DrawerState.closed,

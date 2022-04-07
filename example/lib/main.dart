@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 // void main() async {
@@ -90,11 +91,11 @@ class _ZoomState extends State<Zoom> {
     return ZoomDrawer(
       controller: z,
       borderRadius: 24,
-      style: DrawerStyle.style1,
+      style: DrawerStyle.defaultStyle,
+      showShadow: true,
       openCurve: Curves.fastOutSlowIn,
       slideWidth: MediaQuery.of(context).size.width * 0.65,
       duration: const Duration(milliseconds: 500),
-      showShadow: true,
       angle: 0.0,
       mainScreen: const Body(),
       menuScreen: Theme(
