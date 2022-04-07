@@ -1,5 +1,7 @@
 # [3.0.0]
 
+**Thanks to [@YDA93](https://github.com/YDA93) for his contribution**
+
 Breaking changes
 
 - Due to new futures added some styles were removed in favor of `moveMenuScreen` feature, please refer to README
@@ -56,7 +58,7 @@ Fixes:
 
 # [2.2.0]
 
-**Thanks to @Skquark for his contribution**
+**Thanks to [@Skquark](https://github.com/Skquark) for his contribution**
 
 - Added `overlayColor`, `overlayBlend`, `mainScreenTapClose` and `boxShadow`
 - Restructured mainScreen effects stack, cleaned up bugs, added Style8 from a fork
