@@ -310,21 +310,29 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     }
 
     /// We use DrawerLastAction instead of DrawerState,
-    /// because on draging, Drawer state is always equal to DrawerState.opening
-    else if (drawerLastAction == DrawerLastAction.open &&
-        _animationController.value < 0.6) {
+    /// because on draging, Drawer state is always equal to DrawerState.opening.
+    /// User must pass 35% of animation value to proceed the full animation,
+    /// Otherwise, it will return to initial position
+    else if (drawerLastAction == DrawerLastAction.open) {
+      // Because drawer is open, Animation value starts from 1.0 to 0
+      if (_animationController.value > 0.65) {
+        // User have not passed 35% of animation value
+        // Return back to initial position
+        open();
+        return;
+      }
       // Continue animation to close the drawer
       close();
-    } else if (drawerLastAction == DrawerLastAction.closed &&
-        _animationController.value > 0.15) {
+    } else if (drawerLastAction == DrawerLastAction.closed) {
+      // Because drawer is closed, Animation value starts from 0 to 1.0
+      if (_animationController.value < 0.35) {
+        // User have not passed 35% of animation value
+        // Return back to initial position
+        close();
+        return;
+      }
       // Continue animation to open the drawer
       open();
-    } else if (drawerLastAction == DrawerLastAction.open) {
-      // Return back to initial position
-      open();
-    } else if (drawerLastAction == DrawerLastAction.closed) {
-      // Return back to initial position
-      close();
     }
   }
 
