@@ -14,36 +14,20 @@ extension ZoomDrawerContext on BuildContext {
 
   /// drawerLastAction
   DrawerLastAction? get drawerLastAction =>
-      ZoomDrawer
-          .of(this)
-          ?.drawerLastAction;
+      ZoomDrawer.of(this)?.drawerLastAction;
 
   /// drawerState
-  DrawerState? get drawerState =>
-      ZoomDrawer
-          .of(this)
-          ?.stateNotifier
-          .value;
+  DrawerState? get drawerState => ZoomDrawer.of(this)?.stateNotifier.value;
 
   /// drawerState notifier
   ValueNotifier<DrawerState>? get drawerStateNotifier =>
-      ZoomDrawer
-          .of(this)
-          ?.stateNotifier;
+      ZoomDrawer.of(this)?.stateNotifier;
 
   /// Screen Width
-  double get _screenWidth =>
-      MediaQuery
-          .of(this)
-          .size
-          .width;
+  double get _screenWidth => MediaQuery.of(this).size.width;
 
   /// Screen Height
-  double get _screenHeight =>
-      MediaQuery
-          .of(this)
-          .size
-          .height;
+  double get _screenHeight => MediaQuery.of(this).size.height;
 }
 
 class ZoomDrawer extends StatefulWidget {
@@ -218,7 +202,7 @@ class ZoomDrawer extends StatefulWidget {
   /// static function to provide the drawer state
   static _ZoomDrawerState? of(BuildContext context) {
     return context.findAncestorStateOfType<State<ZoomDrawer>>()
-    as _ZoomDrawerState?;
+        as _ZoomDrawerState?;
   }
 }
 
@@ -236,7 +220,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Drawer state
   final ValueNotifier<DrawerState> _stateNotifier =
-  ValueNotifier(DrawerState.closed);
+      ValueNotifier(DrawerState.closed);
 
   ValueNotifier<DrawerState> get stateNotifier => _stateNotifier;
 
@@ -435,8 +419,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       vsync: this,
       duration: widget.duration,
       reverseDuration: widget.duration,
-    )
-      ..addStatusListener(_animationStatusListener);
+    )..addStatusListener(_animationStatusListener);
 
     _assignToController();
 
@@ -470,7 +453,8 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   ///
   /// * [slide] is the sliding amount of the drawer
   ///
-  Widget _applyDefaultStyle(Widget? child, {
+  Widget _applyDefaultStyle(
+    Widget? child, {
     double? angle,
     double scale = 1,
     double slide = 0,
@@ -636,7 +620,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       final _radius = widget.borderRadius * animationValue;
 
       _mainScreen = Container(
-        margin: EdgeInsets.all(8.0*animationValue),
+        margin: EdgeInsets.all(8.0 * animationValue),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(_radius),
           boxShadow: widget.boxShadow ??
@@ -669,7 +653,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       final _blurAmount = widget.overlayBlur! * animationValue;
       _mainScreen = ImageFiltered(
         imageFilter: ImageFilter.blur(
-          sigmaX: _blurAmount, sigmaY: _blurAmount,),
+          sigmaX: _blurAmount,
+          sigmaY: _blurAmount,
+        ),
         child: _mainScreen,
       );
     }
@@ -754,8 +740,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       _parentWidget = WillPopScope(
         onWillPop: () async {
           // Case drawer is opened or will open, either way will close
-          if (
-          [DrawerState.open, DrawerState.opening]
+          if ([DrawerState.open, DrawerState.opening]
               .contains(stateNotifier.value)) {
             close();
           }
@@ -793,17 +778,15 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           builder: (_, __) => menuScreenWidget,
         ),
         if (widget.showShadow) ...[
-
           /// Displaying the first shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _applyDefaultStyle(
-                  w,
-                  angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
-                  scale: .9,
-                  slide: _slidePercent * 2,
-                ),
+            builder: (_, w) => _applyDefaultStyle(
+              w,
+              angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 8,
+              scale: .9,
+              slide: _slidePercent * 2,
+            ),
             child: Container(
               color: widget.shadowLayer1Color ??
                   widget.drawerShadowsBackgroundColor.withAlpha(60),
@@ -813,13 +796,12 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           /// Displaying the second shadow
           AnimatedBuilder(
             animation: _animationController,
-            builder: (_, w) =>
-                _applyDefaultStyle(
-                  w,
-                  angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
-                  scale: .95,
-                  slide: _slidePercent,
-                ),
+            builder: (_, w) => _applyDefaultStyle(
+              w,
+              angle: (widget.angle == 0.0) ? 0.0 : widget.angle - 4.0,
+              scale: .95,
+              slide: _slidePercent,
+            ),
             child: Container(
               color: widget.shadowLayer2Color ??
                   widget.drawerShadowsBackgroundColor.withAlpha(180),
@@ -830,10 +812,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         /// Displaying the Main screen
         AnimatedBuilder(
           animation: _animationController,
-          builder: (_, __) =>
-              _applyDefaultStyle(
-                mainScreenWidget,
-              ),
+          builder: (_, __) => _applyDefaultStyle(
+            mainScreenWidget,
+          ),
         ),
       ],
     );
@@ -906,7 +887,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..scale(_scalePercentage)
                 ..rotateY(_yAngle),
               alignment:
-              widget.isRtl ? Alignment.centerLeft : Alignment.centerRight,
+                  widget.isRtl ? Alignment.centerLeft : Alignment.centerRight,
               child: mainScreenWidget,
             ),
           ],
@@ -934,7 +915,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
                 ..scale(_scalePercentage)
                 ..rotateY(-_yAngle),
               alignment:
-              widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
+                  widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
               child: mainScreenWidget,
             ),
           ],
