@@ -34,15 +34,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       mainScreen: MainScreen(),
       openCurve: Curves.fastOutSlowIn,
-      borderRadius: 32.0,
-      style: DrawerStyle.style3,
-      showShadow: true,
-      angle: 0.0,
+      showShadow: false,
       slideWidth: MediaQuery.of(context).size.width * (_isRtl ? .55 : 0.65),
       isRtl: _isRtl,
       mainScreenTapClose: true,
       mainScreenOverlayColor: Colors.brown.withOpacity(0.5),
-      boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 12)],
+      borderRadius: 10,
+      angle: 0.0,
+      menuScreenWidth: double.infinity,
+      moveMenuScreen: false,
+      style: DrawerStyle.defaultStyle,
+      drawerShadowsBackgroundColor: Colors.yellow,
+      mainScreenAbsorbPointer: false,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 5,
+          blurRadius: 7,
+          offset: Offset(0, 3), // changes position of shadow
+        ),
+      ],
     );
   }
 

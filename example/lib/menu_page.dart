@@ -32,6 +32,7 @@ class MenuScreen extends StatelessWidget {
             : _iosStyle;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -90,14 +91,14 @@ class MenuScreen extends StatelessWidget {
                       ...mainMenu
                           .map(
                             (item) => MenuItemWidget(
-                              key: Key(item.index.toString()),
-                              item: item,
-                              callback: callback,
-                              widthBox: const SizedBox(width: 16.0),
-                              style: style,
-                              selected: index == item.index,
-                            ),
-                          )
+                          key: Key(item.index.toString()),
+                          item: item,
+                          callback: callback,
+                          widthBox: const SizedBox(width: 16.0),
+                          style: style,
+                          selected: index == item.index,
+                        ),
+                      )
                           .toList()
                     ],
                   ),
@@ -115,7 +116,7 @@ class MenuScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       final languageCode =
-                          (context.locale.languageCode == "ar") ? "en" : "ar";
+                      (context.locale.languageCode == "ar") ? "en" : "ar";
 
                       context.setLocale(Locale(languageCode));
                     },
