@@ -505,10 +505,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         ..rotateZ(_rotationAngle)
         ..scale(_scalePercentage, _scalePercentage),
       alignment: widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_radius),
-        child: child,
-      ),
+
+      // We exclude mainScreen from ClipRRect because it already has borderRadius applied
+      // Only mainScreen has Scale of 1 while others has < 1
+      // We apply borderRadius to shadowLayer1Color and shadowLayer2Color
+      child: scale == 1
+          ? child
+          : ClipRRect(
+              borderRadius: BorderRadius.circular(_radius),
+              child: child,
+            ),
     );
   }
 
