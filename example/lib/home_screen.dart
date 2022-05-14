@@ -7,12 +7,12 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  static List<MenuItem> mainMenu = [
-    MenuItem(tr("payment"), Icons.payment, 0),
-    MenuItem(tr("promos"), Icons.card_giftcard, 1),
-    MenuItem(tr("notifications"), Icons.notifications, 2),
-    MenuItem(tr("help"), Icons.help, 3),
-    MenuItem(tr("about_us"), Icons.info_outline, 4),
+  static List<MenuClass> mainMenu = [
+    MenuClass(tr("payment"), Icons.payment, 0),
+    MenuClass(tr("promos"), Icons.card_giftcard, 1),
+    MenuClass(tr("notifications"), Icons.notifications, 2),
+    MenuClass(tr("help"), Icons.help, 3),
+    MenuClass(tr("about_us"), Icons.info_outline, 4),
   ];
 
   @override

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MenuScreen extends StatelessWidget {
-  final List<MenuItem> mainMenu;
+  final List<MenuClass> mainMenu;
   final void Function(int)? callback;
   final int? current;
 
@@ -140,7 +140,7 @@ class MenuScreen extends StatelessWidget {
 }
 
 class MenuItemWidget extends StatelessWidget {
-  final MenuItem? item;
+  final MenuClass? item;
   final Widget? widthBox;
   final TextStyle? style;
   final void Function(int)? callback;
@@ -183,10 +183,10 @@ class MenuItemWidget extends StatelessWidget {
   }
 }
 
-class MenuItem {
+class MenuClass {
   final String title;
   final IconData icon;
   final int index;
 
-  const MenuItem(this.title, this.icon, this.index);
+  const MenuClass(this.title, this.icon, this.index);
 }
