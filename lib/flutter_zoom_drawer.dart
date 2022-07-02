@@ -749,8 +749,9 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           if ([DrawerState.open, DrawerState.opening]
               .contains(stateNotifier.value)) {
             close();
+            return false;
           }
-          return false;
+          return true;
         },
         child: _parentWidget,
       );
