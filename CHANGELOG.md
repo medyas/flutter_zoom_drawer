@@ -1,3 +1,6 @@
+# [3.0.3]
+- Fix [#107](https://github.com/medyas/flutter_zoom_drawer/issues/107) [#99](https://github.com/medyas/flutter_zoom_drawer/issues/99)
+
 # [3.0.2]
 -
 - Fix [#96](https://github.com/medyas/flutter_zoom_drawer/issues/96)

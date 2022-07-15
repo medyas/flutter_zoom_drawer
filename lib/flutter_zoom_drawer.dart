@@ -224,7 +224,11 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   ValueNotifier<DrawerState> get stateNotifier => _stateNotifier;
 
-  late final AnimationController _animationController;
+  late final AnimationController _animationController = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+    reverseDuration: widget.duration,
+  )..addStatusListener(_animationStatusListener);
 
   double get animationValue => _animationController.value;
 
@@ -308,7 +312,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
       _animationController.fling(
         velocity: widget.isRtl ? _visualVelocityInPxRTL : _visualVelocityInPx,
-        animationBehavior: AnimationBehavior.normal,
+        animationBehavior: AnimationBehavior.preserve,
       );
     }
 
@@ -354,12 +358,16 @@ class _ZoomDrawerState extends State<ZoomDrawer>
 
   /// Open drawer
   void open() {
-    _animationController.forward();
+    if (mounted) {
+      _animationController.forward();
+    }
   }
 
   /// Close drawer
   void close() {
-    _animationController.reverse();
+    if (mounted) {
+      _animationController.reverse();
+    }
   }
 
   /// Toggle drawer,
@@ -390,19 +398,33 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Updates stateNotifier, drawerLastAction, and _absorbingMainScreen
   void _animationStatusListener(AnimationStatus status) {
     switch (status) {
+
+      /// The to animation.fling causes the AnimationStatus to be
+      /// emmitted with forward & reverse for the same action
+      /// Adding a check to determine if the drawer is in the process of opening or closing
       case AnimationStatus.forward:
-        stateNotifier.value = DrawerState.opening;
+        if (drawerLastAction == DrawerLastAction.open &&
+            _animationController.value < 1) {
+          _stateNotifier.value = DrawerState.closing;
+        } else {
+          _stateNotifier.value = DrawerState.opening;
+        }
         break;
       case AnimationStatus.reverse:
-        stateNotifier.value = DrawerState.closing;
+        if (drawerLastAction == DrawerLastAction.closed &&
+            _animationController.value > 0) {
+          _stateNotifier.value = DrawerState.opening;
+        } else {
+          _stateNotifier.value = DrawerState.closing;
+        }
         break;
       case AnimationStatus.completed:
-        stateNotifier.value = DrawerState.open;
+        _stateNotifier.value = DrawerState.open;
         _drawerLastAction = DrawerLastAction.open;
         _absorbingMainScreen.value = widget.mainScreenAbsorbPointer;
         break;
       case AnimationStatus.dismissed:
-        stateNotifier.value = DrawerState.closed;
+        _stateNotifier.value = DrawerState.closed;
         _drawerLastAction = DrawerLastAction.closed;
         _absorbingMainScreen.value = false;
         break;
@@ -414,12 +436,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
     super.initState();
 
     _absorbingMainScreen = ValueNotifier(widget.mainScreenAbsorbPointer);
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-      reverseDuration: widget.duration,
-    )..addStatusListener(_animationStatusListener);
 
     _assignToController();
 
