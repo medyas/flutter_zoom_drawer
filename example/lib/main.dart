@@ -1,12 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'home_screen.dart';
 
 // void main() {
 //   runApp(const MyApp());
@@ -151,7 +146,6 @@ import 'home_screen.dart';
 //   }
 // }
 
-
 /*
 * ---------------------------------------------------------
 * */
@@ -258,14 +252,28 @@ class _ZoomState extends State<Zoom> {
       mainScreen: const Body(),
       menuScreen: Theme(
         data: ThemeData.dark(),
-        child: const Scaffold(
+        child: Scaffold(
           backgroundColor: Colors.indigo,
           body: Padding(
             padding: EdgeInsets.only(left: 25),
             child: Center(
-              child: Text(
-                'Menu goes here',
-                // style: TextStyle(color: Colors.white),
+              child: TextButton(
+                onPressed: () {
+                  final navigator = Navigator.of(
+                    context,
+                  );
+                  z.close?.call()?.then(
+                        (value) => navigator.push(
+                          MaterialPageRoute(
+                            builder: (_) => TestPage(),
+                          ),
+                        ),
+                      );
+                },
+                child: Text(
+                  "Push Page",
+                  style: TextStyle(fontSize: 24.0, color: Colors.white),
+                ),
               ),
             ),
           ),
@@ -335,6 +343,19 @@ class TwoPanels extends StatefulWidget {
 class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
   static const _headerHeight = 32.0;
   late TabController tabController = TabController(length: 3, vsync: this);
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 2),
+    vsync: this,
+  )..addListener(() {
+      print("SlideValue: ${_controller.value} - ${_controller.status}");
+    });
+  late final Animation<Offset> _offsetAnimation = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(1.5, 0.0),
+  ).animate(CurvedAnimation(
+    parent: _controller,
+    curve: Curves.elasticIn,
+  ));
 
   Animation<RelativeRect> getPanelAnimation(BoxConstraints constraints) {
     final _height = constraints.biggest.height;
@@ -356,6 +377,7 @@ class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _controller.dispose();
     tabController.dispose();
     super.dispose();
   }
@@ -406,10 +428,45 @@ class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
               ),
               Container(
                 color: Colors.pink,
-                child: const Center(
-                  child: Text(
-                    "Back Panel",
-                    style: TextStyle(fontSize: 24.0, color: Colors.white),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Back Panel",
+                        style: TextStyle(fontSize: 24.0, color: Colors.white),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (_controller.status == AnimationStatus.completed) {
+                            _controller.reverse();
+                          } else {
+                            _controller.forward();
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TestPage(),
+                            ),
+                          );
+                        },
+                        child: Text("Push"),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      SlideTransition(
+                        position: _offsetAnimation,
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: FlutterLogo(size: 150.0),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -440,7 +497,7 @@ class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
                   child: Center(
                     child: Text(
                       "Shop Here",
-                      style: Theme.of(context).textTheme.button,
+                      style: Theme.of(context).textTheme.labelLarge,
                     ),
                   ),
                 ),
@@ -464,6 +521,20 @@ class _TwoPanelsState extends State<TwoPanels> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: bothPanels,
+    );
+  }
+}
+
+class TestPage extends StatelessWidget {
+  const TestPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Text("Test Page !"),
+      ),
     );
   }
 }

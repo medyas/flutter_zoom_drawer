@@ -1,3 +1,7 @@
+# [3.0.4]
+- Updated the `close/open/toggle` callbacks to return TickerFuture?
+- workaround for [#119](https://github.com/medyas/flutter_zoom_drawer/issues/119) 
+
 # [3.0.3]
 - Fix [#107](https://github.com/medyas/flutter_zoom_drawer/issues/107) [#99](https://github.com/medyas/flutter_zoom_drawer/issues/99)
 

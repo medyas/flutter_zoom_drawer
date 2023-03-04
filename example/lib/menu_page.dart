@@ -91,14 +91,14 @@ class MenuScreen extends StatelessWidget {
                       ...mainMenu
                           .map(
                             (item) => MenuItemWidget(
-                          key: Key(item.index.toString()),
-                          item: item,
-                          callback: callback,
-                          widthBox: const SizedBox(width: 16.0),
-                          style: style,
-                          selected: index == item.index,
-                        ),
-                      )
+                              key: Key(item.index.toString()),
+                              item: item,
+                              callback: callback,
+                              widthBox: const SizedBox(width: 16.0),
+                              style: style,
+                              selected: index == item.index,
+                            ),
+                          )
                           .toList()
                     ],
                   ),
@@ -116,7 +116,7 @@ class MenuScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       final languageCode =
-                      (context.locale.languageCode == "ar") ? "en" : "ar";
+                          (context.locale.languageCode == "ar") ? "en" : "ar";
 
                       context.setLocale(Locale(languageCode));
                     },
@@ -160,7 +160,7 @@ class MenuItemWidget extends StatelessWidget {
     return TextButton(
       onPressed: () => callback!(item!.index),
       style: TextButton.styleFrom(
-        primary: selected! ? const Color(0x44000000) : null,
+        foregroundColor: selected! ? const Color(0x44000000) : null,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
