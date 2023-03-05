@@ -9,14 +9,12 @@ enum DrawerState { opening, closing, open, closed }
 /// To detect last action from drawer if it was opened or closed.
 enum DrawerLastAction { open, closed }
 
-typedef TickerFutureCallback = TickerFuture? Function()?;
-
 class ZoomDrawerController {
   /// Open drawer
-  TickerFutureCallback open;
+  TickerFuture? Function()? open;
 
   /// Close drawer
-  TickerFutureCallback close;
+  TickerFuture? Function()? close;
 
   /// Toggle drawer
   TickerFuture? Function({bool forceToggle})? toggle;
