@@ -539,7 +539,7 @@ class _ZoomDrawerState extends State<ZoomDrawer>
   /// Builds the layers of menuScreen
   Widget get menuScreenWidget {
     // Add layer - GestureDetector
-    Widget menuScreen = GestureDetector(
+    final Widget menuScreen = GestureDetector(
       behavior: HitTestBehavior.translucent,
       // onTap shouldn't be null to avoid loosing state
       onTap: _menuScreenTapHandler,
@@ -561,42 +561,50 @@ class _ZoomDrawerState extends State<ZoomDrawer>
       ),
     );
 
-    // Add layer - Transform
-    if (widget.moveMenuScreen && widget.style != DrawerStyle.style1) {
-      final left = (1 - animationValue) * widget.slideWidth * _slideDirection;
-      menuScreen = Transform.translate(
-        offset: Offset(-left, 0),
-        child: menuScreen,
-      );
-    }
-    // Add layer - Overlay color
-    // Material widget needs to be set after ColorFilter,
-    // Storing Material widget in variable will make
-    // ColorFiltered renders only 50% of the width
-    if (widget.menuScreenOverlayColor != null) {
-      final overlayColor = ColorTween(
-        begin: widget.menuScreenOverlayColor,
-        end: widget.menuScreenOverlayColor!.withOpacity(0.0),
-      );
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        final value = _animationController.value;
+        var item = child ?? const SizedBox();
+        // Add layer - Transform
+        if (widget.moveMenuScreen && widget.style != DrawerStyle.style1) {
+          final left =
+              (1 - value) * widget.slideWidth * _slideDirection;
+          item = Transform.translate(
+            offset: Offset(-left, 0),
+            child: item,
+          );
+        }
+        // Add layer - Overlay color
+        // Material widget needs to be set after ColorFilter,
+        // Storing Material widget in variable will make
+        // ColorFiltered renders only 50% of the width
+        if (widget.menuScreenOverlayColor != null) {
+          final overlayColor = ColorTween(
+            begin: widget.menuScreenOverlayColor,
+            end: widget.menuScreenOverlayColor!.withOpacity(0.0),
+          );
 
-      menuScreen = ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          overlayColor.lerp(animationValue)!,
-          widget.overlayBlend,
-        ),
-        child: Material(
-          color: widget.menuBackgroundColor,
-          child: menuScreen,
-        ),
-      );
-    } else {
-      menuScreen = Material(
-        color: widget.menuBackgroundColor,
-        child: menuScreen,
-      );
-    }
-
-    return menuScreen;
+          item = ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              overlayColor.lerp(value)!,
+              widget.overlayBlend,
+            ),
+            child: Material(
+              color: widget.menuBackgroundColor,
+              child: item,
+            ),
+          );
+        } else {
+          item = Material(
+            color: widget.menuBackgroundColor,
+            child: item,
+          );
+        }
+        return item;
+      },
+      child: menuScreen,
+    );
   }
 
   /// Builds the layers of mainScreen
@@ -741,7 +749,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
         case DrawerStyle.style1:
           parentWidget = _Style1Widget(
             animationController: _animationController,
-            animationValue: animationValue,
             widget: widget,
             slideDirection: _slideDirection,
             mainScreenWidget: mainScreenWidget,
@@ -753,7 +760,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
             animationController: _animationController,
             widget: widget,
             slideDirection: _slideDirection,
-            animationValue: animationValue,
             menuScreenWidget: menuScreenWidget,
             mainScreenWidget: mainScreenWidget,
           );
@@ -762,7 +768,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           parentWidget = _Style3Widget(
             animationController: _animationController,
             widget: widget,
-            animationValue: animationValue,
             slideDirection: _slideDirection,
             menuScreenWidget: menuScreenWidget,
             mainScreenWidget: mainScreenWidget,
@@ -772,7 +777,6 @@ class _ZoomDrawerState extends State<ZoomDrawer>
           parentWidget = _Style4Widget(
             animationController: _animationController,
             widget: widget,
-            animationValue: animationValue,
             slideDirection: _slideDirection,
             menuScreenWidget: menuScreenWidget,
             mainScreenWidget: mainScreenWidget,
@@ -871,7 +875,6 @@ class _Style4Widget extends StatelessWidget {
     Key? key,
     required AnimationController animationController,
     required this.widget,
-    required this.animationValue,
     required int slideDirection,
     required this.menuScreenWidget,
     required this.mainScreenWidget,
@@ -881,7 +884,6 @@ class _Style4Widget extends StatelessWidget {
 
   final AnimationController _animationController;
   final ZoomDrawer widget;
-  final double animationValue;
   final int _slideDirection;
   final Widget menuScreenWidget;
   final Widget mainScreenWidget;
@@ -891,6 +893,7 @@ class _Style4Widget extends StatelessWidget {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
+        final animationValue = _animationController.value;
         final xPosition =
             (widget.slideWidth * 1.2) * animationValue * _slideDirection;
         final scalePercentage = 1 - (animationValue * widget.mainScreenScale);
@@ -921,7 +924,6 @@ class _Style3Widget extends StatelessWidget {
     Key? key,
     required AnimationController animationController,
     required this.widget,
-    required this.animationValue,
     required int slideDirection,
     required this.menuScreenWidget,
     required this.mainScreenWidget,
@@ -931,7 +933,6 @@ class _Style3Widget extends StatelessWidget {
 
   final AnimationController _animationController;
   final ZoomDrawer widget;
-  final double animationValue;
   final int _slideDirection;
   final Widget menuScreenWidget;
   final Widget mainScreenWidget;
@@ -941,6 +942,7 @@ class _Style3Widget extends StatelessWidget {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
+        final animationValue = _animationController.value;
         final xPosition =
             (widget.slideWidth / 2) * animationValue * _slideDirection;
         final scalePercentage = 1 - (animationValue * widget.mainScreenScale);
@@ -972,7 +974,6 @@ class _Style2Widget extends StatelessWidget {
     required AnimationController animationController,
     required this.widget,
     required int slideDirection,
-    required this.animationValue,
     required this.menuScreenWidget,
     required this.mainScreenWidget,
   })  : _animationController = animationController,
@@ -982,7 +983,6 @@ class _Style2Widget extends StatelessWidget {
   final AnimationController _animationController;
   final ZoomDrawer widget;
   final int _slideDirection;
-  final double animationValue;
   final Widget menuScreenWidget;
   final Widget mainScreenWidget;
 
@@ -991,6 +991,7 @@ class _Style2Widget extends StatelessWidget {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
+        final animationValue = _animationController.value;
         final xPosition = widget.slideWidth * _slideDirection * animationValue;
         final yPosition = animationValue * widget.slideWidth;
         final scalePercentage = 1 - (animationValue * widget.mainScreenScale);
@@ -1016,7 +1017,6 @@ class _Style1Widget extends StatelessWidget {
   const _Style1Widget({
     Key? key,
     required AnimationController animationController,
-    required this.animationValue,
     required this.widget,
     required int slideDirection,
     required this.mainScreenWidget,
@@ -1026,7 +1026,6 @@ class _Style1Widget extends StatelessWidget {
         super(key: key);
 
   final AnimationController _animationController;
-  final double animationValue;
   final ZoomDrawer widget;
   final int _slideDirection;
   final Widget mainScreenWidget;
@@ -1037,6 +1036,7 @@ class _Style1Widget extends StatelessWidget {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (_, __) {
+        final animationValue = _animationController.value;
         final xOffset =
             (1 - animationValue) * widget.slideWidth * _slideDirection;
 
