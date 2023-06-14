@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 // void main() {
@@ -242,39 +241,33 @@ class _ZoomState extends State<Zoom> {
     return ZoomDrawer(
       controller: z,
       borderRadius: 24,
-      style: DrawerStyle.defaultStyle,
       // showShadow: true,
       openCurve: Curves.fastOutSlowIn,
       slideWidth: MediaQuery.of(context).size.width * 0.65,
       duration: const Duration(milliseconds: 500),
       // angle: 0.0,
-      menuBackgroundColor: Colors.indigo,
+      menuBackgroundColor: Colors.blue,
       mainScreen: const Body(),
-      menuScreen: Theme(
-        data: ThemeData.dark(),
-        child: Scaffold(
-          backgroundColor: Colors.indigo,
-          body: Padding(
-            padding: EdgeInsets.only(left: 25),
-            child: Center(
-              child: TextButton(
-                onPressed: () {
-                  final navigator = Navigator.of(
-                    context,
+moveMenuScreen: false,
+      menuScreen: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: InkWell(
+            onTap: () {
+              final navigator = Navigator.of(
+                context,
+              );
+              z.close?.call()?.then(
+                    (value) => navigator.push(
+                      MaterialPageRoute(
+                        builder: (_) => TestPage(),
+                      ),
+                    ),
                   );
-                  z.close?.call()?.then(
-                        (value) => navigator.push(
-                          MaterialPageRoute(
-                            builder: (_) => TestPage(),
-                          ),
-                        ),
-                      );
-                },
-                child: Text(
-                  "Push Page",
-                  style: TextStyle(fontSize: 24.0, color: Colors.white),
-                ),
-              ),
+            },
+            child: Text(
+              "Push Page",
+              style: TextStyle(fontSize: 24.0, color: Colors.black),
             ),
           ),
         ),
