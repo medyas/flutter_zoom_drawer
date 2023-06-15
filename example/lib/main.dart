@@ -240,6 +240,41 @@ class _ZoomState extends State<Zoom> {
   Widget build(BuildContext context) {
     return ZoomDrawer(
       controller: z,
+      borderRadius: 50,
+      // showShadow: true,
+      openCurve: Curves.fastOutSlowIn,
+      slideWidth: MediaQuery.of(context).size.width * 0.65,
+      duration: const Duration(milliseconds: 500),
+      // angle: 0.0,
+      menuBackgroundColor: Colors.blue,
+      mainScreen: const Body(),
+      // moveMenuScreen: false,
+      menuScreen: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: InkWell(
+            onTap: () {
+              final navigator = Navigator.of(
+                context,
+              );
+              z.close?.call()?.then(
+                    (value) => navigator.push(
+                  MaterialPageRoute(
+                    builder: (_) => TestPage(),
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              "Push Page",
+              style: TextStyle(fontSize: 24.0, color: Colors.black),
+            ),
+          ),
+        ),
+      ),
+    );
+    return ZoomDrawer(
+      controller: z,
       borderRadius: 24,
       // showShadow: true,
       openCurve: Curves.fastOutSlowIn,
@@ -248,7 +283,7 @@ class _ZoomState extends State<Zoom> {
       // angle: 0.0,
       menuBackgroundColor: Colors.blue,
       mainScreen: const Body(),
-moveMenuScreen: false,
+      moveMenuScreen: false,
       menuScreen: Scaffold(
         backgroundColor: Colors.white,
         body: Center(

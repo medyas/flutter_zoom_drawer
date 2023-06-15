@@ -35,48 +35,34 @@ class StyleDefaultWidget extends StatelessWidget {
 
     return Stack(
       children: [
-        AnimatedBuilder(
-          animation: animationController,
-          builder: (_, __) => menuScreenWidget,
-        ),
+        menuScreenWidget,
         if (showShadow) ...[
           /// Displaying the first shadow
-          AnimatedBuilder(
-            animation: animationController,
-            builder: (_, w) => applyDefaultStyle(
-              w,
-              angle: (angle == 0.0) ? 0.0 : angle - 8,
-              scale: .9,
-              slide: slidePercent * 2,
-            ),
-            child: Container(
+          applyDefaultStyle(
+            Container(
               color: shadowLayer1Color ??
                   drawerShadowsBackgroundColor.withAlpha(60),
             ),
+            angle: (angle == 0.0) ? 0.0 : angle - 8,
+            scale: .9,
+            slide: slidePercent * 2,
           ),
 
           /// Displaying the second shadow
-          AnimatedBuilder(
-            animation: animationController,
-            builder: (_, w) => applyDefaultStyle(
-              w,
-              angle: (angle == 0.0) ? 0.0 : angle - 4.0,
-              scale: .95,
-              slide: slidePercent,
-            ),
-            child: Container(
+          applyDefaultStyle(
+            Container(
               color: shadowLayer2Color ??
                   drawerShadowsBackgroundColor.withAlpha(180),
             ),
+            angle: (angle == 0.0) ? 0.0 : angle - 4.0,
+            scale: .95,
+            slide: slidePercent,
           )
         ],
 
         /// Displaying the Main screen
-        AnimatedBuilder(
-          animation: animationController,
-          builder: (_, __) => applyDefaultStyle(
-            mainScreenWidget,
-          ),
+        applyDefaultStyle(
+          mainScreenWidget,
         ),
       ],
     );

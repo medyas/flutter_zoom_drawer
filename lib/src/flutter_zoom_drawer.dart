@@ -726,79 +726,74 @@ class ZoomDrawerState extends State<ZoomDrawer>
         case DrawerStyle.style1:
           parentWidget = AnimatedBuilder(
             animation: _animationController,
-            builder: (context, _) {
-              return Style1Widget(
-                animationValue: _animationValue,
-                isRtl: widget.isRtl,
-                mainScreenScale: widget.mainScreenScale,
-                slideWidth: widget.slideWidth,
-                menuBackgroundColor: widget.menuBackgroundColor,
-                slideDirection: _slideDirection,
-                mainScreenWidget: mainScreenWidget,
-                menuScreenWidget: menuScreenWidget,
-              );
-            },
+            builder: (context, _) => Style1Widget(
+              animationValue: _animationValue,
+              isRtl: widget.isRtl,
+              mainScreenScale: widget.mainScreenScale,
+              slideWidth: widget.slideWidth,
+              menuBackgroundColor: widget.menuBackgroundColor,
+              slideDirection: _slideDirection,
+              mainScreenWidget: mainScreenWidget,
+              menuScreenWidget: menuScreenWidget,
+            ),
           );
           break;
         case DrawerStyle.style2:
           parentWidget = AnimatedBuilder(
             animation: _animationController,
-            builder: (context, _) {
-              return Style2Widget(
-                isRtl: widget.isRtl,
-                mainScreenScale: widget.mainScreenScale,
-                slideWidth: widget.slideWidth,
-                slideDirection: _slideDirection,
-                animationValue: _animationValue,
-                menuScreenWidget: menuScreenWidget,
-                mainScreenWidget: mainScreenWidget,
-              );
-            },
+            builder: (context, _) => Style2Widget(
+              isRtl: widget.isRtl,
+              mainScreenScale: widget.mainScreenScale,
+              slideWidth: widget.slideWidth,
+              slideDirection: _slideDirection,
+              animationValue: _animationValue,
+              menuScreenWidget: menuScreenWidget,
+              mainScreenWidget: mainScreenWidget,
+            ),
           );
           break;
         case DrawerStyle.style3:
           parentWidget = AnimatedBuilder(
             animation: _animationController,
-            builder: (context, _) {
-              return Style3Widget(
-                isRtl: widget.isRtl,
-                mainScreenScale: widget.mainScreenScale,
-                slideWidth: widget.slideWidth,
-                animationValue: _animationValue,
-                slideDirection: _slideDirection,
-                menuScreenWidget: menuScreenWidget,
-                mainScreenWidget: mainScreenWidget,
-              );
-            },
+            builder: (context, _) => Style3Widget(
+              isRtl: widget.isRtl,
+              mainScreenScale: widget.mainScreenScale,
+              slideWidth: widget.slideWidth,
+              animationValue: _animationValue,
+              slideDirection: _slideDirection,
+              menuScreenWidget: menuScreenWidget,
+              mainScreenWidget: mainScreenWidget,
+            ),
           );
           break;
         case DrawerStyle.style4:
           parentWidget = AnimatedBuilder(
             animation: _animationController,
-            builder: (context, _) {
-              return Style4Widget(
-                isRtl: widget.isRtl,
-                mainScreenScale: widget.mainScreenScale,
-                slideWidth: widget.slideWidth,
-                animationValue: _animationValue,
-                slideDirection: _slideDirection,
-                menuScreenWidget: menuScreenWidget,
-                mainScreenWidget: mainScreenWidget,
-              );
-            },
+            builder: (context, _) => Style4Widget(
+              isRtl: widget.isRtl,
+              mainScreenScale: widget.mainScreenScale,
+              slideWidth: widget.slideWidth,
+              animationValue: _animationValue,
+              slideDirection: _slideDirection,
+              menuScreenWidget: menuScreenWidget,
+              mainScreenWidget: mainScreenWidget,
+            ),
           );
           break;
         default:
-          parentWidget = StyleDefaultWidget(
-            animationController: _animationController,
-            mainScreenWidget: mainScreenWidget,
-            menuScreenWidget: menuScreenWidget,
-            angle: widget.angle,
-            showShadow: widget.showShadow,
-            shadowLayer1Color: widget.shadowLayer1Color,
-            shadowLayer2Color: widget.shadowLayer2Color,
-            drawerShadowsBackgroundColor: widget.drawerShadowsBackgroundColor,
-            applyDefaultStyle: _applyDefaultStyle,
+          parentWidget = AnimatedBuilder(
+            animation: _animationController,
+            builder: (_, __) => StyleDefaultWidget(
+              animationController: _animationController,
+              mainScreenWidget: mainScreenWidget,
+              menuScreenWidget: menuScreenWidget,
+              angle: widget.angle,
+              showShadow: widget.showShadow,
+              shadowLayer1Color: widget.shadowLayer1Color,
+              shadowLayer2Color: widget.shadowLayer2Color,
+              drawerShadowsBackgroundColor: widget.drawerShadowsBackgroundColor,
+              applyDefaultStyle: _applyDefaultStyle,
+            ),
           );
       }
     }

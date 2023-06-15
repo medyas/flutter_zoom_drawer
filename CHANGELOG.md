@@ -1,3 +1,6 @@
+# [3.1.1]
+- Fix for [#125](https://github.com/medyas/flutter_zoom_drawer/issues/125)
+
 # [3.1.0]
 - Fix for [#122](https://github.com/medyas/flutter_zoom_drawer/issues/122)
 - Refactor the package structure
