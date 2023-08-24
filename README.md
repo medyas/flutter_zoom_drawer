@@ -4,7 +4,7 @@
 
 A Flutter package with custom implementation of the Side Menu (Drawer)
 
-## Getting Started
+## 🌟 Getting Started
 
 To start using this package, add `flutter_zoom_drawer` dependency to your `pubspec.yaml`
 
@@ -13,60 +13,18 @@ dependencies:
   flutter_zoom_drawer: "<latest_release>"
 ```
 
-## Version 3 Breaking changes
+## ⚠ Version 3 Breaking Changes for Style
+| Old Style | New Style |
+| -------------|---------------|
+| `DrawerStyle.style1`   | `DrawerStyle.defaultStyle`   |
+| `DrawerStyle.style2` | `DrawerStyle.defaultStyle`   | 
+| `DrawerStyle.style3`| `DrawerStyle.defaultStyle`   |
+| `DrawerStyle.style4`| `DrawerStyle.style1`   |
+| `DrawerStyle.style5`| `DrawerStyle.style2`   |
+| `DrawerStyle.style6`| `DrawerStyle.style3`   |
+| `DrawerStyle.style7`| `DrawerStyle.style4`   |
 
-### Style 1 changed to defaultStyle
-
-Before merge:
-`ZoomDrawer( style: DrawerStyle.style1, )`
-Now:
-
-```
-ZoomDrawer(
-style: DrawerStyle.defaultStyle,
-showShadow: true,
-moveMenuScreen: false,
-)
-```
-
-### Style 2 changed to defaultStyle
-
-Before merge:
-`ZoomDrawer( style: DrawerStyle.style2, )`
-Now:
-`ZoomDrawer( style: DrawerStyle.defaultStyle, )`
-
-### Style 3 changed to defaultStyle
-
-Before merge:
-`ZoomDrawer( style: DrawerStyle.style3, )`
-Now:
-`ZoomDrawer( style: DrawerStyle.defaultStyle, moveMenuScreen: false, )`
-
-### Style 4 changed to Style 1
-
-### Style 5 changed to Style 2
-
-### Style 6 changed to Style 3
-
-### Style 7 changed to Style 4
-
-### Style 8 changed to defaultStyle
-
-Before merge:
-`ZoomDrawer( style: DrawerStyle.style8, )`
-
-Now:
-
-```
-ZoomDrawer(
-style: DrawerStyle.defaultStyle,
-moveMenuScreen: false,
-slideWidth: MediaQuery.of(context).screenWidth * 0.5 // set slideWidth
-)
-```
-
-## Features
+## 💪 Features
 
 - Simple sliding drawer
 - Sliding drawer with shadows
@@ -74,7 +32,7 @@ slideWidth: MediaQuery.of(context).screenWidth * 0.5 // set slideWidth
 - Sliding drawer with rotation and shadows
 - Support for both LTR & RTL
 
-## Simple Example (Thanks to @JesusHdezWaterloo)
+## 📌 Simple Example (Thanks to @JesusHdezWaterloo)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -158,7 +116,7 @@ class MyDrawerController extends GetxController {
 }
 ```
 
-## Documentation
+## 📝 Documentation
 
 ```dart
     ZoomDrawer(
@@ -176,8 +134,8 @@ class MyDrawerController extends GetxController {
     )
 ```
 
-| Parameters                     | Value                  | Required | Docs                                                                            |
-| ------------------------------ | ---------------------- | :------: | ------------------------------------------------------------------------------- | --- |
+| Parameters | Value | Required | Docs |
+| ---------- | ----- | :------: | ---- | 
 | `controller`                   | `ZoomDrawerController` |    No    | Controller to have access to the open/close/toggle function of the drawer       |
 | `style`                        | `DrawerStyle`          |    No    | the drawer style to be displayed (check the `DrawerStyle` enum)                 |
 | `mainScreen`                   | `Widget`               |   Yes    | Screen containing the main content to display                                   |
@@ -199,20 +157,20 @@ class MyDrawerController extends GetxController {
 | `shrinkMainScreen`             | `bool`                 |    No    | Shrinks the mainScreen by [slideWidth], good on desktop with Style2             |
 | `drawerStyleBuilder`           | `DrawerStyleBuilder`   |    No    | Build custom animated style to override [DrawerStyle]                           |
 
-### Controlling the drawer
+## 🕹️ Drawer Usage
 
-To get access to the drawer, and be able to control it, there are 2 ways:
+To use the drawer, and be able to control it, there are **2** ways:
 
-- Using a `ZoomDrawerController` inside the main widget where ou have the `ZoomDrawer` widget and providing it to the widget, which will allow you to trigger the open/close/toggle methods.
+- Using a `ZoomDrawerController` inside the main widget where you have the `ZoomDrawer` widget and providing it to the widget, which will allow you to trigger the open/close/toggle methods.
 
 ```dart
-    final _drawerController = ZoomDrawerController();
+    final drawerController = ZoomDrawerController();
 
-    _drawerController.open();
-    _drawerController.close();
-    _drawerController.toggle();
-    _drawerController.isOpen();
-    _drawerController.stateNotifier;
+    drawerController.open();
+    drawerController.close();
+    drawerController.toggle();
+    drawerController.isOpen();
+    drawerController.stateNotifier;
 ```
 
 - Using the static method inside ancestor widgets to get access to the `ZoomDrawer`.
