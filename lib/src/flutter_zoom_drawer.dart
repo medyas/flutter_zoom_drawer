@@ -25,6 +25,7 @@ class ZoomDrawer extends StatefulWidget {
     this.controller,
     this.mainScreenScale = 0.3,
     this.slideWidth = 275.0,
+    this.slideHeight = 0,
     this.menuScreenWidth,
     this.borderRadius = 16.0,
     this.angle = -12.0,
@@ -55,7 +56,7 @@ class ZoomDrawer extends StatefulWidget {
     this.shrinkMainScreen = false,
     this.boxShadow,
     this.drawerStyleBuilder,
-  }) : assert(angle <= 0.0 && angle >= -30.0);
+  });
 
   /// Layout style
   final DrawerStyle style;
@@ -74,6 +75,9 @@ class ZoomDrawer extends StatefulWidget {
 
   /// Sliding width of the drawer
   final double slideWidth;
+
+  /// Sliding height of the drawer
+  final double slideHeight;
 
   /// menuScreen Width
   /// Set it to double.infinity to make it take screen width
@@ -487,9 +491,14 @@ class ZoomDrawerState extends State<ZoomDrawer>
         break;
     }
 
-    /// Sliding
+    /// Sliding X
     final xPosition =
         ((widget.slideWidth - slide) * _animationValue * _slideDirection) *
+            slidePercent;
+
+    /// Sliding Y
+    final yPosition =
+        ((widget.slideHeight - slide) * _animationValue * _slideDirection) *
             slidePercent;
 
     /// Scale
@@ -504,7 +513,7 @@ class ZoomDrawerState extends State<ZoomDrawer>
             _slideDirection;
 
     return Transform(
-      transform: Matrix4.translationValues(xPosition, 0.0, 0.0)
+      transform: Matrix4.translationValues(xPosition, yPosition, 0.0)
         ..rotateZ(rotationAngle)
         ..scale(scalePercentage, scalePercentage),
       alignment: widget.isRtl ? Alignment.centerRight : Alignment.centerLeft,
