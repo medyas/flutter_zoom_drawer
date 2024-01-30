@@ -1,3 +1,6 @@
+# [3.1.2]
+- Added ability to change mainMenu slide height and removed angle limitation (#132)
+
 # [3.1.1+1]
 - docs: Improved ReadMe file
 

@@ -134,13 +134,14 @@ class MyDrawerController extends GetxController {
     )
 ```
 
-| Parameters | Value | Required | Docs |
-| ---------- | ----- | :------: | ---- | 
+| Parameters | Value | Required | Docs                                                                            |
+| ---------- | ----- | :------: |---------------------------------------------------------------------------------| 
 | `controller`                   | `ZoomDrawerController` |    No    | Controller to have access to the open/close/toggle function of the drawer       |
 | `style`                        | `DrawerStyle`          |    No    | the drawer style to be displayed (check the `DrawerStyle` enum)                 |
 | `mainScreen`                   | `Widget`               |   Yes    | Screen containing the main content to display                                   |
 | `menuScreen`                   | `Widget`               |   Yes    | Screen containing the menu/bottom screen                                        |
 | `slideWidth`                   | `double`               |    No    | Sliding width of the drawer - defaults to 275.0                                 |
+| `slideHeight`                  | `double`               |    No    | Sliding height of the drawer - defaults to 0.0                                  |
 | `mainScreenScale`              | `double`               |    No    | MainScreen scale - defaults to 0.3                                              |
 | `borderRadius`                 | `double`               |    No    | Border radius of the slided content - defaults to 16.0                          |
 | `angle`                        | `double`               |    No    | Rotation angle of the drawer - defaults to -12.0 - should be 0.0 to -30.0       |
