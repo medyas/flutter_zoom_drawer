@@ -245,6 +245,7 @@ class _ZoomState extends State<Zoom> {
       openCurve: Curves.fastOutSlowIn,
       slideWidth: MediaQuery.of(context).size.width * 0.65,
       duration: const Duration(milliseconds: 500),
+      menuScreenTapClose: true,
       // angle: 0.0,
       menuBackgroundColor: Colors.blue,
       mainScreen: const Body(),
@@ -259,11 +260,11 @@ class _ZoomState extends State<Zoom> {
               );
               z.close?.call()?.then(
                     (value) => navigator.push(
-                  MaterialPageRoute(
-                    builder: (_) => TestPage(),
-                  ),
-                ),
-              );
+                      MaterialPageRoute(
+                        builder: (_) => TestPage(),
+                      ),
+                    ),
+                  );
             },
             child: Text(
               "Push Page",
@@ -341,15 +342,15 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: IconButton(
-          onPressed: () {
-            controller.fling(velocity: isPanelVisible ? -1.0 : 1.0);
-          },
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.close_menu,
-            progress: controller.view,
-          ),
+        onPressed: () {
+          z.stateNotifier?.addListener(() {
+            print("========> State: ${z.stateNotifier?.value}");
+          });
+          controller.fling(velocity: isPanelVisible ? -1.0 : 1.0);
+        },
+        child: AnimatedIcon(
+          icon: AnimatedIcons.close_menu,
+          progress: controller.view,
         ),
       ),
       body: TwoPanels(
