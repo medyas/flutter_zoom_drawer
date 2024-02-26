@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math' show pi;
 import 'dart:ui';
 
@@ -819,12 +818,10 @@ class ZoomDrawerState extends State<ZoomDrawer>
     }
 
     // Add layer - WillPopScope
-    if (!kIsWeb && Platform.isAndroid && widget.androidCloseOnBackTap) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && widget.androidCloseOnBackTap) {
       parentWidget = WillPopScope(
         onWillPop: () async {
-          // Case drawer is opened or will open, either way will close
-          if ([DrawerState.open, DrawerState.opening]
-              .contains(stateNotifier.value)) {
+          if ([DrawerState.open, DrawerState.opening].contains(stateNotifier.value)) {
             close();
             return false;
           }
