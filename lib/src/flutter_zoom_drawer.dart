@@ -104,7 +104,7 @@ class ZoomDrawer extends StatefulWidget {
   final bool showShadow;
 
   /// Close drawer on android back button
-  /// Note: This won't work if you are using WillPopScope in mainScreen,
+  /// Note: This won't work if you are using PopScope in mainScreen,
   /// If that is the case, you have to manually close the drawer from there
   /// By using ZoomDrawer.of(context)?.close()
   final bool androidCloseOnBackTap;
@@ -817,20 +817,24 @@ class ZoomDrawerState extends State<ZoomDrawer>
       );
     }
 
-    // Add layer - WillPopScope
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && widget.androidCloseOnBackTap) {
-      parentWidget = WillPopScope(
-        onWillPop: () async {
-          if ([DrawerState.open, DrawerState.opening].contains(stateNotifier.value)) {
-            close();
-            return false;
-          }
-          return true;
-        },
+    // Add layer - PopScope
+    if (!kIsWeb &&
+        defaultTargetPlatform == TargetPlatform.android &&
+        widget.androidCloseOnBackTap) {
+      parentWidget = PopScope(
+        canPop: _canPop(),
         child: parentWidget,
       );
     }
 
     return parentWidget;
+  }
+
+  bool _canPop() {
+    if ([DrawerState.open, DrawerState.opening].contains(stateNotifier.value)) {
+      close();
+      return false;
+    }
+    return true;
   }
 }
