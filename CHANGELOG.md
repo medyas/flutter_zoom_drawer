@@ -1,3 +1,7 @@
+# [3.2.0]
+- Remove the use of `dart:io` to be able to support web
+- Migrate from `WillPopScope` to `PopScope`
+
 # [3.1.2]
 - Added ability to change mainMenu slide height and removed angle limitation (#132)
 
