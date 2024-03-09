@@ -55,6 +55,7 @@ class ZoomDrawer extends StatefulWidget {
     this.shrinkMainScreen = false,
     this.boxShadow,
     this.drawerStyleBuilder,
+    this.onAnimationValueChange,
   });
 
   /// Layout style
@@ -186,6 +187,9 @@ class ZoomDrawer extends StatefulWidget {
   /// ```
   final DrawerStyleBuilder? drawerStyleBuilder;
 
+  /// Listen to the change of animation value
+  final void Function(double value)? onAnimationValueChange;
+
   @override
   ZoomDrawerState createState() => ZoomDrawerState();
 
@@ -216,7 +220,9 @@ class ZoomDrawerState extends State<ZoomDrawer>
     vsync: this,
     duration: widget.duration,
     reverseDuration: widget.duration,
-  )..addStatusListener(_animationStatusListener);
+  )
+    ..addStatusListener(_animationStatusListener)
+    ..addListener(() => widget.onAnimationValueChange?.call(_animationValue));
 
   double get _animationValue => _animationController.value;
 
