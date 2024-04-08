@@ -503,8 +503,7 @@ class ZoomDrawerState extends State<ZoomDrawer>
 
     /// Sliding Y
     final yPosition =
-        ((widget.slideHeight - slide) * _animationValue * _slideDirection) *
-            slidePercent;
+        ((widget.slideHeight - slide) * _animationValue) * slidePercent;
 
     /// Scale
     final scalePercentage = scale - (widget.mainScreenScale * scalePercent);
